@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.LastChangesets.LastChangesetsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Button Grid.Row="0" Content="Get Last Changesets" Command="{Binding Path=GetLastChangesetsCommand}" Margin="0,0,0,5" />
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Changesets}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="changesetsDataGrid" SelectionChanged="changesetsDataGrid_SelectionChanged" MouseDoubleClick="changesetsDataGrid_MouseDoubleClick">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                <DataGridTextColumn Header="Changeset ID" Binding="{Binding Path=Id}" />
+                <DataGridTextColumn Header="Committer" Binding="{Binding Path=Committer}" />
+                <DataGridTextColumn Header="Time" Binding="{Binding Path=CreationTime}" />
+                <DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button Grid.Row="2" Content="View Changeset Details" Command="{Binding Path=ViewChangesetDetailsCommand}" Margin="0,5,0,0" />
+
+    </Grid>
+</UserControl>

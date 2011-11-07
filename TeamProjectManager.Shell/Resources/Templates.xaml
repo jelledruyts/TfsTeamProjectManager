@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mtc="clr-namespace:Microsoft.TeamFoundation.Client;assembly=Microsoft.TeamFoundation.Client"
+                    xmlns:mts="clr-namespace:Microsoft.TeamFoundation.Server;assembly=Microsoft.TeamFoundation">
+
+    <DataTemplate DataType="{x:Type mtc:RegisteredProjectCollection}">
+        <TextBlock Text="{Binding Name}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type mts:ProjectInfo}">
+        <TextBlock Text="{Binding}" />
+    </DataTemplate>
+
+</ResourceDictionary>

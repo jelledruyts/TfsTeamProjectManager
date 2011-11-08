@@ -107,12 +107,36 @@
 
     <!-- Tab Items With Headers -->
     <Style x:Key="ShellTabItemStyle" TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
-        <Setter Property="Header" Value="{Binding Path=Content.DataContext.HeaderInfo, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Header" Value="{Binding Path=Content.DataContext.Title, RelativeSource={RelativeSource Self}}" />
         <Setter Property="FontSize" Value="14" />
     </Style>
 
     <Style TargetType="{x:Type Expander}">
         <Setter Property="IsExpanded" Value="True" />
+    </Style>
+
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="10,2,10,2" />
+    </Style>
+
+    <Style x:Key="CheckedListBoxStyle" TargetType="{x:Type ListBox}">
+        <!-- Remove the white background for disabled list boxes -->
+        <!-- See http://stackoverflow.com/questions/2594714/change-background-color-of-disabled-listbox-in-windows-classic-theme -->
+        <Style.Resources>
+            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="Transparent"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+        </Style.Resources>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" IsEnabled="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsEnabled}" Content="{Binding}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type Hyperlink}">

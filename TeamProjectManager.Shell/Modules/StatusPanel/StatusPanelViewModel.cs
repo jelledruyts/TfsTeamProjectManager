@@ -37,7 +37,7 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
         /// </summary>
         [ImportingConstructor]
         public StatusPanelViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger)
+            : base("Status Panel", eventAggregator, logger)
         {
             this.removeTasksTimer = new Timer(1000); // Check every second to remove tasks.
             this.removeTasksTimer.Elapsed += new ElapsedEventHandler(OnRemoveTasksTimerElapsed);

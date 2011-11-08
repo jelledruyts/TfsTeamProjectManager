@@ -41,7 +41,7 @@ namespace TeamProjectManager.Shell
 
         [ImportingConstructor]
         public ShellViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger)
+            : base("Shell", eventAggregator, logger)
         {
             this.HeaderTitle = DefaultWindowTitle;
             this.HeaderSubtitle = "v" + App.ApplicationVersion.ToString(3);

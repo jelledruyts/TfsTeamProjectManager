@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Controls;
 using TeamProjectManager.Common.Events;
@@ -26,16 +26,8 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         #endregion
 
-        #region Fields
-
-        private RegisteredProjectCollection selectedTeamProjectCollection;
-        private ICollection<ProjectInfo> selectedTeamProjects;
-
-        #endregion
-
         #region Properties
 
-        public string HeaderInfo { get { return "Last Changesets"; } }
         public RelayCommand GetLastChangesetsCommand { get; private set; }
         public RelayCommand ViewChangesetDetailsCommand { get; private set; }
 
@@ -65,11 +57,10 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         [ImportingConstructor]
         public LastChangesetsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger)
+            : base("Last Changesets", eventAggregator, logger)
         {
             this.GetLastChangesetsCommand = new RelayCommand(GetLastChangesets, CanGetLastChangesets);
             this.ViewChangesetDetailsCommand = new RelayCommand(ViewChangesetDetails, CanViewChangesetDetails);
-            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => { this.selectedTeamProjectCollection = e.SelectedTeamProjectCollection; this.selectedTeamProjects = e.SelectedTeamProjects; });
         }
 
         #endregion
@@ -78,12 +69,12 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private bool CanGetLastChangesets(object argument)
         {
-            return (this.selectedTeamProjectCollection != null && this.selectedTeamProjects != null && this.selectedTeamProjects.Count > 0);
+            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0);
         }
 
         private void GetLastChangesets(object argument)
         {
-            var projects = this.selectedTeamProjects.Select(p => p.Name).ToList();
+            var projects = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var task = new ApplicationTask("Retrieving last changesets", projects.Count);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
@@ -91,9 +82,9 @@ namespace TeamProjectManager.Modules.LastChangesets
             {
                 var changesets = new List<ChangesetInfo>();
                 var step = 0;
-                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.selectedTeamProjectCollection.Uri))
+                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
                 {
-                    var vcs = (VersionControlServer)tfs.GetService(typeof(VersionControlServer));
+                    var vcs = tfs.GetService<VersionControlServer>();
                     foreach (var project in projects)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", project));
@@ -149,13 +140,22 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private void ViewChangesetDetails(object argument)
         {
-            var changeset = this.SelectedChangesets.First().Changeset;
-            var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-            var args = new object[] { changeset.VersionControlServer, changeset, false };
-            using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChangesetDetails", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+            try
             {
-                dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                var changeset = this.SelectedChangesets.First().Changeset;
+                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
+                var args = new object[] { changeset.VersionControlServer, changeset, false };
+                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChangesetDetails", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+                {
+                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+                    dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                }
+            }
+            catch (Exception exc)
+            {
+                var message = "There was a problem showing the internal TFS changeset details dialog.";
+                Logger.Log(message, exc, TraceEventType.Warning);
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

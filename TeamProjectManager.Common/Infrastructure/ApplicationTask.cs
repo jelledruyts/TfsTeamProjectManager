@@ -9,6 +9,8 @@ namespace TeamProjectManager.Common.Infrastructure
     /// </summary>
     public class ApplicationTask : ObservableObject
     {
+        // TODO: Make cancellable.
+
         #region Observable Properties
 
         /// <summary>

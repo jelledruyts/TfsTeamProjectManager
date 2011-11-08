@@ -8,6 +8,7 @@ using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Server;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -26,39 +27,39 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         #region Observable Properties
 
-        public IEnumerable<RegisteredProjectCollection> TeamProjectCollections
+        public IEnumerable<RegisteredProjectCollection> TfsTeamProjectCollections
         {
-            get { return this.GetValue(TeamProjectCollectionsProperty); }
-            set { this.SetValue(TeamProjectCollectionsProperty, value); }
+            get { return this.GetValue(TfsTeamProjectCollectionsProperty); }
+            set { this.SetValue(TfsTeamProjectCollectionsProperty, value); }
         }
 
-        public static ObservableProperty<IEnumerable<RegisteredProjectCollection>> TeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<RegisteredProjectCollection>, TeamProjectsViewModel>(o => o.TeamProjectCollections);
+        public static ObservableProperty<IEnumerable<RegisteredProjectCollection>> TfsTeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<RegisteredProjectCollection>, TeamProjectsViewModel>(o => o.TfsTeamProjectCollections);
 
         [Export]
-        public RegisteredProjectCollection SelectedTeamProjectCollection
+        public RegisteredProjectCollection SelectedTfsTeamProjectCollection
         {
-            get { return this.GetValue(SelectedTeamProjectCollectionProperty); }
-            set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
+            get { return this.GetValue(SelectedTfsTeamProjectCollectionProperty); }
+            set { this.SetValue(SelectedTfsTeamProjectCollectionProperty, value); }
         }
 
-        public static ObservableProperty<RegisteredProjectCollection> SelectedTeamProjectCollectionProperty = new ObservableProperty<RegisteredProjectCollection, TeamProjectsViewModel>(o => o.SelectedTeamProjectCollection, null, OnSelectedTeamProjectCollectionChanged);
+        public static ObservableProperty<RegisteredProjectCollection> SelectedTfsTeamProjectCollectionProperty = new ObservableProperty<RegisteredProjectCollection, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjectCollection, null, OnSelectedTfsTeamProjectCollectionChanged);
 
         [Export]
-        public IEnumerable<ProjectInfo> TeamProjects
+        public IEnumerable<ProjectInfo> TfsTeamProjects
         {
-            get { return this.GetValue(TeamProjectsProperty); }
-            set { this.SetValue(TeamProjectsProperty, value); }
+            get { return this.GetValue(TfsTeamProjectsProperty); }
+            set { this.SetValue(TfsTeamProjectsProperty, value); }
         }
 
-        public static ObservableProperty<IEnumerable<ProjectInfo>> TeamProjectsProperty = new ObservableProperty<IEnumerable<ProjectInfo>, TeamProjectsViewModel>(o => o.TeamProjects, OnTeamProjectsChanged);
+        public static ObservableProperty<IEnumerable<ProjectInfo>> TfsTeamProjectsProperty = new ObservableProperty<IEnumerable<ProjectInfo>, TeamProjectsViewModel>(o => o.TfsTeamProjects, OnTfsTeamProjectsChanged);
 
-        public ICollection<ProjectInfo> SelectedTeamProjects
+        public ICollection<ProjectInfo> SelectedTfsTeamProjects
         {
-            get { return this.GetValue(SelectedTeamProjectsProperty); }
-            set { this.SetValue(SelectedTeamProjectsProperty, value); }
+            get { return this.GetValue(SelectedTfsTeamProjectsProperty); }
+            set { this.SetValue(SelectedTfsTeamProjectsProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<ProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<ProjectInfo>, TeamProjectsViewModel>(o => o.SelectedTeamProjects, null, OnSelectedTeamProjectsChanged);
+        public static ObservableProperty<ICollection<ProjectInfo>> SelectedTfsTeamProjectsProperty = new ObservableProperty<ICollection<ProjectInfo>, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjects, null, OnSelectedTfsTeamProjectsChanged);
 
         public Visibility TeamProjectsVisibility
         {
@@ -84,13 +85,21 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         public static ObservableProperty<string> InfoMessageProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessage);
 
+        public bool IsTeamProjectsLoadComplete
+        {
+            get { return this.GetValue(IsTeamProjectsLoadCompleteProperty); }
+            set { this.SetValue(IsTeamProjectsLoadCompleteProperty, value); }
+        }
+
+        public static ObservableProperty<bool> IsTeamProjectsLoadCompleteProperty = new ObservableProperty<bool, TeamProjectsViewModel>(o => o.IsTeamProjectsLoadComplete, true);
+
         #endregion
 
         #region Constructors
 
         [ImportingConstructor]
         public TeamProjectsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger)
+            : base("Team Projects", eventAggregator, logger)
         {
             this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection);
             RefreshTeamProjectCollections(null);
@@ -100,24 +109,26 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         #region Property Change Handlers
 
-        private static void OnTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<IEnumerable<ProjectInfo>> e)
+        private static void OnTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<IEnumerable<ProjectInfo>> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.SelectedTeamProjects = null;
+            viewModel.SelectedTfsTeamProjects = null;
         }
 
-        private static void OnSelectedTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<RegisteredProjectCollection> e)
+        private static void OnSelectedTfsTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<RegisteredProjectCollection> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            if (viewModel.SelectedTeamProjectCollection != null)
+            viewModel.TfsTeamProjects = null;
+            if (viewModel.SelectedTfsTeamProjectCollection != null)
             {
-                var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", viewModel.SelectedTeamProjectCollection.Name));
+                var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", viewModel.SelectedTfsTeamProjectCollection.Name));
                 viewModel.SetInfoMessage("Loading...");
                 viewModel.PublishStatus(new StatusEventArgs(task));
+                viewModel.IsTeamProjectsLoadComplete = false;
                 var worker = new BackgroundWorker();
                 worker.DoWork += (bsender, be) =>
                 {
-                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(viewModel.SelectedTeamProjectCollection.Uri))
+                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(viewModel.SelectedTfsTeamProjectCollection.Uri))
                     {
                         var store = tfs.GetService<ICommonStructureService>();
                         be.Result = store.ListAllProjects().OrderBy(p => p.Name);
@@ -133,23 +144,22 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                     }
                     else
                     {
-                        viewModel.TeamProjects = (IEnumerable<ProjectInfo>)be.Result;
-                        task.SetComplete("Retrieved " + viewModel.TeamProjects.Count().ToCountString("team project"));
+                        viewModel.TfsTeamProjects = (IEnumerable<ProjectInfo>)be.Result;
+                        task.SetComplete("Retrieved " + viewModel.TfsTeamProjects.Count().ToCountString("team project"));
                     }
                     viewModel.ClearInfoMessage();
+                    viewModel.IsTeamProjectsLoadComplete = true;
                 };
                 worker.RunWorkerAsync();
             }
-            else
-            {
-                viewModel.TeamProjects = null;
-            }
         }
 
-        private static void OnSelectedTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<ProjectInfo>> e)
+        private static void OnSelectedTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<ProjectInfo>> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(viewModel.SelectedTeamProjectCollection, viewModel.SelectedTeamProjects));
+            var selectedTeamProjectCollection = viewModel.SelectedTfsTeamProjectCollection == null ? null : new TeamProjectCollectionInfo(viewModel.SelectedTfsTeamProjectCollection.Name, viewModel.SelectedTfsTeamProjectCollection.Uri);
+            var selectedTeamProjects = viewModel.SelectedTfsTeamProjects == null ? null : viewModel.SelectedTfsTeamProjects.Select(p => new TeamProjectInfo(p.Name, new Uri(p.Uri))).ToList();
+            viewModel.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(selectedTeamProjectCollection, selectedTeamProjects));
         }
 
         #endregion
@@ -179,8 +189,8 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             try
             {
                 SetInfoMessage("Loading...");
-                this.TeamProjectCollections = RegisteredTfsConnections.GetProjectCollections();
-                this.SelectedTeamProjectCollection = this.TeamProjectCollections.FirstOrDefault(t => t.Name == selectedTeamProjectCollectionName);
+                this.TfsTeamProjectCollections = RegisteredTfsConnections.GetProjectCollections();
+                this.SelectedTfsTeamProjectCollection = this.TfsTeamProjectCollections.FirstOrDefault(t => t.Name == selectedTeamProjectCollectionName);
                 SetInfoMessage("Please select a project collection");
             }
             catch (Exception exc)

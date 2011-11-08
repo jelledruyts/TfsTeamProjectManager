@@ -20,13 +20,16 @@ namespace TeamProjectManager.Shell
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
             this.logger = new Logger();
             this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0})", ApplicationVersion.ToString()), TraceEventType.Information);
+
             var jumpList = new JumpList();
             jumpList.JumpItems.Add(new JumpTask { Title = "Open Log File", ApplicationPath = "notepad.exe", Arguments = this.logger.LogFilePath, Description = "Open the log file" });
             jumpList.JumpItems.Add(new JumpTask { Title = Constants.ApplicationName + " Homepage", ApplicationPath = Constants.ApplicationUrl, Description = "Go to the homepage for " + Constants.ApplicationName });
             jumpList.Apply();
             JumpList.SetJumpList(this, jumpList);
+
             new Bootstrapper(this.logger).Run();
         }
 

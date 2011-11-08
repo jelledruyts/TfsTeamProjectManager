@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +10,6 @@ using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.Client;
 using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Controls;
 using TeamProjectManager.Common.Events;
@@ -20,16 +21,8 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
     [Export]
     public class BuildProcessTemplatesViewModel : ViewModelBase
     {
-        #region Fields
-
-        private RegisteredProjectCollection selectedTeamProjectCollection;
-        private ICollection<ProjectInfo> selectedTeamProjects;
-
-        #endregion
-
         #region Properties
 
-        public string HeaderInfo { get { return "Build Process Templates"; } }
         public RelayCommand RegisterBuildProcessTemplateCommand { get; private set; }
         public RelayCommand GetBuildProcessTemplatesCommand { get; private set; }
         public RelayCommand DeleteSelectedBuildProcessTemplatesCommand { get; private set; }
@@ -101,13 +94,12 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         [ImportingConstructor]
         public BuildProcessTemplatesViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger)
+            : base("Build Process Templates", eventAggregator, logger)
         {
             this.RegisterBuildProcessTemplateCommand = new RelayCommand(RegisterBuildProcessTemplate, CanRegisterBuildProcessTemplate);
             this.GetBuildProcessTemplatesCommand = new RelayCommand(GetBuildProcessTemplates, CanGetBuildProcessTemplates);
             this.DeleteSelectedBuildProcessTemplatesCommand = new RelayCommand(DeleteSelectedBuildProcessTemplates, CanDeleteSelectedBuildProcessTemplates);
             this.BrowseTemplateServerPathCommand = new RelayCommand(BrowseTemplateServerPath, CanBrowseTemplateServerPath);
-            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => { this.selectedTeamProjectCollection = e.SelectedTeamProjectCollection; this.selectedTeamProjects = e.SelectedTeamProjects; });
         }
 
         #endregion
@@ -116,47 +108,57 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private bool CanBrowseTemplateServerPath(object argument)
         {
-            return this.selectedTeamProjectCollection != null;
+            return this.SelectedTeamProjectCollection != null;
         }
 
         private void BrowseTemplateServerPath(object argument)
         {
-            using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.selectedTeamProjectCollection.Uri))
+            using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
             {
-                var vcs = (VersionControlServer)tfs.GetService(typeof(VersionControlServer));
-                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-                var args = new object[] { vcs };
-                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChooseItem", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+                var vcs = tfs.GetService<VersionControlServer>();
+
+                try
                 {
-                    dialog.GetType().GetProperty("AllowFileOnly").SetValue(dialog, true, null);
-                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                    var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
-                    if (result == System.Windows.Forms.DialogResult.OK)
+                    var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
+                    var args = new object[] { vcs };
+                    using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChooseItem", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
                     {
-                        var item = (Item)dialog.GetType().GetProperty("SelectedItem", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dialog, null);
-                        if (item != null)
+                        dialog.GetType().GetProperty("AllowFileOnly").SetValue(dialog, true, null);
+                        dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+                        var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                        if (result == System.Windows.Forms.DialogResult.OK)
                         {
-                            this.TemplateServerPath = item.ServerItem;
+                            var item = (Item)dialog.GetType().GetProperty("SelectedItem", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dialog, null);
+                            if (item != null)
+                            {
+                                this.TemplateServerPath = item.ServerItem;
+                            }
                         }
                     }
+                }
+                catch (Exception exc)
+                {
+                    var message = "There was a problem showing the internal TFS version control file browser dialog.";
+                    Logger.Log(message, exc, TraceEventType.Warning);
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
 
         private bool CanGetBuildProcessTemplates(object argument)
         {
-            return (this.selectedTeamProjectCollection != null && this.selectedTeamProjects != null && this.selectedTeamProjects.Count > 0);
+            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0);
         }
 
         private void GetBuildProcessTemplates(object argument)
         {
-            var teamProjectNames = this.selectedTeamProjects.Select(p => p.Name).ToList();
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var task = new ApplicationTask("Retrieving build process templates", teamProjectNames.Count);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                e.Result = Tasks.GetBuildProcessTemplates(task, this.selectedTeamProjectCollection.Uri, teamProjectNames);
+                e.Result = Tasks.GetBuildProcessTemplates(task, this.SelectedTeamProjectCollection.Uri, teamProjectNames);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -177,7 +179,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private bool CanRegisterBuildProcessTemplate(object argument)
         {
-            return (this.selectedTeamProjectCollection != null && this.selectedTeamProjects != null && this.selectedTeamProjects.Count > 0 && !string.IsNullOrEmpty(this.TemplateServerPath));
+            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && !string.IsNullOrEmpty(this.TemplateServerPath));
         }
 
         private void RegisterBuildProcessTemplate(object argument)
@@ -189,13 +191,13 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             }
             if (result == MessageBoxResult.Yes)
             {
-                var teamProjectNames = this.selectedTeamProjects.Select(p => p.Name).ToList();
+                var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
                 var task = new ApplicationTask((this.Simulate ? "Simulating registering build process template" : "Registering build process template"), teamProjectNames.Count);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
-                    Tasks.RegisterBuildProcessTemplate(task, this.selectedTeamProjectCollection.Uri, teamProjectNames, this.TemplateServerPath, this.TemplateType, true, this.UnregisterAllOtherTemplates, this.UnregisterAllOtherTemplatesIncludesUpgradeTemplate, this.Simulate);
+                    Tasks.RegisterBuildProcessTemplate(task, this.SelectedTeamProjectCollection.Uri, teamProjectNames, this.TemplateServerPath, this.TemplateType, true, this.UnregisterAllOtherTemplates, this.UnregisterAllOtherTemplatesIncludesUpgradeTemplate, this.Simulate);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
                 {

@@ -16,7 +16,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" ItemsSource="{Binding Path=TeamProjectCollections}" SelectedItem="{Binding Path=SelectedTeamProjectCollection, Mode=TwoWay}" />
+            <ComboBox Grid.Column="0" ItemsSource="{Binding Path=TfsTeamProjectCollections}" SelectedItem="{Binding Path=SelectedTfsTeamProjectCollection, Mode=TwoWay}" IsEnabled="{Binding Path=IsTeamProjectsLoadComplete}" />
             <TextBlock Grid.Column="1" Margin="5,0,0,0"><Hyperlink Command="{Binding Path=AddTeamProjectCollectionCommand}" ToolTip="Connect to a Team Project Collection">add</Hyperlink></TextBlock>
         </Grid>
 
@@ -25,7 +25,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ListBox Grid.Row="0" ItemsSource="{Binding Path=TeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
+            <ListBox Grid.Row="0" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=TfsTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
 
             <WrapPanel Grid.Row="1">
                 <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>

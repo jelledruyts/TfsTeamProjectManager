@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.Composition.Hosting;
+﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.Practices.Prism.Logging;
 using Microsoft.Practices.Prism.MefExtensions;
+using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Shell.Infrastructure;
 
 namespace TeamProjectManager.Shell
@@ -32,6 +34,7 @@ namespace TeamProjectManager.Shell
         protected override void ConfigureContainer()
         {
             base.ConfigureContainer();
+            this.Container.ComposeExportedValue<ILogger>(this.logger);
             ((LoggerAdapter)this.Logger).EventAggregator = this.Container.GetExportedValue<IEventAggregator>();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
@@ -37,6 +38,28 @@ namespace TeamProjectManager.Common.Infrastructure
 
         public ILogger Logger { get; private set; }
 
+        public string Title { get; private set; }
+
+        #endregion
+
+        #region Observable Properties
+
+        public TeamProjectCollectionInfo SelectedTeamProjectCollection
+        {
+            get { return this.GetValue(SelectedTeamProjectCollectionProperty); }
+            set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
+        }
+
+        public static ObservableProperty<TeamProjectCollectionInfo> SelectedTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, ViewModelBase>(o => o.SelectedTeamProjectCollection);
+
+        public ICollection<TeamProjectInfo> SelectedTeamProjects
+        {
+            get { return this.GetValue(SelectedTeamProjectsProperty); }
+            set { this.SetValue(SelectedTeamProjectsProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, ViewModelBase>(o => o.SelectedTeamProjects);
+
         #endregion
 
         #region Constructors
@@ -44,10 +67,12 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase"/> class.
         /// </summary>
-        protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger)
+        protected ViewModelBase(string title, IEventAggregator eventAggregator, ILogger logger)
         {
             this.EventAggregator = eventAggregator;
             this.Logger = logger;
+            this.Title = title;
+            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => { this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection; this.SelectedTeamProjects = e.SelectedTeamProjects; });
         }
 
         #endregion

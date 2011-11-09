@@ -38,6 +38,7 @@ namespace TeamProjectManager.Shell.Infrastructure
         {
             lockObject = new object();
             tracer = new TraceSource("TeamProjectManager");
+            // TODO: Don't log to app path unless configured to do so.
             var applicationPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             this.LogFilePath = Path.Combine(applicationPath, "TeamProjectManager.log");
             tracer.Listeners.Add(new TextWriterTraceListener(this.LogFilePath));

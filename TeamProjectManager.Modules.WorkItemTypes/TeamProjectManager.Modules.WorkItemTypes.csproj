@@ -73,6 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SearchResult.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
     <Compile Include="WorkItemTypeFile.cs" />
     <Compile Include="WorkItemTypesView.xaml.cs">

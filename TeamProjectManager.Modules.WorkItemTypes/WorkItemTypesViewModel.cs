@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -17,6 +20,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         #region Properties
 
         public RelayCommand BrowseWorkItemTypesFilePathCommand { get; private set; }
+        public RelayCommand SearchCommand { get; private set; }
         public RelayCommand ValidateCommand { get; private set; }
         public RelayCommand ValidateAndImportCommand { get; private set; }
         public RelayCommand ImportCommand { get; private set; }
@@ -49,6 +53,22 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public static ObservableProperty<ICollection<WorkItemTypeFile>> SelectedWorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeFile>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypeFiles);
 
+        public string SearchText
+        {
+            get { return this.GetValue(SearchTextProperty); }
+            set { this.SetValue(SearchTextProperty, value); }
+        }
+
+        public static ObservableProperty<string> SearchTextProperty = new ObservableProperty<string, WorkItemTypesViewModel>(o => o.SearchText);
+
+        public ICollection<SearchResult> SearchResults
+        {
+            get { return this.GetValue(SearchResultsProperty); }
+            set { this.SetValue(SearchResultsProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<SearchResult>> SearchResultsProperty = new ObservableProperty<ICollection<SearchResult>, WorkItemTypesViewModel>(o => o.SearchResults);
+
         #endregion
 
         #region Constructors
@@ -58,6 +78,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             : base("Work Item Types", eventAggregator, logger)
         {
             this.BrowseWorkItemTypesFilePathCommand = new RelayCommand(BrowseWorkItemTypesFilePath, CanBrowseWorkItemTypesFilePath);
+            this.SearchCommand = new RelayCommand(Search, CanSearch);
             this.ValidateCommand = new RelayCommand(Validate, CanValidate);
             this.ValidateAndImportCommand = new RelayCommand(ValidateAndImport, CanValidateAndImport);
             this.ImportCommand = new RelayCommand(Import, CanImport);
@@ -100,6 +121,77 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             {
                 this.WorkItemTypesFilePath = dialog.SelectedPath;
             }
+        }
+
+        private bool CanSearch(object argument)
+        {
+            return this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && !string.IsNullOrEmpty(this.SearchText);
+        }
+
+        private void Search(object argument)
+        {
+            var searchText = this.SearchText;
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Searching for \"{0}\"", searchText), teamProjectNames.Count);
+            PublishStatus(new StatusEventArgs(task));
+            var step = 0;
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                {
+                    var store = tfs.GetService<WorkItemStore>();
+
+                    var results = new List<SearchResult>();
+                    foreach (var teamProjectName in teamProjectNames)
+                    {
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
+                        var project = store.Projects[teamProjectName];
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
+                        {
+                            if (Matches(searchText, workItemType.Name))
+                            {
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
+                            }
+                            else if (Matches(searchText, workItemType.Description))
+                            {
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
+                            }
+                            foreach (FieldDefinition field in workItemType.FieldDefinitions)
+                            {
+                                if (Matches(searchText, field.Name))
+                                {
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
+                                }
+                                else if (Matches(searchText, field.ReferenceName))
+                                {
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
+                                }
+                                else if (Matches(searchText, field.HelpText))
+                                {
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
+                                }
+                            }
+                        }
+                    }
+                    e.Result = results;
+                }
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while searching", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    this.SearchResults = (ICollection<SearchResult>)e.Result;
+                    task.SetComplete("Found " + this.SearchResults.Count.ToCountString("result"));
+                }
+            };
+            worker.RunWorkerAsync();
         }
 
         private bool CanValidate(object argument)
@@ -176,6 +268,11 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 numberOfSteps += numberOfImports;
             }
             return numberOfSteps;
+        }
+
+        private static bool Matches(string searchText, string value)
+        {
+            return (value != null && value.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
 
         #endregion

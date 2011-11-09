@@ -13,7 +13,7 @@ namespace TeamProjectManager.Shell
     {
         #region Constants
 
-        private const string DefaultWindowTitle = "Team Project Manager";
+        private const string DefaultWindowTitle = "TFS Team Project Manager";
 
         #endregion
 

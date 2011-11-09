@@ -5,47 +5,86 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+    <TabControl>
 
-            <Label Grid.Column="0" Content="Work Item Type Definitions Path" Margin="0,0,5,0" />
-            <TextBox Grid.Column="1" Text="{Binding Path=WorkItemTypesFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
-            <Button Grid.Column="2" Content="..." Command="{Binding Path=BrowseWorkItemTypesFilePathCommand}" Padding="5,0,5,0" />
+        <TabItem Header="Import">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Content="Work Item Type Definitions Path" Margin="0,0,5,0" />
+                    <TextBox Grid.Column="1" Text="{Binding Path=WorkItemTypesFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
+                    <Button Grid.Column="2" Content="..." Command="{Binding Path=BrowseWorkItemTypesFilePathCommand}" Padding="5,0,5,0" />
+
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="0,5,0,5">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox Grid.Row="0" x:Name="workItemTypeFilesListBox" ItemsSource="{Binding Path=WorkItemTypeFiles}" Style="{StaticResource CheckedListBoxStyle}" SelectionMode="Extended" SelectionChanged="workItemTypeFilesListBox_SelectionChanged" />
+
+                    <WrapPanel Grid.Row="1">
+                        <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>
+                        <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
+                    </WrapPanel>
+
+                </Grid>
+
+                <WrapPanel Grid.Row="2">
+                    <Button Content="Validate" Margin="0,0,5,0" Command="{Binding Path=ValidateCommand}" />
+                    <Button Content="Validate &amp; Import" Margin="0,0,5,0" Command="{Binding Path=ValidateAndImportCommand}" />
+                    <Button Content="Import" Command="{Binding Path=ImportCommand}" />
+                </WrapPanel>
+
+            </Grid>
+        </TabItem>
+        
+        <TabItem Header="Search">
             
-        </Grid>
-        
-        <Grid Grid.Row="1" Margin="0,5,0,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Content="Search For" Margin="0,0,5,0" />
+                    <TextBox Grid.Column="1" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
+                    <Button Grid.Column="2" Content="Search" Command="{Binding Path=SearchCommand}" Padding="5,0,5,0" />
+                </Grid>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SearchResults}" Margin="0,5,0,0" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                        <DataGridTextColumn Header="Type" Binding="{Binding Path=Type}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
+                        <DataGridTextColumn Header="Reason" Binding="{Binding Path=Reason}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Grid>
             
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <ListBox Grid.Row="0" x:Name="workItemTypeFilesListBox" ItemsSource="{Binding Path=WorkItemTypeFiles}" Style="{StaticResource CheckedListBoxStyle}" SelectionMode="Extended" SelectionChanged="workItemTypeFilesListBox_SelectionChanged" />
-
-            <WrapPanel Grid.Row="1">
-                <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>
-                <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
-            </WrapPanel>
-
-        </Grid>
+        </TabItem>
         
-        <WrapPanel Grid.Row="2">
-            <Button Content="Validate" Margin="0,0,5,0" Command="{Binding Path=ValidateCommand}" />
-            <Button Content="Validate &amp; Import" Margin="0,0,5,0" Command="{Binding Path=ValidateAndImportCommand}" />
-            <Button Content="Import" Command="{Binding Path=ImportCommand}" />
-        </WrapPanel>
-        
-    </Grid>
+    </TabControl>
 </UserControl>

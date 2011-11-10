@@ -2,7 +2,6 @@
 using Microsoft.Practices.Prism.MefExtensions.Modularity;
 using Microsoft.Practices.Prism.Modularity;
 using Microsoft.Practices.Prism.Regions;
-using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Shell.Modules.StatusPanel
 {
@@ -14,7 +13,7 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
 
         public void Initialize()
         {
-            this.RegionViewRegistry.RegisterViewWithRegion(RegionNames.StatusPanel, typeof(StatusPanelView));
+            this.RegionViewRegistry.RegisterViewWithRegion(InternalConstants.RegionNameStatusPanel, typeof(StatusPanelView));
         }
     }
 }

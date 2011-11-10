@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://www.codeplex.com/prism"
         xmlns:c="clr-namespace:TeamProjectManager.Common;assembly=TeamProjectManager.Common"
+        xmlns:s="clr-namespace:TeamProjectManager.Shell"
         Title="{Binding Path=WindowTitle}"
         WindowStartupLocation="CenterScreen"
         Height="600"
@@ -22,11 +23,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top">
-                    <TextBlock Text="{Binding Path=HeaderTitle, Converter={StaticResource caseConverter}, ConverterParameter=upper}" FontSize="14" FontWeight="DemiBold" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="{Binding Path=HeaderSubtitle, Converter={StaticResource caseConverter}, ConverterParameter=lower}" FontSize="11" Foreground="{StaticResource UserMessageFontBrush}" />
-                </StackPanel>
-                <ContentControl Grid.Column="1" prism:RegionManager.RegionName="{x:Static c:RegionNames.StatusPanel}" />
+                <ContentControl Grid.Column="0" prism:RegionManager.RegionName="{x:Static s:InternalConstants.RegionNameLogo}" />
+                <ContentControl Grid.Column="1" prism:RegionManager.RegionName="{x:Static s:InternalConstants.RegionNameStatusPanel}" />
             </Grid>
         </Border>
 
@@ -37,7 +35,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Column="0" prism:RegionManager.RegionName="{x:Static c:RegionNames.TeamProjects}" />
+            <ContentControl Grid.Column="0" prism:RegionManager.RegionName="{x:Static s:InternalConstants.RegionNameTeamProjects}" />
 
             <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
 

@@ -11,16 +11,8 @@ namespace TeamProjectManager.Shell
     [Export(typeof(IStatusService))]
     public class ShellViewModel : ViewModelBase, IStatusService
     {
-        #region Constants
-
-        private const string DefaultWindowTitle = "TFS Team Project Manager";
-
-        #endregion
-
         #region Properties
 
-        public string HeaderTitle { get; private set; }
-        public string HeaderSubtitle { get; private set; }
         public TaskbarItemInfo TaskbarItemInfo { get; private set; }
 
         #endregion
@@ -43,9 +35,7 @@ namespace TeamProjectManager.Shell
         public ShellViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base("Shell", eventAggregator, logger)
         {
-            this.HeaderTitle = DefaultWindowTitle;
-            this.HeaderSubtitle = "v" + App.ApplicationVersion.ToString(3);
-            this.WindowTitle = DefaultWindowTitle;
+            this.WindowTitle = InternalConstants.DefaultWindowTitle;
             this.TaskbarItemInfo = new TaskbarItemInfo();
         }
 
@@ -57,11 +47,11 @@ namespace TeamProjectManager.Shell
         {
             if (string.IsNullOrWhiteSpace(status))
             {
-                this.WindowTitle = DefaultWindowTitle;
+                this.WindowTitle = InternalConstants.DefaultWindowTitle;
             }
             else
             {
-                this.WindowTitle = string.Concat(DefaultWindowTitle, " - ", status);
+                this.WindowTitle = string.Concat(InternalConstants.DefaultWindowTitle, " - ", status);
             }
         }
 

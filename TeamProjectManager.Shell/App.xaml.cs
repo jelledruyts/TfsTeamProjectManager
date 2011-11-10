@@ -15,6 +15,7 @@ namespace TeamProjectManager.Shell
     public partial class App : Application
     {
         internal static readonly Version ApplicationVersion = Assembly.GetEntryAssembly().GetName().Version;
+        internal static string LogFilePath { get; private set; }
         private Logger logger;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -23,9 +24,10 @@ namespace TeamProjectManager.Shell
 
             this.logger = new Logger();
             this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0})", ApplicationVersion.ToString()), TraceEventType.Information);
+            App.LogFilePath = this.logger.LogFilePath;
 
             var jumpList = new JumpList();
-            jumpList.JumpItems.Add(new JumpTask { Title = "Open Log File", ApplicationPath = "notepad.exe", Arguments = this.logger.LogFilePath, Description = "Open the log file" });
+            jumpList.JumpItems.Add(new JumpTask { Title = "Open Log File", ApplicationPath = "notepad.exe", Arguments = App.LogFilePath, Description = "Open the log file" });
             jumpList.JumpItems.Add(new JumpTask { Title = Constants.ApplicationName + " Homepage", ApplicationPath = Constants.ApplicationUrl, Description = "Go to the homepage for " + Constants.ApplicationName });
             jumpList.Apply();
             JumpList.SetJumpList(this, jumpList);

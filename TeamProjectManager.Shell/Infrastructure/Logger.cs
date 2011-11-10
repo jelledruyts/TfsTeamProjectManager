@@ -37,15 +37,15 @@ namespace TeamProjectManager.Shell.Infrastructure
         public Logger()
         {
             lockObject = new object();
-            tracer = new TraceSource("TeamProjectManager");
-            var logFileOverride = ConfigurationManager.AppSettings["LogFilePath"];
+            tracer = new TraceSource(InternalConstants.LoggerTraceSwitchName);
+            var logFileOverride = ConfigurationManager.AppSettings[InternalConstants.LoggerAppSettingNameLogFilePath];
             if (!string.IsNullOrEmpty(logFileOverride))
             {
                 this.LogFilePath = logFileOverride;
             }
             else
             {
-                this.LogFilePath = Path.Combine(System.Windows.Forms.Application.LocalUserAppDataPath, "TeamProjectManager.log");
+                this.LogFilePath = Path.Combine(System.Windows.Forms.Application.LocalUserAppDataPath, InternalConstants.LoggerDefaultLogFileName);
             }
             tracer.Listeners.Add(new TextWriterTraceListener(this.LogFilePath));
         }

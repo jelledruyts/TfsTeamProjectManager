@@ -65,6 +65,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -88,9 +89,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Infrastructure\CodePlexClient.cs" />
     <Compile Include="Infrastructure\IStatusService.cs" />
     <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Infrastructure\LoggerAdapter.cs" />
+    <Compile Include="InternalConstants.cs" />
+    <Compile Include="Modules\Logo\LogoModule.cs" />
+    <Compile Include="Modules\Logo\LogoView.xaml.cs">
+      <DependentUpon>LogoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Logo\LogoViewModel.cs" />
     <Compile Include="Modules\StatusPanel\ApplicationTaskViewModel.cs" />
     <Compile Include="Modules\StatusPanel\StatusPanelModule.cs" />
     <Compile Include="Modules\StatusPanel\StatusPanelView.xaml.cs">
@@ -116,6 +124,10 @@
     <None Include="App.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Modules\Logo\LogoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\StatusPanel\StatusPanelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

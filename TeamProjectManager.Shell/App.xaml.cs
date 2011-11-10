@@ -9,9 +9,6 @@ using TeamProjectManager.Shell.Infrastructure;
 
 namespace TeamProjectManager.Shell
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         internal static readonly Version ApplicationVersion = Assembly.GetEntryAssembly().GetName().Version;
@@ -28,7 +25,7 @@ namespace TeamProjectManager.Shell
 
             var jumpList = new JumpList();
             jumpList.JumpItems.Add(new JumpTask { Title = "Open Log File", ApplicationPath = "notepad.exe", Arguments = App.LogFilePath, Description = "Open the log file" });
-            jumpList.JumpItems.Add(new JumpTask { Title = Constants.ApplicationName + " Homepage", ApplicationPath = Constants.ApplicationUrl, Description = "Go to the homepage for " + Constants.ApplicationName });
+            jumpList.JumpItems.Add(new JumpTask { Title = "Go To Homepage", ApplicationPath = Constants.ApplicationUrl, Description = "Go to the homepage for " + Constants.ApplicationName });
             jumpList.Apply();
             JumpList.SetJumpList(this, jumpList);
 

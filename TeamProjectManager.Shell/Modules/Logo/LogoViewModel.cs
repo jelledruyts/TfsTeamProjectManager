@@ -21,8 +21,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
         public string HeaderTitle { get; private set; }
         public string HeaderSubtitle { get; private set; }
         public RelayCommand OpenLogFileCommand { get; private set; }
-        public RelayCommand OpenHomePageCommand { get; private set; }
-        public RelayCommand CheckForUpdatesCommand { get; private set; }
+        public RelayCommand OpenHomepageCommand { get; private set; }
 
         #endregion
 
@@ -95,9 +94,8 @@ namespace TeamProjectManager.Shell.Modules.Logo
             this.HeaderTitle = InternalConstants.DefaultWindowTitle;
             this.HeaderSubtitle = "v" + App.ApplicationVersion.ToString(3);
             this.OpenLogFileCommand = new RelayCommand(OpenLogFile, CanOpenLogFile);
-            this.OpenHomePageCommand = new RelayCommand(OpenHomePage, CanOpenHomePage);
-            this.CheckForUpdatesCommand = new RelayCommand(CheckForUpdates, CanCheckForUpdates);
-            CheckForUpdates(null);
+            this.OpenHomepageCommand = new RelayCommand(OpenHomepage, CanOpenHomepage);
+            CheckForUpdates();
         }
 
         #endregion
@@ -114,22 +112,21 @@ namespace TeamProjectManager.Shell.Modules.Logo
             Process.Start(App.LogFilePath);
         }
 
-        private bool CanOpenHomePage(object argument)
+        private bool CanOpenHomepage(object argument)
         {
             return Network.IsAvailable();
         }
 
-        private void OpenHomePage(object argument)
+        private void OpenHomepage(object argument)
         {
             Process.Start(Constants.ApplicationUrl);
         }
 
-        private bool CanCheckForUpdates(object argument)
-        {
-            return CodePlexClient.IsOnline();
-        }
+        #endregion
 
-        private void CheckForUpdates(object argument)
+        #region Helper Methods
+
+        private void CheckForUpdates()
         {
             if (CodePlexClient.IsOnline())
             {

@@ -22,7 +22,7 @@ namespace TeamProjectManager.Modules.LastChangesets
         }
 
         public ChangesetInfo(string teamProject, Changeset changeset)
-            : this(teamProject, changeset.ChangesetId, changeset.CommitterDisplayName, changeset.CreationDate, changeset.Comment)
+            : this(teamProject, changeset.ChangesetId, changeset.Committer, changeset.CreationDate, changeset.Comment)
         {
             this.Changeset = changeset;
         }

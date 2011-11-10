@@ -35,6 +35,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     WorkItemType.ValidationEventHandler += ImportEventHandler;
                     foreach (var teamProjectName in teamProjectNames)
                     {
+                        // TODO: Verify what happens if team project is deleted.
                         var project = store.Projects[teamProjectName];
                         foreach (var workItemTypeFile in workItemTypeFiles)
                         {
@@ -58,6 +59,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 {
                     foreach (var teamProjectName in teamProjectNames)
                     {
+                        // TODO: Verify what happens if team project is deleted.
                         var project = store.Projects[teamProjectName];
                         project.WorkItemTypes.ImportEventHandler += ImportEventHandler;
                         foreach (var workItemTypeFile in workItemTypeFiles)

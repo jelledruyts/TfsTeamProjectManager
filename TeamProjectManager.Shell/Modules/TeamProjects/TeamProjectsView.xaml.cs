@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;
-using Microsoft.TeamFoundation.Server;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Shell.Modules.TeamProjects
@@ -34,7 +34,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         private void teamProjectsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ViewModel.SelectedTfsTeamProjects = this.teamProjectsListBox.SelectedItems.Cast<ProjectInfo>().ToList();
+            this.ViewModel.SelectedTfsTeamProjects = this.teamProjectsListBox.SelectedItems.Cast<TeamProjectInfo>().ToList();
         }
 
         private bool CanSelectAll(object argument)

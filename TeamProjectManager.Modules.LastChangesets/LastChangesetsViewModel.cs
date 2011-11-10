@@ -74,8 +74,8 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private void GetLastChangesets(object argument)
         {
-            var projects = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var task = new ApplicationTask("Retrieving last changesets", projects.Count);
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var task = new ApplicationTask("Retrieving last changesets", teamProjectNames.Count);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -85,10 +85,11 @@ namespace TeamProjectManager.Modules.LastChangesets
                 using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
                 {
                     var vcs = tfs.GetService<VersionControlServer>();
-                    foreach (var project in projects)
+                    foreach (var teamProjectName in teamProjectNames)
                     {
-                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", project));
-                        var history = vcs.QueryHistory("$/" + project, VersionSpec.Latest, 0, RecursionType.Full, null, null, null, MaxHistoryCount, false, false);
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
+                        // TODO: Verify what happens if team project is deleted.
+                        var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, null, MaxHistoryCount, false, false);
                         Changeset lastChangeset = null;
                         var historyFound = false;
                         foreach (Changeset historyItem in history)
@@ -106,11 +107,11 @@ namespace TeamProjectManager.Modules.LastChangesets
                         if (lastChangeset == null)
                         {
                             var comment = (historyFound ? "The latest changeset from an actual user was not found in the last " + MaxHistoryCount + " changesets" : "There are no changesets in this Team Project");
-                            changesets.Add(new ChangesetInfo(project, null, null, null, comment));
+                            changesets.Add(new ChangesetInfo(teamProjectName, null, null, null, comment));
                         }
                         else
                         {
-                            changesets.Add(new ChangesetInfo(project, lastChangeset));
+                            changesets.Add(new ChangesetInfo(teamProjectName, lastChangeset));
                         }
                     }
                 }

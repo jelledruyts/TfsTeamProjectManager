@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using TeamProjectManager.Common.Infrastructure;
 
@@ -38,9 +38,15 @@ namespace TeamProjectManager.Shell.Infrastructure
         {
             lockObject = new object();
             tracer = new TraceSource("TeamProjectManager");
-            // TODO: Don't log to app path unless configured to do so.
-            var applicationPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            this.LogFilePath = Path.Combine(applicationPath, "TeamProjectManager.log");
+            var logFileOverride = ConfigurationManager.AppSettings["LogFilePath"];
+            if (!string.IsNullOrEmpty(logFileOverride))
+            {
+                this.LogFilePath = logFileOverride;
+            }
+            else
+            {
+                this.LogFilePath = Path.Combine(System.Windows.Forms.Application.LocalUserAppDataPath, "TeamProjectManager.log");
+            }
             tracer.Listeners.Add(new TextWriterTraceListener(this.LogFilePath));
         }
 

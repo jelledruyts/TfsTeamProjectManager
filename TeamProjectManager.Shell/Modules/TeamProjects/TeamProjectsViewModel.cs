@@ -131,7 +131,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                     using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(viewModel.SelectedTfsTeamProjectCollection.Uri))
                     {
                         var store = tfs.GetService<ICommonStructureService>();
-                        be.Result = store.ListAllProjects().Select(p => new TeamProjectInfo(p.Name, new Uri(p.Uri), p.Status == ProjectState.Deleting)).OrderBy(p => p.Name);
+                        be.Result = store.ListAllProjects().Where(p => p.Status == ProjectState.WellFormed).Select(p => new TeamProjectInfo(p.Name, new Uri(p.Uri))).OrderBy(p => p.Name);
                     }
                 };
                 worker.RunWorkerCompleted += (bsender, be) =>

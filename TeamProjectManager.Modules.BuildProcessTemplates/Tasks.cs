@@ -22,10 +22,8 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
 
-                    // TODO: Verify what happens if team project is deleted.
                     var teamProjectBuildDefinitions = buildServer.QueryBuildDefinitions(teamProjectName, QueryOptions.Process);
 
-                    // TODO: Verify what happens if team project is deleted.
                     foreach (var processTemplate in buildServer.QueryProcessTemplates(teamProjectName))
                     {
                         var processTemplateBuildDefinitions = new List<IBuildDefinition>();
@@ -55,7 +53,6 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
 
-                        // TODO: Verify what happens if team project is deleted.
                         var allTemplates = buildServer.QueryProcessTemplates(teamProjectName);
                         var matchingTemplates = allTemplates.Where(t => t.ServerPath.Equals(templateServerPath, StringComparison.OrdinalIgnoreCase)).ToList();
 
@@ -69,7 +66,6 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                             foreach (var templateToUnregister in templatesToUnregister)
                             {
                                 task.Status = string.Format(CultureInfo.CurrentCulture, "Unregistering existing build process template \"{0}\"", templateToUnregister.ServerPath);
-                                // TODO: Verify what happens if team project is deleted.
                                 var buildDefinitions = buildServer.QueryBuildDefinitions(teamProjectName, QueryOptions.Process);
                                 foreach (var buildDefinition in buildDefinitions)
                                 {
@@ -107,7 +103,6 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                             task.Status = string.Format(CultureInfo.CurrentCulture, "Registering new build process template \"{0}\" as type \"{1}\"", templateServerPath, templateType.ToString());
                             if (!simulate)
                             {
-                                // TODO: Verify what happens if team project is deleted.
                                 var template = buildServer.CreateProcessTemplate(teamProjectName, templateServerPath);
                                 template.TemplateType = templateType;
                                 template.Save();

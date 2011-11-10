@@ -146,38 +146,30 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     foreach (var teamProjectName in teamProjectNames)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                        if (!store.Projects.Contains(teamProjectName))
+                        var project = store.Projects[teamProjectName];
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
-                            // TODO: Check if this works fine for deleted projects.
-                            task.Status = string.Format(CultureInfo.CurrentCulture, "The Team Project \"{0}\" is deleted", teamProjectName);
-                        }
-                        else
-                        {
-                            var project = store.Projects[teamProjectName];
-                            foreach (WorkItemType workItemType in project.WorkItemTypes)
+                            if (Matches(searchText, workItemType.Name))
                             {
-                                if (Matches(searchText, workItemType.Name))
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
+                            }
+                            else if (Matches(searchText, workItemType.Description))
+                            {
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
+                            }
+                            foreach (FieldDefinition field in workItemType.FieldDefinitions)
+                            {
+                                if (Matches(searchText, field.Name))
                                 {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
                                 }
-                                else if (Matches(searchText, workItemType.Description))
+                                else if (Matches(searchText, field.ReferenceName))
                                 {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
                                 }
-                                foreach (FieldDefinition field in workItemType.FieldDefinitions)
+                                else if (Matches(searchText, field.HelpText))
                                 {
-                                    if (Matches(searchText, field.Name))
-                                    {
-                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
-                                    }
-                                    else if (Matches(searchText, field.ReferenceName))
-                                    {
-                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
-                                    }
-                                    else if (Matches(searchText, field.HelpText))
-                                    {
-                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
-                                    }
+                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
                                 }
                             }
                         }

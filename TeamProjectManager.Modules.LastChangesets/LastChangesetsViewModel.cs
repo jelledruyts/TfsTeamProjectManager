@@ -88,7 +88,6 @@ namespace TeamProjectManager.Modules.LastChangesets
                     foreach (var teamProjectName in teamProjectNames)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                        // TODO: Verify what happens if team project is deleted.
                         var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, null, MaxHistoryCount, false, false);
                         Changeset lastChangeset = null;
                         var historyFound = false;

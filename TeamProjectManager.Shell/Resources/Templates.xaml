@@ -3,22 +3,11 @@
                     xmlns:tc="clr-namespace:TeamProjectManager.Common;assembly=TeamProjectManager.Common">
 
     <DataTemplate DataType="{x:Type tc:TeamProjectCollectionInfo}">
-        <TextBlock Text="{Binding Name}" />
+        <TextBlock Text="{Binding Path=Name}" />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type tc:TeamProjectInfo}">
-        <TextBlock Text="{Binding Path=Name}">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=IsDeleted}" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource ErrorForegroundBrush}" />
-                            <Setter Property="ToolTip" Value="This project is deleted" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock Text="{Binding Path=Name}" />
     </DataTemplate>
 
 </ResourceDictionary>

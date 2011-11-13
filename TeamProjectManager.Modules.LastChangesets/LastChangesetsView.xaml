@@ -12,7 +12,25 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <Button Grid.Row="0" Content="Get Last Changesets" Command="{Binding Path=GetLastChangesetsCommand}" Margin="0,0,0,5" />
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Number Of Changesets" />
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=NumberOfChangesets, UpdateSourceTrigger=PropertyChanged}" />
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Exclude When Comment Contains" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Exclusions, UpdateSourceTrigger=PropertyChanged}" ToolTip="Separate multiple entries with a semicolon (;)" />
+
+            <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Get Last Changesets" Command="{Binding Path=GetLastChangesetsCommand}" Margin="0,0,0,5" />
+        </Grid>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding Changesets}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="changesetsDataGrid" SelectionChanged="changesetsDataGrid_SelectionChanged" MouseDoubleClick="changesetsDataGrid_MouseDoubleClick">
             <DataGrid.Columns>

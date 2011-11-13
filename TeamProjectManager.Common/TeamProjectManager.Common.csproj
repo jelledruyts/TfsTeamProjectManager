@@ -67,6 +67,7 @@
     <Compile Include="Infrastructure\ApplicationTask.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />
+    <Compile Include="Infrastructure\FileSystem.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\Network.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />

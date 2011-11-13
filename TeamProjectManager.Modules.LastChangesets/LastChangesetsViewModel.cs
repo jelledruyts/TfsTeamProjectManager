@@ -20,12 +20,6 @@ namespace TeamProjectManager.Modules.LastChangesets
     [Export]
     public class LastChangesetsViewModel : ViewModelBase
     {
-        #region Constants
-
-        private const int MaxHistoryCount = 100;
-
-        #endregion
-
         #region Properties
 
         public RelayCommand GetLastChangesetsCommand { get; private set; }
@@ -51,6 +45,22 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         public static ObservableProperty<ICollection<ChangesetInfo>> SelectedChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, LastChangesetsViewModel>(o => o.SelectedChangesets);
 
+        public int NumberOfChangesets
+        {
+            get { return this.GetValue(NumberOfChangesetsProperty); }
+            set { this.SetValue(NumberOfChangesetsProperty, value); }
+        }
+
+        public static ObservableProperty<int> NumberOfChangesetsProperty = new ObservableProperty<int, LastChangesetsViewModel>(o => o.NumberOfChangesets, 1);
+
+        public string Exclusions
+        {
+            get { return this.GetValue(ExclusionsProperty); }
+            set { this.SetValue(ExclusionsProperty, value); }
+        }
+
+        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, LastChangesetsViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update");
+
         #endregion
 
         #region Constructors
@@ -69,12 +79,14 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private bool CanGetLastChangesets(object argument)
         {
-            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0);
+            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && this.NumberOfChangesets > 0);
         }
 
         private void GetLastChangesets(object argument)
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var numberOfChangesetsForProject = this.NumberOfChangesets;
+            var exclusions = (string.IsNullOrEmpty(this.Exclusions) ? new string[0] : this.Exclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
             var task = new ApplicationTask("Retrieving last changesets", teamProjectNames.Count);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
@@ -88,29 +100,33 @@ namespace TeamProjectManager.Modules.LastChangesets
                     foreach (var teamProjectName in teamProjectNames)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                        var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, null, MaxHistoryCount, false, false);
-                        Changeset lastChangeset = null;
-                        var historyFound = false;
-                        foreach (Changeset historyItem in history)
+                        var foundChangesetsForProject = 0;
+                        VersionSpec versionTo = null;
+                        while (foundChangesetsForProject < numberOfChangesetsForProject)
                         {
-                            historyFound = true;
-
-                            // TODO: Make exclusions configurable.
-                            if (!string.Equals(historyItem.Comment, "Auto-Build: Version Update", StringComparison.OrdinalIgnoreCase))
+                            const int pageCount = 5;
+                            var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
+                            foreach (Changeset historyItem in history)
                             {
-                                lastChangeset = historyItem;
+                                if (!string.IsNullOrEmpty(historyItem.Comment) && !exclusions.Any(x => historyItem.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                                {
+                                    foundChangesetsForProject++;
+                                    task.SetProgressForCurrentStep((double)foundChangesetsForProject / (double)numberOfChangesetsForProject);
+                                    changesets.Add(new ChangesetInfo(teamProjectName, historyItem));
+                                    if (foundChangesetsForProject == numberOfChangesetsForProject)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            if (history.Count == pageCount)
+                            {
+                                versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
+                            }
+                            else
+                            {
                                 break;
                             }
-                        }
-
-                        if (lastChangeset == null)
-                        {
-                            var comment = (historyFound ? "The latest changeset from an actual user was not found in the last " + MaxHistoryCount + " changesets" : "There are no changesets in this Team Project");
-                            changesets.Add(new ChangesetInfo(teamProjectName, null, null, null, comment));
-                        }
-                        else
-                        {
-                            changesets.Add(new ChangesetInfo(teamProjectName, lastChangeset));
                         }
                     }
                 }

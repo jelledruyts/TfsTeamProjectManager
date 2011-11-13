@@ -51,7 +51,7 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
 
         private void OnStatusEvent(StatusEventArgs message)
         {
-            ApplicationTask task = message.Task;
+            var task = message.Task;
             if (task == null)
             {
                 task = new ApplicationTask(message.EventType.ToString());
@@ -76,7 +76,7 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
             this.executingTasksLock.EnterWriteLock();
             try
             {
-                this.ExecutingTasks.Insert(0, new ApplicationTaskViewModel(task));
+                this.ExecutingTasks.Insert(0, new ApplicationTaskViewModel(task, this.Logger));
             }
             finally
             {

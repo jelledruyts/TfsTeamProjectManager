@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Globalization;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 
@@ -7,6 +9,13 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
 {
     public class ApplicationTaskViewModel : ObservableObject
     {
+        #region Fields
+
+        private ILogger logger;
+        private string taskId;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -73,25 +82,29 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
         /// Initializes a new instance of the <see cref="ApplicationTaskViewModel"/> class.
         /// </summary>
         /// <param name="task">The task.</param>
-        public ApplicationTaskViewModel(ApplicationTask task)
+        public ApplicationTaskViewModel(ApplicationTask task, ILogger logger)
         {
             if (task == null)
             {
                 throw new ArgumentNullException("task");
             }
             this.Task = task;
+            this.logger = logger;
+            this.taskId = Guid.NewGuid().ToString();
+            Log(task.Name);
             task.StatusHistory.CollectionChanged += new NotifyCollectionChangedEventHandler(TaskStatusHistory_CollectionChanged);
-            this.ShowDetailsCommand = new RelayCommand((o) => { this.DetailsVisible = true; }, (o) => { return this.DetailsAvailable; });
-            this.DetailsAvailable = (this.Task.StatusHistory.Count > 0);
             if (this.Task.StatusHistory != null)
             {
                 var status = string.Empty;
                 foreach (string item in this.Task.StatusHistory)
                 {
                     status += Environment.NewLine + item;
+                    Log(item);
                 }
                 this.StatusHistoryDescription = status.Trim();
             }
+            this.ShowDetailsCommand = new RelayCommand((o) => { this.DetailsVisible = true; }, (o) => { return this.DetailsAvailable; });
+            this.DetailsAvailable = (this.Task.StatusHistory.Count > 0);
         }
 
         #endregion
@@ -105,9 +118,22 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
             foreach (string item in e.NewItems)
             {
                 status += Environment.NewLine + item;
+                Log(item);
             }
             this.StatusHistoryDescription = status.Trim();
             this.DetailsAvailable = (Task.StatusHistory.Count > 0);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void Log(string message)
+        {
+            if (this.logger != null)
+            {
+                this.logger.Log(string.Format(CultureInfo.CurrentCulture, "[Task {0}] {1}", taskId, message), TraceEventType.Verbose);
+            }
         }
 
         #endregion

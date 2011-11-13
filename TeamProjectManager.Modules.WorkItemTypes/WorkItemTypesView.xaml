@@ -52,25 +52,34 @@
 
             </Grid>
         </TabItem>
-        
+
         <TabItem Header="Search">
-            
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                
+
                 <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Column="0" Content="Search For" Margin="0,0,5,0" />
-                    <TextBox Grid.Column="1" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
-                    <Button Grid.Column="2" Content="Search" Command="{Binding Path=SearchCommand}" Padding="5,0,5,0" />
+                    <Label Grid.Row="0" Grid.Column="0" Content="Search For" Margin="0,0,5,0" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
+                    <Button Grid.Row="0" Grid.Column="2" Content="Search" Command="{Binding Path=SearchCommand}" Padding="5,0,5,0" />
+
+                    <WrapPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="5,5,0,0">
+                        <CheckBox IsChecked="{Binding Path=SearchIncludesWorkItemFields}" Content="Include work item fields" Margin="0,0,10,0" />
+                        <CheckBox IsChecked="{Binding Path=SearchUsesExactMatch}" Content="Match exactly" />
+                    </WrapPanel>
                 </Grid>
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SearchResults}" Margin="0,5,0,0" AutoGenerateColumns="False">
@@ -83,8 +92,8 @@
                 </DataGrid>
 
             </Grid>
-            
+
         </TabItem>
-        
+
     </TabControl>
 </UserControl>

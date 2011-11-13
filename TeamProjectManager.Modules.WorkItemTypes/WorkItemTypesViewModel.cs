@@ -69,6 +69,22 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public static ObservableProperty<ICollection<SearchResult>> SearchResultsProperty = new ObservableProperty<ICollection<SearchResult>, WorkItemTypesViewModel>(o => o.SearchResults);
 
+        public bool SearchIncludesWorkItemFields
+        {
+            get { return this.GetValue(SearchIncludesWorkItemFieldsProperty); }
+            set { this.SetValue(SearchIncludesWorkItemFieldsProperty, value); }
+        }
+
+        public static ObservableProperty<bool> SearchIncludesWorkItemFieldsProperty = new ObservableProperty<bool, WorkItemTypesViewModel>(o => o.SearchIncludesWorkItemFields, true);
+
+        public bool SearchUsesExactMatch
+        {
+            get { return this.GetValue(SearchUsesExactMatchProperty); }
+            set { this.SetValue(SearchUsesExactMatchProperty, value); }
+        }
+
+        public static ObservableProperty<bool> SearchUsesExactMatchProperty = new ObservableProperty<bool, WorkItemTypesViewModel>(o => o.SearchUsesExactMatch);
+
         #endregion
 
         #region Constructors
@@ -131,6 +147,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         private void Search(object argument)
         {
             var searchText = this.SearchText;
+            var searchUsesExactMatch = this.SearchUsesExactMatch;
+            var searchIncludesWorkItemFields = this.SearchIncludesWorkItemFields;
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Searching for \"{0}\"", searchText), teamProjectNames.Count);
             PublishStatus(new StatusEventArgs(task));
@@ -149,27 +167,30 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         var project = store.Projects[teamProjectName];
                         foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
-                            if (Matches(searchText, workItemType.Name))
+                            if (Matches(searchText, searchUsesExactMatch, workItemType.Name))
                             {
                                 results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
                             }
-                            else if (Matches(searchText, workItemType.Description))
+                            else if (Matches(searchText, searchUsesExactMatch, workItemType.Description))
                             {
                                 results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
                             }
-                            foreach (FieldDefinition field in workItemType.FieldDefinitions)
+                            if (searchIncludesWorkItemFields)
                             {
-                                if (Matches(searchText, field.Name))
+                                foreach (FieldDefinition field in workItemType.FieldDefinitions)
                                 {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
-                                }
-                                else if (Matches(searchText, field.ReferenceName))
-                                {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
-                                }
-                                else if (Matches(searchText, field.HelpText))
-                                {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
+                                    if (Matches(searchText, searchUsesExactMatch, field.Name))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
+                                    }
+                                    else if (Matches(searchText, searchUsesExactMatch, field.ReferenceName))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
+                                    }
+                                    else if (Matches(searchText, searchUsesExactMatch, field.HelpText))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
+                                    }
                                 }
                             }
                         }
@@ -270,9 +291,9 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             return numberOfSteps;
         }
 
-        private static bool Matches(string searchText, string value)
+        private static bool Matches(string searchText, bool exactMatch, string value)
         {
-            return (value != null && value.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0);
+            return (value != null && (exactMatch ? value.Equals(searchText, StringComparison.CurrentCultureIgnoreCase) : value.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0));
         }
 
         #endregion

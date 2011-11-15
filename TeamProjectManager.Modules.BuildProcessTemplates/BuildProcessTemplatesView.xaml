@@ -20,7 +20,7 @@
                         <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
                         <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
                         <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
-                        <DataGridTextColumn Header="Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
+                        <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <Button Grid.Row="2" Content="Delete Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />

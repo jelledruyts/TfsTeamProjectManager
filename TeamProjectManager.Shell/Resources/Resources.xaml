@@ -23,7 +23,7 @@
     <Style TargetType="{x:Type ProgressBar}" />
 
     <Style TargetType="{x:Type TextBlock}">
-        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI,Tahoma,Verdana,Helvetica,Sans-Serif" />
     </Style>
 
     <LinearGradientBrush x:Key="ResizeGripperForeground" EndPoint="1,0.75" StartPoint="0,0.25">

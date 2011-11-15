@@ -82,7 +82,7 @@
                     </WrapPanel>
                 </Grid>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SearchResults}" Margin="0,5,0,0" AutoGenerateColumns="False">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SearchResults}" Margin="0,5,0,0" AutoGenerateColumns="False" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                         <DataGridTextColumn Header="Type" Binding="{Binding Path=Type}" />

@@ -38,7 +38,7 @@
                 <DataGridTextColumn Header="Changeset ID" Binding="{Binding Path=Id}" />
                 <DataGridTextColumn Header="Committer" Binding="{Binding Path=Committer}" />
                 <DataGridTextColumn Header="Time" Binding="{Binding Path=CreationTime}" />
-                <DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment}" />
+                <DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment, Converter={StaticResource singleLineConverter}}" />
             </DataGrid.Columns>
         </DataGrid>
 

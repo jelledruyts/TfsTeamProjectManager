@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.Build.Client;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Controls;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -87,6 +88,21 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
         }
 
         public static ObservableProperty<ICollection<BuildProcessTemplateInfo>> SelectedBuildProcessTemplatesProperty = new ObservableProperty<ICollection<BuildProcessTemplateInfo>, BuildProcessTemplatesViewModel>(o => o.SelectedBuildProcessTemplates);
+
+        public Visibility UnsupportedVisibility
+        {
+            get { return this.GetValue(UnsupportedVisibilityProperty); }
+            set { this.SetValue(UnsupportedVisibilityProperty, value); }
+        }
+        public static ObservableProperty<Visibility> UnsupportedVisibilityProperty = new ObservableProperty<Visibility, BuildProcessTemplatesViewModel>(o => o.UnsupportedVisibility, Visibility.Hidden);
+
+        public Visibility SupportedVisibility
+        {
+            get { return this.GetValue(SupportedVisibilityProperty); }
+            set { this.SetValue(SupportedVisibilityProperty, value); }
+        }
+
+        public static ObservableProperty<Visibility> SupportedVisibilityProperty = new ObservableProperty<Visibility, BuildProcessTemplatesViewModel>(o => o.SupportedVisibility, Visibility.Visible);
 
         #endregion
 
@@ -252,6 +268,22 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 // Refresh the list.
                 GetBuildProcessTemplates(null);
             }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        protected override void OnSelectedTeamProjectCollectionChanged()
+        {
+            var supported = IsTfsSupported();
+            this.SupportedVisibility = supported ? Visibility.Visible : Visibility.Hidden;
+            this.UnsupportedVisibility = supported ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        private bool IsTfsSupported()
+        {
+            return this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServerInfo.MajorVersion >= TfsMajorVersion.Tfs2010 && this.SelectedTeamProjectCollection.Name.Contains("codeplex");
         }
 
         #endregion

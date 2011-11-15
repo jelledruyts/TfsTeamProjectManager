@@ -60,7 +60,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             set { this.SetValue(SelectedTfsTeamProjectsProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTfsTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjects, null, OnSelectedTfsTeamProjectsChanged);
+        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTfsTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjects, new TeamProjectInfo[0], OnSelectedTfsTeamProjectsChanged);
 
         public Visibility TeamProjectsVisibility
         {
@@ -106,13 +106,13 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             var viewModel = (TeamProjectsViewModel)sender;
             viewModel.TeamProjectsVisibility = viewModel.TfsTeamProjects == null ? Visibility.Collapsed : Visibility.Visible;
-            viewModel.SelectedTfsTeamProjects = null;
+            viewModel.SelectedTfsTeamProjects = new TeamProjectInfo[0];
         }
 
         private static void OnSelectedTfsTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<TeamProjectCollectionInfo> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.TfsTeamProjects = null;
+            viewModel.TfsTeamProjects = new TeamProjectInfo[0];
             if (viewModel.SelectedTfsTeamProjectCollection != null)
             {
                 var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", viewModel.SelectedTfsTeamProjectCollection.Name));
@@ -134,6 +134,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 };
                 worker.RunWorkerCompleted += (bsender, be) =>
                 {
+                    viewModel.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(viewModel.SelectedTfsTeamProjectCollection));
                     if (be.Error != null)
                     {
                         viewModel.Logger.Log("An unexpected exception occurred while retrieving team projects", be.Error);
@@ -155,7 +156,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         private static void OnSelectedTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(viewModel.SelectedTfsTeamProjectCollection, viewModel.SelectedTfsTeamProjects));
+            viewModel.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(viewModel.SelectedTfsTeamProjects));
         }
 
         #endregion

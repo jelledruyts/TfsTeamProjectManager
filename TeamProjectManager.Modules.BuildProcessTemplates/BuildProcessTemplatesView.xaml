@@ -5,64 +5,68 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <TabControl>
+    <Grid>
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=UnsupportedVisibility}" />
 
-        <TabItem Header="View / Delete Templates">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Button Grid.Row="0" Content="Get Registered Build Process Templates" Margin="0,5,0,5" Command="{Binding Path=GetBuildProcessTemplatesCommand}" />
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildProcessTemplates}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildProcessTemplatesDataGrid" SelectionChanged="buildProcessTemplatesDataGrid_SelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
-                        <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
-                        <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
-                        <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                <Button Grid.Row="2" Content="Delete Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
-            </Grid>
-        </TabItem>
-        
-        <TabItem Header="Register / Update Template">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+        <TabControl Visibility="{Binding Path=SupportedVisibility}">
 
-                <Label Grid.Row="0" Grid.Column="0" Content="XAML Server Path In Version Control" />
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=TemplateServerPath, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
-                <Button Grid.Row="0" Grid.Column="2" Content="..." Command="{Binding Path=BrowseTemplateServerPathCommand}" Padding="5,0,5,0" />
+            <TabItem Header="View / Delete Templates">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Get Registered Build Process Templates" Margin="0,5,0,5" Command="{Binding Path=GetBuildProcessTemplatesCommand}" />
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildProcessTemplates}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildProcessTemplatesDataGrid" SelectionChanged="buildProcessTemplatesDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
+                            <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
+                            <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
+                            <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="2" Content="Delete Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
+                </Grid>
+            </TabItem>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Template Type" />
-                <ComboBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="5,0,0,0">
-                    <ComboBoxItem Content="Default" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Default}" />
-                    <ComboBoxItem Content="Upgrade" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Upgrade}" />
-                    <ComboBoxItem Content="Custom" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Custom}" />
-                </ComboBox>
+            <TabItem Header="Register / Update Template">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Unregister all other templates" IsChecked="{Binding Path=UnregisterAllOtherTemplates}" Margin="0,5,0,0" />
-                <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="Also unregister the Upgrade template" IsChecked="{Binding Path=UnregisterAllOtherTemplatesIncludesUpgradeTemplate}" IsEnabled="{Binding Path=UnregisterAllOtherTemplates}" Margin="20,5,0,0" />
+                    <Label Grid.Row="0" Grid.Column="0" Content="XAML Server Path In Version Control" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=TemplateServerPath, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                    <Button Grid.Row="0" Grid.Column="2" Content="..." Command="{Binding Path=BrowseTemplateServerPathCommand}" Padding="5,0,5,0" />
 
-                <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Simulate only, do not save any changes" IsChecked="{Binding Path=Simulate}" Margin="0,5,0,0" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Template Type" />
+                    <ComboBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="5,0,0,0">
+                        <ComboBoxItem Content="Default" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Default}" />
+                        <ComboBoxItem Content="Upgrade" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Upgrade}" />
+                        <ComboBoxItem Content="Custom" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Custom}" />
+                    </ComboBox>
 
-                <Button Grid.Row="5" Grid.ColumnSpan="2" Content="Register Or Update Build Process Template" Command="{Binding Path=RegisterBuildProcessTemplateCommand}" Margin="0,5,0,0" />
+                    <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Unregister all other templates" IsChecked="{Binding Path=UnregisterAllOtherTemplates}" Margin="0,5,0,0" />
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="Also unregister the Upgrade template" IsChecked="{Binding Path=UnregisterAllOtherTemplatesIncludesUpgradeTemplate}" IsEnabled="{Binding Path=UnregisterAllOtherTemplates}" Margin="20,5,0,0" />
 
-            </Grid>
-        </TabItem>
+                    <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Simulate only, do not save any changes" IsChecked="{Binding Path=Simulate}" Margin="0,5,0,0" />
 
-    </TabControl>
+                    <Button Grid.Row="5" Grid.ColumnSpan="2" Content="Register Or Update Build Process Template" Command="{Binding Path=RegisterBuildProcessTemplateCommand}" Margin="0,5,0,0" />
+
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
 </UserControl>

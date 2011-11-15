@@ -72,7 +72,24 @@ namespace TeamProjectManager.Common.Infrastructure
             this.EventAggregator = eventAggregator;
             this.Logger = logger;
             this.Title = title;
-            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => { this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection; this.SelectedTeamProjects = e.SelectedTeamProjects; });
+            this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(OnTeamProjectCollectionSelectionChanged);
+            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(OnTeamProjectSelectionChanged);
+        }
+
+        #endregion
+
+        #region Event Handlers
+
+        private void OnTeamProjectCollectionSelectionChanged(TeamProjectCollectionSelectionChangedEventArgs e)
+        {
+            this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection;
+            OnSelectedTeamProjectCollectionChanged();
+        }
+
+        private void OnTeamProjectSelectionChanged(TeamProjectSelectionChangedEventArgs e)
+        {
+            this.SelectedTeamProjects = e.SelectedTeamProjects;
+            OnSelectedTeamProjectsChanged();
         }
 
         #endregion
@@ -137,6 +154,14 @@ namespace TeamProjectManager.Common.Infrastructure
                     action();
                 }
             }
+        }
+
+        protected virtual void OnSelectedTeamProjectCollectionChanged()
+        {
+        }
+
+        protected virtual void OnSelectedTeamProjectsChanged()
+        {
         }
 
         #endregion

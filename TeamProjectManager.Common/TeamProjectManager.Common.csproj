@@ -84,8 +84,10 @@
     <Compile Include="ObjectModel\ObservablePropertyChangedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
+    <Compile Include="TeamFoundationServerInfo.cs" />
     <Compile Include="TeamProjectCollectionInfo.cs" />
     <Compile Include="TeamProjectInfo.cs" />
+    <Compile Include="TfsMajorVersion.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

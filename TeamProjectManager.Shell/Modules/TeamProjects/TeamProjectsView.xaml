@@ -9,6 +9,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -25,11 +26,14 @@
             <TextBlock Grid.Column="1" Margin="5,0,0,0"><Hyperlink Command="{Binding Path=AddTeamProjectCollectionCommand}" ToolTip="Connect to a Team Project Collection">add</Hyperlink></TextBlock>
         </Grid>
 
-        <Grid Grid.Row="2" Visibility="{Binding Path=TeamProjectsVisibility}">
+        <TextBlock Grid.Row="2" Text="{Binding Path=InfoMessage, Converter={StaticResource caseConverter}}" Foreground="{StaticResource UserMessageFontBrush}" TextWrapping="Wrap" Margin="0,5,0,0" />
+
+        <Grid Grid.Row="3" Visibility="{Binding Path=TeamProjectsVisibility}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            
             <ListBox Grid.Row="0" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=TfsTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
 
             <WrapPanel Grid.Row="1">
@@ -37,8 +41,6 @@
                 <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
             </WrapPanel>
         </Grid>
-
-        <TextBlock Grid.Row="2" Visibility="{Binding Path=InfoMessageVisibility}" Text="{Binding Path=InfoMessage, Converter={StaticResource caseConverter}}" Foreground="{StaticResource UserMessageFontBrush}" TextWrapping="Wrap" Margin="0,5,0,0" />
 
     </Grid>
 </UserControl>

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Schema;
-using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TeamProjectManager.Common.Infrastructure;
@@ -44,7 +43,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                             {
                                 WorkItemType.Validate(project, definition);
                             }
-                            catch (TeamFoundationServerException exc)
+                            catch (Exception exc)
                             {
                                 task.SetError("ERROR - " + exc.Message);
                             }
@@ -68,7 +67,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                             {
                                 project.WorkItemTypes.Import(definition);
                             }
-                            catch (TeamFoundationServerException exc)
+                            catch (Exception exc)
                             {
                                 task.SetError("ERROR - " + exc.Message);
                             }

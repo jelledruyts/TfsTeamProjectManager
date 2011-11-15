@@ -104,15 +104,15 @@ namespace TeamProjectManager.Modules.LastChangesets
                         VersionSpec versionTo = null;
                         while (foundChangesetsForProject < numberOfChangesetsForProject)
                         {
-                            const int pageCount = 5;
+                            const int pageCount = 10;
                             var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
-                            foreach (Changeset historyItem in history)
+                            foreach (Changeset changeset in history)
                             {
-                                if (!string.IsNullOrEmpty(historyItem.Comment) && !exclusions.Any(x => historyItem.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                                if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
                                 {
                                     foundChangesetsForProject++;
                                     task.SetProgressForCurrentStep((double)foundChangesetsForProject / (double)numberOfChangesetsForProject);
-                                    changesets.Add(new ChangesetInfo(teamProjectName, historyItem));
+                                    changesets.Add(new ChangesetInfo(teamProjectName, changeset.ChangesetId, changeset.Committer, changeset.CreationDate, changeset.Comment));
                                     if (foundChangesetsForProject == numberOfChangesetsForProject)
                                     {
                                         break;
@@ -151,20 +151,24 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private bool CanViewChangesetDetails(object argument)
         {
-            return this.SelectedChangesets != null && this.SelectedChangesets.Count == 1 && this.SelectedChangesets.First().Changeset != null;
+            return this.SelectedChangesets != null && this.SelectedChangesets.Count == 1;
         }
 
         private void ViewChangesetDetails(object argument)
         {
             try
             {
-                var changeset = this.SelectedChangesets.First().Changeset;
-                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-                var args = new object[] { changeset.VersionControlServer, changeset, false };
-                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChangesetDetails", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
                 {
-                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                    dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                    var vcs = tfs.GetService<VersionControlServer>();
+                    var changesetId = this.SelectedChangesets.First().Id;
+                    var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
+                    var args = new object[] { vcs, vcs.GetChangeset(changesetId), false };
+                    using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChangesetDetails", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+                    {
+                        dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+                        dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                    }
                 }
             }
             catch (Exception exc)

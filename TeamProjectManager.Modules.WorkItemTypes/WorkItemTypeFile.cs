@@ -16,7 +16,12 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 try
                 {
                     var doc = XDocument.Load(path);
-                    this.DisplayName = doc.Element(XName.Get("WITD", "http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef")).Element("WORKITEMTYPE").Attribute("name").Value;
+                    var rootElement = doc.Element(XName.Get("WITD", "http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef"));
+                    if (rootElement == null)
+                    {
+                        rootElement = doc.Element("WITD");
+                    }
+                    this.DisplayName = rootElement.Element("WORKITEMTYPE").Attribute("name").Value;
                 }
                 catch
                 {

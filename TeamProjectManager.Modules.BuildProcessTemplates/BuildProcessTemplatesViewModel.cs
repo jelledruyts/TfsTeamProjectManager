@@ -163,7 +163,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private bool CanGetBuildProcessTemplates(object argument)
         {
-            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0);
+            return IsAnyTeamProjectSelected();
         }
 
         private void GetBuildProcessTemplates(object argument)
@@ -195,7 +195,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private bool CanRegisterBuildProcessTemplate(object argument)
         {
-            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && !string.IsNullOrEmpty(this.TemplateServerPath));
+            return IsAnyTeamProjectSelected() && !string.IsNullOrEmpty(this.TemplateServerPath);
         }
 
         private void RegisterBuildProcessTemplate(object argument)

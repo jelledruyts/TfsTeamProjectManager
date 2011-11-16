@@ -10,7 +10,7 @@
 
         <TabControl Visibility="{Binding Path=SupportedVisibility}">
 
-            <TabItem Header="View / Delete Templates">
+            <TabItem Header="View / Delete">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -30,7 +30,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Register / Update Template">
+            <TabItem Header="Register / Update">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

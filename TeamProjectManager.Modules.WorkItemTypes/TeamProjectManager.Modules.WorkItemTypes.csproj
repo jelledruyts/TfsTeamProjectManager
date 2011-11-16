@@ -78,6 +78,7 @@
     <Compile Include="SearchResult.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
     <Compile Include="WorkItemTypeFile.cs" />
+    <Compile Include="WorkItemTypeInfo.cs" />
     <Compile Include="WorkItemTypesView.xaml.cs">
       <DependentUpon>WorkItemTypesView.xaml</DependentUpon>
     </Compile>

@@ -79,7 +79,7 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         private bool CanGetLastChangesets(object argument)
         {
-            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && this.NumberOfChangesets > 0);
+            return IsAnyTeamProjectSelected() && this.NumberOfChangesets > 0;
         }
 
         private void GetLastChangesets(object argument)

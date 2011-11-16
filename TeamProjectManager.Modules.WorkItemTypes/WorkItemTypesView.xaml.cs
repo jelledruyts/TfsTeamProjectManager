@@ -31,6 +31,11 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             }
         }
 
+        private void workItemTypesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.ViewModel.SelectedWorkItemTypes = this.workItemTypesDataGrid.SelectedItems.Cast<WorkItemTypeInfo>().ToList();
+        }
+
         private void workItemTypeFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.ViewModel.SelectedWorkItemTypeFiles = this.workItemTypeFilesListBox.SelectedItems.Cast<WorkItemTypeFile>().ToList();

@@ -5,9 +5,11 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -19,6 +21,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
     {
         #region Properties
 
+        public RelayCommand GetWorkItemTypesCommand { get; private set; }
+        public RelayCommand ExportSelectedWorkItemTypesCommand { get; private set; }
         public RelayCommand BrowseWorkItemTypesFilePathCommand { get; private set; }
         public RelayCommand SearchCommand { get; private set; }
         public RelayCommand ValidateCommand { get; private set; }
@@ -28,6 +32,22 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         #endregion
 
         #region Observable Properties
+
+        public ICollection<WorkItemTypeInfo> WorkItemTypes
+        {
+            get { return this.GetValue(WorkItemTypesProperty); }
+            set { this.SetValue(WorkItemTypesProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<WorkItemTypeInfo>> WorkItemTypesProperty = new ObservableProperty<ICollection<WorkItemTypeInfo>, WorkItemTypesViewModel>(o => o.WorkItemTypes);
+
+        public ICollection<WorkItemTypeInfo> SelectedWorkItemTypes
+        {
+            get { return this.GetValue(SelectedWorkItemTypesProperty); }
+            set { this.SetValue(SelectedWorkItemTypesProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<WorkItemTypeInfo>> SelectedWorkItemTypesProperty = new ObservableProperty<ICollection<WorkItemTypeInfo>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypes);
 
         public string WorkItemTypesFilePath
         {
@@ -93,6 +113,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public WorkItemTypesViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base("Work Item Types", eventAggregator, logger)
         {
+            this.GetWorkItemTypesCommand = new RelayCommand(GetWorkItemTypes, CanGetWorkItemTypes);
+            this.ExportSelectedWorkItemTypesCommand = new RelayCommand(ExportSelectedWorkItemTypes, CanExportSelectedWorkItemTypes);
             this.BrowseWorkItemTypesFilePathCommand = new RelayCommand(BrowseWorkItemTypesFilePath, CanBrowseWorkItemTypesFilePath);
             this.SearchCommand = new RelayCommand(Search, CanSearch);
             this.ValidateCommand = new RelayCommand(Validate, CanValidate);
@@ -122,6 +144,134 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         #region Commands
 
+        private bool CanGetWorkItemTypes(object argument)
+        {
+            return IsAnyTeamProjectSelected();
+        }
+
+        private void GetWorkItemTypes(object argument)
+        {
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var task = new ApplicationTask("Retrieving work item types", teamProjectNames.Count);
+            PublishStatus(new StatusEventArgs(task));
+            var step = 0;
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                {
+                    var store = tfs.GetService<WorkItemStore>();
+
+                    var results = new List<WorkItemTypeInfo>();
+                    foreach (var teamProjectName in teamProjectNames)
+                    {
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
+                        var project = store.Projects[teamProjectName];
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
+                        {
+                            var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
+                            results.Add(new WorkItemTypeInfo(teamProjectName, workItemType.Name, workItemType.Description, workItemCount));
+                        }
+                    }
+                    e.Result = results;
+                }
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while retrieving work item types", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    this.WorkItemTypes = (ICollection<WorkItemTypeInfo>)e.Result;
+                    task.SetComplete("Retrieved " + this.WorkItemTypes.Count.ToCountString("work item type"));
+                }
+            };
+            worker.RunWorkerAsync();
+        }
+
+        private bool CanExportSelectedWorkItemTypes(object argument)
+        {
+            return (this.SelectedWorkItemTypes != null && this.SelectedWorkItemTypes.Count > 0);
+        }
+
+        private void ExportSelectedWorkItemTypes(object argument)
+        {
+            var workItemTypesToExport = new List<Tuple<WorkItemTypeInfo, string>>();
+            var workItemTypes = this.SelectedWorkItemTypes;
+            if (workItemTypes.Count == 1)
+            {
+                // Export to single file.
+                var workItemType = workItemTypes.Single();
+                var dialog = new SaveFileDialog();
+                dialog.FileName = workItemType.Name + ".xml";
+                var result = dialog.ShowDialog(Application.Current.MainWindow);
+                if (result == true)
+                {
+                    workItemTypesToExport.Add(new Tuple<WorkItemTypeInfo, string>(workItemType, dialog.FileName));
+                }
+            }
+            else
+            {
+                // Export to a directory structure.
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                dialog.Description = "Please select the path where to export the Work Item Type Definition files (*.xml). They will be stored in a folder per Team Project.";
+                var result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var rootFolder = dialog.SelectedPath;
+                    foreach (var workItemType in workItemTypes)
+                    {
+                        var fileName = Path.Combine(rootFolder, workItemType.TeamProject, workItemType.Name + ".xml");
+                        workItemTypesToExport.Add(new Tuple<WorkItemTypeInfo, string>(workItemType, fileName));
+                    }
+                }
+            }
+
+            if (workItemTypesToExport.Count > 0)
+            {
+                var task = new ApplicationTask("Exporting work item types", workItemTypesToExport.Count);
+                PublishStatus(new StatusEventArgs(task));
+                var step = 0;
+                var worker = new BackgroundWorker();
+                worker.DoWork += (sender, e) =>
+                {
+                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                    {
+                        var store = tfs.GetService<WorkItemStore>();
+
+                        var results = new List<WorkItemTypeInfo>();
+                        foreach (var workItemTypeToExport in workItemTypesToExport)
+                        {
+                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Exporting work item type \"{0}\" from Team Project \"{1}\"", workItemTypeToExport.Item1.Name, workItemTypeToExport.Item1.TeamProject));
+                            Directory.CreateDirectory(Path.GetDirectoryName(workItemTypeToExport.Item2));
+                            var project = store.Projects[workItemTypeToExport.Item1.TeamProject];
+                            var workItemType = project.WorkItemTypes[workItemTypeToExport.Item1.Name];
+                            var workItemTypeXml = workItemType.Export(false);
+                            workItemTypeXml.Save(workItemTypeToExport.Item2);
+                        }
+                    }
+                };
+                worker.RunWorkerCompleted += (sender, e) =>
+                {
+                    if (e.Error != null)
+                    {
+                        Logger.Log("An unexpected exception occurred while exporting work item types", e.Error);
+                        task.SetError(e.Error);
+                        task.SetComplete("An unexpected exception occurred");
+                    }
+                    else
+                    {
+                        task.SetComplete("Exported " + workItemTypesToExport.Count.ToCountString("work item type"));
+                    }
+                };
+                worker.RunWorkerAsync();
+            }
+        }
+
         private bool CanBrowseWorkItemTypesFilePath(object arguments)
         {
             return true;
@@ -141,7 +291,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         private bool CanSearch(object argument)
         {
-            return this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && !string.IsNullOrEmpty(this.SearchText);
+            return IsAnyTeamProjectSelected() && !string.IsNullOrEmpty(this.SearchText);
         }
 
         private void Search(object argument)
@@ -217,7 +367,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         private bool CanValidate(object argument)
         {
-            return this.SelectedTeamProjects != null && this.SelectedTeamProjects.Count > 0 && this.SelectedWorkItemTypeFiles != null && this.SelectedWorkItemTypeFiles.Count > 0;
+            return IsAnyTeamProjectSelected() && this.SelectedWorkItemTypeFiles != null && this.SelectedWorkItemTypeFiles.Count > 0;
         }
 
         private void Validate(object argument)

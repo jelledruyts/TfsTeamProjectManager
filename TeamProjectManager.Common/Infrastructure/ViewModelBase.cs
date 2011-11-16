@@ -164,6 +164,16 @@ namespace TeamProjectManager.Common.Infrastructure
         {
         }
 
+        protected int GetNumberOfSelectedTeamProjects()
+        {
+            return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null ? this.SelectedTeamProjects.Count : 0);
+        }
+
+        protected bool IsAnyTeamProjectSelected()
+        {
+            return GetNumberOfSelectedTeamProjects() > 0;
+        }
+
         #endregion
     }
 }

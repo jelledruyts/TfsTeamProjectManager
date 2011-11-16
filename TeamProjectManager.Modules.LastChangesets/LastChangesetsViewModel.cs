@@ -175,7 +175,7 @@ namespace TeamProjectManager.Modules.LastChangesets
             {
                 var message = "There was a problem showing the internal TFS changeset details dialog.";
                 Logger.Log(message, exc, TraceEventType.Warning);
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

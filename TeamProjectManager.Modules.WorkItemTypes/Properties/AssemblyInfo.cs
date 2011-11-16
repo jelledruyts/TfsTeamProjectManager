@@ -7,20 +7,20 @@ using TeamProjectManager.Common;
 
 [assembly: AssemblyVersion("1.0.*")] // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
 [assembly: AssemblyInformationalVersion("1.0.0.0")] // Keep this constant as long as possible to avoid the user's settings getting lost (it is used for the LocalUserAppDataPath where the configuration file is stored).
+[assembly: Guid("9e940ec7-d7af-4406-a211-0668071f9c02")]
 
 [assembly: AssemblyProduct(Constants.ApplicationName)]
 [assembly: AssemblyTitle(Constants.ApplicationName + " - Work Item Types Module")]
-[assembly: AssemblyDescription("Allows various tasks to be automated across Team Projects in Team Foundation Server.")]
-[assembly: AssemblyCompany("Jelle Druyts")]
-[assembly: AssemblyCopyright("Copyright © Jelle Druyts 2011")]
-[assembly: Guid("9e940ec7-d7af-4406-a211-0668071f9c02")]
+[assembly: AssemblyDescription(Constants.ApplicationDescription)]
+[assembly: AssemblyCompany(Constants.ApplicationCompany)]
+[assembly: AssemblyCopyright(Constants.ApplicationCopyright)]
 
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyConfiguration(Constants.AssemblyConfiguration)]
+[assembly: AssemblyTrademark(Constants.AssemblyTrademark)]
+[assembly: AssemblyCulture(Constants.AssemblyCulture)]
+[assembly: NeutralResourcesLanguage(Constants.AssemblyNeutralResourcesLanguage)]
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(false)]
-[assembly: NeutralResourcesLanguage("en-US")]
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located

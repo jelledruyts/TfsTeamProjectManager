@@ -36,7 +36,6 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         public static ObservableProperty<IEnumerable<TeamProjectCollectionInfo>> TfsTeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<TeamProjectCollectionInfo>, TeamProjectsViewModel>(o => o.TfsTeamProjectCollections);
 
-        [Export]
         public TeamProjectCollectionInfo SelectedTfsTeamProjectCollection
         {
             get { return this.GetValue(SelectedTfsTeamProjectCollectionProperty); }
@@ -44,15 +43,6 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         }
 
         public static ObservableProperty<TeamProjectCollectionInfo> SelectedTfsTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjectCollection, null, OnSelectedTfsTeamProjectCollectionChanged);
-
-        [Export]
-        public IEnumerable<TeamProjectInfo> TfsTeamProjects
-        {
-            get { return this.GetValue(TfsTeamProjectsProperty); }
-            set { this.SetValue(TfsTeamProjectsProperty, value); }
-        }
-
-        public static ObservableProperty<IEnumerable<TeamProjectInfo>> TfsTeamProjectsProperty = new ObservableProperty<IEnumerable<TeamProjectInfo>, TeamProjectsViewModel>(o => o.TfsTeamProjects, OnTfsTeamProjectsChanged);
 
         public ICollection<TeamProjectInfo> SelectedTfsTeamProjects
         {
@@ -76,7 +66,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             set { this.SetValue(InfoMessageProperty, value); }
         }
 
-        public static ObservableProperty<string> InfoMessageProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessage);
+        public static ObservableProperty<string> InfoMessageProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessage, "Please select a project collection");
 
         public bool IsTeamProjectsLoadComplete
         {
@@ -94,7 +84,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         public TeamProjectsViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base("Team Projects", eventAggregator, logger)
         {
-            this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection);
+            this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection, CanAddTeamProjectCollection);
             RefreshTeamProjectCollections(null);
         }
 
@@ -102,55 +92,10 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         #region Property Change Handlers
 
-        private static void OnTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<IEnumerable<TeamProjectInfo>> e)
-        {
-            var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.TeamProjectsVisibility = viewModel.TfsTeamProjects == null ? Visibility.Collapsed : Visibility.Visible;
-            viewModel.SelectedTfsTeamProjects = new TeamProjectInfo[0];
-        }
-
         private static void OnSelectedTfsTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<TeamProjectCollectionInfo> e)
         {
             var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.TfsTeamProjects = new TeamProjectInfo[0];
-            if (viewModel.SelectedTfsTeamProjectCollection != null)
-            {
-                var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", viewModel.SelectedTfsTeamProjectCollection.Name));
-                viewModel.InfoMessage = "Loading...";
-                viewModel.PublishStatus(new StatusEventArgs(task));
-                viewModel.IsTeamProjectsLoadComplete = false;
-                var worker = new BackgroundWorker();
-                worker.DoWork += (bsender, be) =>
-                {
-                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(viewModel.SelectedTfsTeamProjectCollection.Uri))
-                    {
-                        if (viewModel.SelectedTfsTeamProjectCollection.TeamFoundationServerInfo == null)
-                        {
-                            viewModel.SelectedTfsTeamProjectCollection.TeamFoundationServerInfo = new TeamFoundationServerInfo(viewModel.GetTfsMajorVersion(tfs));
-                        }
-                        var store = tfs.GetService<ICommonStructureService>();
-                        be.Result = store.ListAllProjects().Where(p => p.Status == ProjectState.WellFormed).Select(p => new TeamProjectInfo(viewModel.SelectedTfsTeamProjectCollection, p.Name, new Uri(p.Uri))).OrderBy(p => p.Name);
-                    }
-                };
-                worker.RunWorkerCompleted += (bsender, be) =>
-                {
-                    viewModel.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(viewModel.SelectedTfsTeamProjectCollection));
-                    if (be.Error != null)
-                    {
-                        viewModel.Logger.Log("An unexpected exception occurred while retrieving team projects", be.Error);
-                        task.SetError(be.Error);
-                        task.SetComplete("An unexpected exception occurred");
-                    }
-                    else
-                    {
-                        viewModel.TfsTeamProjects = (IEnumerable<TeamProjectInfo>)be.Result;
-                        task.SetComplete("Retrieved " + viewModel.TfsTeamProjects.Count().ToCountString("team project"));
-                    }
-                    viewModel.InfoMessage = "Connected to " + viewModel.SelectedTfsTeamProjectCollection.TeamFoundationServerInfo.ShortDisplayVersion;
-                    viewModel.IsTeamProjectsLoadComplete = true;
-                };
-                worker.RunWorkerAsync();
-            }
+            viewModel.RefreshTeamProjects();
         }
 
         private static void OnSelectedTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
@@ -162,6 +107,11 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         #endregion
 
         #region Commands
+
+        private bool CanAddTeamProjectCollection(object argument)
+        {
+            return Network.IsAvailable();
+        }
 
         private void AddTeamProjectCollection(object argument)
         {
@@ -185,9 +135,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             try
             {
-                this.InfoMessage = "Loading...";
                 this.TfsTeamProjectCollections = RegisteredTfsConnections.GetProjectCollections().Select(c => new TeamProjectCollectionInfo(c.Name, c.Uri));
-                this.InfoMessage = "Please select a project collection";
                 this.SelectedTfsTeamProjectCollection = this.TfsTeamProjectCollections.FirstOrDefault(t => t.Name == selectedTeamProjectCollectionName);
             }
             catch (Exception exc)
@@ -196,7 +144,66 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
         }
 
-        private TfsMajorVersion GetTfsMajorVersion(TfsTeamProjectCollection tfs)
+        private void RefreshTeamProjects()
+        {
+            if (this.SelectedTfsTeamProjectCollection != null && this.SelectedTfsTeamProjectCollection.TeamFoundationServer == null && this.SelectedTfsTeamProjectCollection.TeamProjects == null)
+            {
+                var teamProjectCollectionToRefresh = this.SelectedTfsTeamProjectCollection;
+                this.SelectedTfsTeamProjectCollection = null;
+                var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", teamProjectCollectionToRefresh.Name));
+                this.InfoMessage = "Loading...";
+                this.PublishStatus(new StatusEventArgs(task));
+                this.IsTeamProjectsLoadComplete = false;
+                this.TeamProjectsVisibility = Visibility.Collapsed;
+                var worker = new BackgroundWorker();
+                worker.DoWork += (sender, e) =>
+                {
+                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(teamProjectCollectionToRefresh.Uri))
+                    {
+                        var tfsInfo = new TeamFoundationServerInfo(GetTfsMajorVersion(tfs, this.Logger));
+                        var store = tfs.GetService<ICommonStructureService>();
+                        var teamProjects = store.ListAllProjects().Where(p => p.Status == ProjectState.WellFormed).Select(p => new TeamProjectInfo(teamProjectCollectionToRefresh, p.Name, new Uri(p.Uri))).OrderBy(p => p.Name).ToList();
+                        e.Result = new Tuple<TeamFoundationServerInfo, ICollection<TeamProjectInfo>>(tfsInfo, teamProjects);
+                    }
+                };
+                worker.RunWorkerCompleted += (sender, e) =>
+                {
+                    if (e.Error != null)
+                    {
+                        this.Logger.Log("An unexpected exception occurred while retrieving team projects", e.Error);
+                        this.InfoMessage = "Could not connect";
+                        task.SetError(e.Error);
+                        task.SetComplete("An unexpected exception occurred");
+                    }
+                    else
+                    {
+                        var result = (Tuple<TeamFoundationServerInfo, ICollection<TeamProjectInfo>>)e.Result;
+                        teamProjectCollectionToRefresh.TeamFoundationServer = result.Item1;
+                        teamProjectCollectionToRefresh.TeamProjects = result.Item2;
+                        this.SelectedTfsTeamProjectCollection = teamProjectCollectionToRefresh;
+                        task.SetComplete("Retrieved " + teamProjectCollectionToRefresh.TeamProjects.Count.ToCountString("team project"));
+                    }
+                    this.IsTeamProjectsLoadComplete = true;
+                };
+                worker.RunWorkerAsync();
+            }
+            else
+            {
+                if (this.SelectedTfsTeamProjectCollection == null)
+                {
+                    this.InfoMessage = InfoMessageProperty.DefaultValue;
+                    this.TeamProjectsVisibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.InfoMessage = "Connected to " + this.SelectedTfsTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion;
+                    this.TeamProjectsVisibility = Visibility.Visible;
+                }
+                this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(this.SelectedTfsTeamProjectCollection));
+            }
+        }
+
+        private static TfsMajorVersion GetTfsMajorVersion(TfsTeamProjectCollection tfs, ILogger logger)
         {
             try
             {
@@ -241,7 +248,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
             catch (TeamFoundationServerException exc)
             {
-                this.Logger.Log("An exception occurred while determining the TFS major version", exc);
+                logger.Log("An exception occurred while determining the TFS major version", exc);
                 return TfsMajorVersion.Unknown;
             }
         }

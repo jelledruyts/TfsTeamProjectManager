@@ -33,8 +33,8 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
-            <ListBox Grid.Row="0" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=TfsTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
+
+            <ListBox Grid.Row="0" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=SelectedTfsTeamProjectCollection.TeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
 
             <WrapPanel Grid.Row="1">
                 <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>

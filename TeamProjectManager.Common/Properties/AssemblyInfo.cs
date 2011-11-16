@@ -1,35 +1,25 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using TeamProjectManager.Common;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("TeamProjectManager.Common")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("TeamProjectManager.Common")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b2430a62-ebfa-4e0b-bbe2-f3a5dec93b85")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: Guid("b2430a62-ebfa-4e0b-bbe2-f3a5dec93b85")]
+
+[assembly: AssemblyProduct(Constants.ApplicationName)]
+[assembly: AssemblyTitle(Constants.ApplicationName + " - Common Assembly")]
+[assembly: AssemblyDescription(Constants.ApplicationDescription)]
+[assembly: AssemblyCompany(Constants.ApplicationCompany)]
+[assembly: AssemblyCopyright(Constants.ApplicationCopyright)]
+
+[assembly: AssemblyConfiguration(Constants.AssemblyConfiguration)]
+[assembly: AssemblyTrademark(Constants.AssemblyTrademark)]
+[assembly: AssemblyCulture(Constants.AssemblyCulture)]
+[assembly: NeutralResourcesLanguage(Constants.AssemblyNeutralResourcesLanguage)]
+[assembly: ComVisible(false)]
+[assembly: CLSCompliant(true)]
+
+[assembly: InternalsVisibleTo("TeamProjectManager, PublicKey=00240000048000009400000006020000002400005253413100040000010001000ba240836a4513ea6df49f0bb0d38c15d5fce4d04c63a60ac7c5c9cdc1d2df43cf40ad0e06c9b07a51e3e531fb294ba5ef06a8f4a811cba9fa28011236797f6074e8485f19e1338561ccdf1a13bc0422bf22d257ebb5560522da5ff2c8847f92d2c4c02d5ea72a28bbafe157b3e833b5f053eb1267c8cb335d9e79da0a37d0b1")]

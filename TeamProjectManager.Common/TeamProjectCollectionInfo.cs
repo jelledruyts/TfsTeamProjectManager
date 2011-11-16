@@ -1,47 +1,44 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Common
 {
-    public sealed class TeamProjectCollectionInfo : INotifyPropertyChanged
+    public sealed class TeamProjectCollectionInfo : ObservableObject
     {
-        private TeamFoundationServerInfo teamFoundationServerInfo;
-        public TeamFoundationServerInfo TeamFoundationServerInfo
-        {
-            get
-            {
-                return this.teamFoundationServerInfo;
-            }
-            set
-            {
-                if (this.teamFoundationServerInfo != null)
-                {
-                    throw new InvalidOperationException("The TeamFoundationServerInfo property can only be set once.");
-                }
-                this.teamFoundationServerInfo = value;
-                OnPropertyChanged("TeamFoundationServerInfo");
-            }
-        }
+        #region Properties
 
         public string Name { get; private set; }
         public Uri Uri { get; private set; }
+
+        #endregion
+
+        #region Observable Properties
+
+        public TeamFoundationServerInfo TeamFoundationServer
+        {
+            get { return this.GetValue(TeamFoundationServerProperty); }
+            internal set { this.SetValue(TeamFoundationServerProperty, value); }
+        }
+
+        public static ObservableProperty<TeamFoundationServerInfo> TeamFoundationServerProperty = new ObservableProperty<TeamFoundationServerInfo, TeamProjectCollectionInfo>(o => o.TeamFoundationServer);
+
+        public ICollection<TeamProjectInfo> TeamProjects
+        {
+            get { return this.GetValue(TeamProjectsProperty); }
+            set { this.SetValue(TeamProjectsProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<TeamProjectInfo>> TeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectCollectionInfo>(o => o.TeamProjects);
+
+        #endregion
+
+        #region Constructors
 
         public TeamProjectCollectionInfo(string name, Uri uri)
         {
             this.Name = name;
             this.Uri = uri;
-        }
-
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
         }
 
         #endregion

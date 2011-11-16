@@ -156,7 +156,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     var message = "There was a problem showing the internal TFS version control file browser dialog.";
                     Logger.Log(message, exc, TraceEventType.Warning);
-                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
@@ -283,7 +283,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private bool IsTfsSupported()
         {
-            return this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServerInfo.MajorVersion >= TfsMajorVersion.Tfs2010 && this.SelectedTeamProjectCollection.Name.Contains("codeplex");
+            return this.SelectedTeamProjectCollection == null || this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.Tfs2010;
         }
 
         #endregion

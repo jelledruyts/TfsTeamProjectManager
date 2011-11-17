@@ -20,11 +20,13 @@
                         <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                         <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
                         <DataGridTextColumn Header="Number Of Work Items" Binding="{Binding Path=WorkItemCount}" />
+                        <DataGridTextColumn Header="Used In Categories" Binding="{Binding Path=WorkItemCategoriesList}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <WrapPanel Grid.Row="2" Margin="0,5,0,0">
                     <Button Content="Export Selected Work Item Types" Margin="0,0,5,0" Command="{Binding Path=ExportSelectedWorkItemTypesCommand}" />
+                    <Button Content="Delete Selected Work Item Types" Command="{Binding Path=DeleteSelectedWorkItemTypesCommand}" />
                 </WrapPanel>
             </Grid>
         </TabItem>

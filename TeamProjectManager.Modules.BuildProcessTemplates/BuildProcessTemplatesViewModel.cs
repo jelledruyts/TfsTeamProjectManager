@@ -262,11 +262,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                     {
                         task.SetComplete("Deleted " + buildProcessTemplates.Count.ToCountString("build process template"));
                     }
+
+                    // Refresh the list.
+                    GetBuildProcessTemplates(null);
                 };
                 worker.RunWorkerAsync();
-
-                // Refresh the list.
-                GetBuildProcessTemplates(null);
             }
         }
 

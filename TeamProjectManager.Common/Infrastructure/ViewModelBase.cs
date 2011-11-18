@@ -50,7 +50,7 @@ namespace TeamProjectManager.Common.Infrastructure
             set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
         }
 
-        public static ObservableProperty<TeamProjectCollectionInfo> SelectedTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, ViewModelBase>(o => o.SelectedTeamProjectCollection);
+        public static ObservableProperty<TeamProjectCollectionInfo> SelectedTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, ViewModelBase>(o => o.SelectedTeamProjectCollection, OnSelectedTeamProjectCollectionChanged);
 
         public ICollection<TeamProjectInfo> SelectedTeamProjects
         {
@@ -58,7 +58,7 @@ namespace TeamProjectManager.Common.Infrastructure
             set { this.SetValue(SelectedTeamProjectsProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, ViewModelBase>(o => o.SelectedTeamProjects);
+        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, ViewModelBase>(o => o.SelectedTeamProjects, OnSelectedTeamProjectsChanged);
 
         #endregion
 
@@ -72,24 +72,24 @@ namespace TeamProjectManager.Common.Infrastructure
             this.EventAggregator = eventAggregator;
             this.Logger = logger;
             this.Title = title;
-            this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(OnTeamProjectCollectionSelectionChanged);
-            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(OnTeamProjectSelectionChanged);
+            this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection);
+            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjects = e.SelectedTeamProjects);
         }
 
         #endregion
 
         #region Event Handlers
 
-        private void OnTeamProjectCollectionSelectionChanged(TeamProjectCollectionSelectionChangedEventArgs e)
+        private static void OnSelectedTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<TeamProjectCollectionInfo> e)
         {
-            this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection;
-            OnSelectedTeamProjectCollectionChanged();
+            var viewModel = (ViewModelBase)sender;
+            viewModel.OnSelectedTeamProjectCollectionChanged();
         }
 
-        private void OnTeamProjectSelectionChanged(TeamProjectSelectionChangedEventArgs e)
+        private static void OnSelectedTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
         {
-            this.SelectedTeamProjects = e.SelectedTeamProjects;
-            OnSelectedTeamProjectsChanged();
+            var viewModel = (ViewModelBase)sender;
+            viewModel.OnSelectedTeamProjectsChanged();
         }
 
         #endregion

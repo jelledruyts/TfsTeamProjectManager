@@ -28,29 +28,13 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         #region Observable Properties
 
-        public IEnumerable<TeamProjectCollectionInfo> TfsTeamProjectCollections
+        public IEnumerable<TeamProjectCollectionInfo> TeamProjectCollections
         {
-            get { return this.GetValue(TfsTeamProjectCollectionsProperty); }
-            set { this.SetValue(TfsTeamProjectCollectionsProperty, value); }
+            get { return this.GetValue(TeamProjectCollectionsProperty); }
+            set { this.SetValue(TeamProjectCollectionsProperty, value); }
         }
 
-        public static ObservableProperty<IEnumerable<TeamProjectCollectionInfo>> TfsTeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<TeamProjectCollectionInfo>, TeamProjectsViewModel>(o => o.TfsTeamProjectCollections);
-
-        public TeamProjectCollectionInfo SelectedTfsTeamProjectCollection
-        {
-            get { return this.GetValue(SelectedTfsTeamProjectCollectionProperty); }
-            set { this.SetValue(SelectedTfsTeamProjectCollectionProperty, value); }
-        }
-
-        public static ObservableProperty<TeamProjectCollectionInfo> SelectedTfsTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjectCollection, null, OnSelectedTfsTeamProjectCollectionChanged);
-
-        public ICollection<TeamProjectInfo> SelectedTfsTeamProjects
-        {
-            get { return this.GetValue(SelectedTfsTeamProjectsProperty); }
-            set { this.SetValue(SelectedTfsTeamProjectsProperty, value); }
-        }
-
-        public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTfsTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectsViewModel>(o => o.SelectedTfsTeamProjects, new TeamProjectInfo[0], OnSelectedTfsTeamProjectsChanged);
+        public static ObservableProperty<IEnumerable<TeamProjectCollectionInfo>> TeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<TeamProjectCollectionInfo>, TeamProjectsViewModel>(o => o.TeamProjectCollections);
 
         public Visibility TeamProjectsVisibility
         {
@@ -92,16 +76,14 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         #region Property Change Handlers
 
-        private static void OnSelectedTfsTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<TeamProjectCollectionInfo> e)
+        protected override void OnSelectedTeamProjectCollectionChanged()
         {
-            var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.RefreshTeamProjects();
+            RefreshTeamProjects();
         }
 
-        private static void OnSelectedTfsTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
+        protected override void OnSelectedTeamProjectsChanged()
         {
-            var viewModel = (TeamProjectsViewModel)sender;
-            viewModel.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(viewModel.SelectedTfsTeamProjects));
+            this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(this.SelectedTeamProjects));
         }
 
         #endregion
@@ -135,8 +117,8 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             try
             {
-                this.TfsTeamProjectCollections = RegisteredTfsConnections.GetProjectCollections().Select(c => new TeamProjectCollectionInfo(c.Name, c.Uri));
-                this.SelectedTfsTeamProjectCollection = this.TfsTeamProjectCollections.FirstOrDefault(t => t.Name == selectedTeamProjectCollectionName);
+                this.TeamProjectCollections = RegisteredTfsConnections.GetProjectCollections().Select(c => new TeamProjectCollectionInfo(c.Name, c.Uri));
+                this.SelectedTeamProjectCollection = this.TeamProjectCollections.FirstOrDefault(t => t.Name == selectedTeamProjectCollectionName);
             }
             catch (Exception exc)
             {
@@ -146,10 +128,10 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         private void RefreshTeamProjects()
         {
-            if (this.SelectedTfsTeamProjectCollection != null && this.SelectedTfsTeamProjectCollection.TeamFoundationServer == null && this.SelectedTfsTeamProjectCollection.TeamProjects == null)
+            if (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer == null && this.SelectedTeamProjectCollection.TeamProjects == null)
             {
-                var teamProjectCollectionToRefresh = this.SelectedTfsTeamProjectCollection;
-                this.SelectedTfsTeamProjectCollection = null;
+                var teamProjectCollectionToRefresh = this.SelectedTeamProjectCollection;
+                this.SelectedTeamProjectCollection = null;
                 var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", teamProjectCollectionToRefresh.Name));
                 this.InfoMessage = "Loading...";
                 this.PublishStatus(new StatusEventArgs(task));
@@ -180,7 +162,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                         var result = (Tuple<TeamFoundationServerInfo, ICollection<TeamProjectInfo>>)e.Result;
                         teamProjectCollectionToRefresh.TeamFoundationServer = result.Item1;
                         teamProjectCollectionToRefresh.TeamProjects = result.Item2;
-                        this.SelectedTfsTeamProjectCollection = teamProjectCollectionToRefresh;
+                        this.SelectedTeamProjectCollection = teamProjectCollectionToRefresh;
                         task.SetComplete("Retrieved " + teamProjectCollectionToRefresh.TeamProjects.Count.ToCountString("team project"));
                     }
                     this.IsTeamProjectsLoadComplete = true;
@@ -189,17 +171,17 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
             else
             {
-                if (this.SelectedTfsTeamProjectCollection == null)
+                if (this.SelectedTeamProjectCollection == null)
                 {
                     this.InfoMessage = InfoMessageProperty.DefaultValue;
                     this.TeamProjectsVisibility = Visibility.Collapsed;
                 }
                 else
                 {
-                    this.InfoMessage = "Connected to " + this.SelectedTfsTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion;
+                    this.InfoMessage = "Connected to " + this.SelectedTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion;
                     this.TeamProjectsVisibility = Visibility.Visible;
                 }
-                this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(this.SelectedTfsTeamProjectCollection));
+                this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(this.SelectedTeamProjectCollection));
             }
         }
 

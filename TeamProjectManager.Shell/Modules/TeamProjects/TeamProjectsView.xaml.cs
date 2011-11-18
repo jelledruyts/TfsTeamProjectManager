@@ -34,7 +34,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         private void teamProjectsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ViewModel.SelectedTfsTeamProjects = this.teamProjectsListBox.SelectedItems.Cast<TeamProjectInfo>().ToList();
+            this.ViewModel.SelectedTeamProjects = this.teamProjectsListBox.SelectedItems.Cast<TeamProjectInfo>().ToList();
         }
 
         private bool CanSelectAll(object argument)

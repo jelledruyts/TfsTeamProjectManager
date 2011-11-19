@@ -115,7 +115,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         [ImportingConstructor]
         public WorkItemTypesViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Work Item Types", eventAggregator, logger)
+            : base(eventAggregator, logger, "Work Item Types", "Allows you to manage work item type definitions and work item categories.")
         {
             this.GetWorkItemTypesCommand = new RelayCommand(GetWorkItemTypes, CanGetWorkItemTypes);
             this.ExportSelectedWorkItemTypesCommand = new RelayCommand(ExportSelectedWorkItemTypes, CanExportSelectedWorkItemTypes);

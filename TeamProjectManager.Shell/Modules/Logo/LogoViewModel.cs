@@ -89,7 +89,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
 
         [ImportingConstructor]
         public LogoViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Logo", eventAggregator, logger)
+            : base(eventAggregator, logger, "Logo")
         {
             this.HeaderTitle = InternalConstants.DefaultWindowTitle;
             this.HeaderSubtitle = "v" + App.ApplicationVersion.ToString(3);

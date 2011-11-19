@@ -110,7 +110,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         [ImportingConstructor]
         public BuildProcessTemplatesViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Build Process Templates", eventAggregator, logger)
+            : base(eventAggregator, logger, "Build Process Templates", "Allows you to manage the registered build process templates for Team Projects.")
         {
             this.RegisterBuildProcessTemplateCommand = new RelayCommand(RegisterBuildProcessTemplate, CanRegisterBuildProcessTemplate);
             this.GetBuildProcessTemplatesCommand = new RelayCommand(GetBuildProcessTemplates, CanGetBuildProcessTemplates);
@@ -239,11 +239,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private void DeleteSelectedBuildProcessTemplates(object argument)
         {
-            var result = MessageBox.Show("This will delete the selected build process templates. Are you sure you want to continue?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will unregister the selected build process templates. Are you sure you want to continue?" + Environment.NewLine + Environment.NewLine + "Note that the XAML files will not be deleted from version control, they will only be unregistered as build process templates.", "Confirm Unregister", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
                 var buildProcessTemplates = this.SelectedBuildProcessTemplates.Select(p => p.ProcessTemplate).ToList();
-                var task = new ApplicationTask("Deleting build process templates", buildProcessTemplates.Count);
+                var task = new ApplicationTask("Unregistering build process templates", buildProcessTemplates.Count);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -254,13 +254,13 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     if (e.Error != null)
                     {
-                        Logger.Log("An unexpected exception occurred while deleting build process template", e.Error);
+                        Logger.Log("An unexpected exception occurred while unregistering build process template", e.Error);
                         task.SetError(e.Error);
                         task.SetComplete("An unexpected exception occurred");
                     }
                     else
                     {
-                        task.SetComplete("Deleted " + buildProcessTemplates.Count.ToCountString("build process template"));
+                        task.SetComplete("Unregistered " + buildProcessTemplates.Count.ToCountString("build process template"));
                     }
 
                     // Refresh the list.

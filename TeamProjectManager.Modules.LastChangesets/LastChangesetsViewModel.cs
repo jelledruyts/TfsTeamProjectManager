@@ -67,7 +67,7 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         [ImportingConstructor]
         public LastChangesetsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Last Changesets", eventAggregator, logger)
+            : base(eventAggregator, logger, "Last Changesets", "Allows you to retrieve the last changesets across Team Projects. This makes it easy to see which projects are still actively being worked on, for example.")
         {
             this.GetLastChangesetsCommand = new RelayCommand(GetLastChangesets, CanGetLastChangesets);
             this.ViewChangesetDetailsCommand = new RelayCommand(ViewChangesetDetails, CanViewChangesetDetails);

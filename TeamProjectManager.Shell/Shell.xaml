@@ -39,7 +39,7 @@
 
             <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
 
-            <TabControl Grid.Column="2" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" SelectedIndex="0" />
+            <TabControl Grid.Column="2" Style="{StaticResource ShellTabControlStyle}" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" SelectedIndex="0" />
         </Grid>
 
     </Grid>

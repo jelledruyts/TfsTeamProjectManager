@@ -38,7 +38,7 @@ namespace TeamProjectManager.Common.Infrastructure
 
         public ILogger Logger { get; private set; }
 
-        public string Title { get; private set; }
+        public ViewModelInfo Info { get; private set; }
 
         #endregion
 
@@ -67,11 +67,19 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase"/> class.
         /// </summary>
-        protected ViewModelBase(string title, IEventAggregator eventAggregator, ILogger logger)
+        protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title)
+            : this(eventAggregator, logger, title, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewModelBase"/> class.
+        /// </summary>
+        protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title, string helpText)
         {
             this.EventAggregator = eventAggregator;
             this.Logger = logger;
-            this.Title = title;
+            this.Info = new ViewModelInfo(title, helpText);
             this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection);
             this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjects = e.SelectedTeamProjects);
         }

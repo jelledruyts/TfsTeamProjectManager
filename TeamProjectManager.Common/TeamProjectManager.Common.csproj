@@ -76,6 +76,7 @@
     <Compile Include="Infrastructure\Network.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
+    <Compile Include="Infrastructure\ViewModelInfo.cs" />
     <Compile Include="Infrastructure\WindowExtensions.cs" />
     <Compile Include="RegionNames.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />

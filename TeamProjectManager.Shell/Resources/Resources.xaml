@@ -81,6 +81,29 @@
         </Setter>
     </Style>
 
+    <Style x:Key="ShellTabControlStyle" TargetType="{x:Type TabControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,1" Margin="0,0,0,5">
+                            <TabPanel IsItemsHost="true"/>
+                        </Border>
+                        <ContentPresenter Grid.Row="1" ContentSource="SelectedContent" />
+                        <Expander Grid.Row="2" Header="Info" IsExpanded="False" Margin="0,5,0,0" Foreground="{StaticResource UserMessageFontBrush}" DataContext="{Binding Path=SelectedContent.DataContext.Info, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                            <TextBlock Text="{Binding Path=HelpText}" TextWrapping="Wrap" Foreground="{StaticResource UserMessageFontBrush}" />
+                        </Expander>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="Template">
             <Setter.Value>
@@ -107,7 +130,7 @@
 
     <!-- Tab Items With Headers -->
     <Style x:Key="ShellTabItemStyle" TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
-        <Setter Property="Header" Value="{Binding Path=Content.DataContext.Title, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Header" Value="{Binding Path=Content.DataContext.Info.Title, RelativeSource={RelativeSource Self}}" />
         <Setter Property="FontSize" Value="14" />
     </Style>
 

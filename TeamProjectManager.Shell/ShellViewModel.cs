@@ -33,7 +33,7 @@ namespace TeamProjectManager.Shell
 
         [ImportingConstructor]
         public ShellViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Shell", eventAggregator, logger)
+            : base(eventAggregator, logger, "Shell")
         {
             this.WindowTitle = InternalConstants.DefaultWindowTitle;
             this.TaskbarItemInfo = new TaskbarItemInfo();

@@ -10,7 +10,7 @@
 
         <TabControl Visibility="{Binding Path=SupportedVisibility}">
 
-            <TabItem Header="View / Delete">
+            <TabItem Header="View / Unregister">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -26,7 +26,7 @@
                             <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="2" Content="Delete Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
+                    <Button Grid.Row="2" Content="Unregister Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
                 </Grid>
             </TabItem>
 

@@ -66,7 +66,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         [ImportingConstructor]
         public TeamProjectsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base("Team Projects", eventAggregator, logger)
+            : base(eventAggregator, logger, "Team Projects")
         {
             this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection, CanAddTeamProjectCollection);
             RefreshTeamProjectCollections(null);

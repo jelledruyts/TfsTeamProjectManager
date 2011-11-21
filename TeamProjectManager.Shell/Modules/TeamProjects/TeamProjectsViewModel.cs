@@ -23,6 +23,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         #region Properties
 
         public RelayCommand AddTeamProjectCollectionCommand { get; private set; }
+        public RelayCommand RefreshTeamProjectsCommand { get; private set; }
 
         #endregion
 
@@ -69,6 +70,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             : base(eventAggregator, logger, "Team Projects")
         {
             this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection, CanAddTeamProjectCollection);
+            this.RefreshTeamProjectsCommand = new RelayCommand(RefreshTeamProjects, CanRefreshTeamProjects);
             RefreshTeamProjectCollections(null);
         }
 
@@ -78,7 +80,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         protected override void OnSelectedTeamProjectCollectionChanged()
         {
-            RefreshTeamProjects();
+            RefreshTeamProjects(false);
         }
 
         protected override void OnSelectedTeamProjectsChanged()
@@ -109,6 +111,16 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
         }
 
+        private bool CanRefreshTeamProjects(object argument)
+        {
+            return this.SelectedTeamProjectCollection != null;
+        }
+
+        private void RefreshTeamProjects(object argument)
+        {
+            RefreshTeamProjects(true);
+        }
+
         #endregion
 
         #region Helper Methods
@@ -126,9 +138,10 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
         }
 
-        private void RefreshTeamProjects()
+
+        private void RefreshTeamProjects(bool forceRefresh)
         {
-            if (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer == null && this.SelectedTeamProjectCollection.TeamProjects == null)
+            if (forceRefresh || (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer == null && this.SelectedTeamProjectCollection.TeamProjects == null))
             {
                 var teamProjectCollectionToRefresh = this.SelectedTeamProjectCollection;
                 this.SelectedTeamProjectCollection = null;

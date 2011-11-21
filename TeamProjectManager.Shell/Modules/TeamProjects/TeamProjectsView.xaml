@@ -39,6 +39,7 @@
             <WrapPanel Grid.Row="1">
                 <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>
                 <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
+                <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=RefreshTeamProjectsCommand}">refresh</Hyperlink></TextBlock>
             </WrapPanel>
         </Grid>
 

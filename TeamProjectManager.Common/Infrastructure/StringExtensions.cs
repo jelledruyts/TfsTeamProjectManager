@@ -68,7 +68,14 @@ namespace TeamProjectManager.Common.Infrastructure
             }
             else
             {
-                return singular + "s";
+                if (singular.EndsWith("y", StringComparison.OrdinalIgnoreCase))
+                {
+                    return singular.Substring(0, singular.Length - 1) + "ies";
+                }
+                else
+                {
+                    return singular + "s";
+                }
             }
         }
 

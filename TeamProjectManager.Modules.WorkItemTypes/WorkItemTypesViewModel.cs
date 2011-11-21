@@ -114,7 +114,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         [ImportingConstructor]
         public WorkItemTypesViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Work Item Types", "Allows you to manage work item type definitions and work item categories.")
+            : base(eventAggregator, logger, "Work Item Types", "Allows you to manage work item type definitions.")
         {
             this.GetWorkItemTypesCommand = new RelayCommand(GetWorkItemTypes, CanGetWorkItemTypes);
             this.ExportSelectedWorkItemTypesCommand = new RelayCommand(ExportSelectedWorkItemTypes, CanExportSelectedWorkItemTypes);
@@ -171,11 +171,12 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
                         var project = store.Projects[teamProjectName];
+                        var categoriesXml = project.Categories.Export();
+                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
+
                         foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
                             var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
-                            var categoriesXml = project.Categories.Export();
-                            var categoryList = WorkItemCategoryList.Load(categoriesXml);
                             var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
                             results.Add(new WorkItemTypeInfo(teamProjectName, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList()));
                         }

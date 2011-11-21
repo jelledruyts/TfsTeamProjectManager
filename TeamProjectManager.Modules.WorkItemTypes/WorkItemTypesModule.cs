@@ -15,6 +15,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public void Initialize()
         {
             this.RegionViewRegistry.RegisterViewWithRegion(RegionNames.Modules, typeof(WorkItemTypesView));
+            this.RegionViewRegistry.RegisterViewWithRegion(RegionNames.Modules, typeof(WorkItemCategoriesView));
         }
     }
 }

@@ -72,12 +72,17 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WorkItemCategoriesView.xaml.cs">
+      <DependentUpon>WorkItemCategoriesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ImportOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SearchResult.cs" />
+    <Compile Include="WorkItemCategoriesViewModel.cs" />
     <Compile Include="WorkItemCategory.cs" />
+    <Compile Include="WorkItemCategoryInfo.cs" />
     <Compile Include="WorkItemCategoryList.cs" />
     <Compile Include="WorkItemTypeReference.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
@@ -91,6 +96,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="WorkItemCategoriesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="WorkItemTypesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

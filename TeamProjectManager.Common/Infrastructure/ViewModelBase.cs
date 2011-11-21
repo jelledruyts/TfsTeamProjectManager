@@ -60,6 +60,21 @@ namespace TeamProjectManager.Common.Infrastructure
 
         public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, ViewModelBase>(o => o.SelectedTeamProjects, OnSelectedTeamProjectsChanged);
 
+        public Visibility TfsUnsupportedVisibility
+        {
+            get { return this.GetValue(TfsUnsupportedVisibilityProperty); }
+            set { this.SetValue(TfsUnsupportedVisibilityProperty, value); }
+        }
+        public static ObservableProperty<Visibility> TfsUnsupportedVisibilityProperty = new ObservableProperty<Visibility, ViewModelBase>(o => o.TfsUnsupportedVisibility, Visibility.Hidden);
+
+        public Visibility TfsSupportedVisibility
+        {
+            get { return this.GetValue(TfsSupportedVisibilityProperty); }
+            set { this.SetValue(TfsSupportedVisibilityProperty, value); }
+        }
+
+        public static ObservableProperty<Visibility> TfsSupportedVisibilityProperty = new ObservableProperty<Visibility, ViewModelBase>(o => o.TfsSupportedVisibility, Visibility.Visible);
+
         #endregion
 
         #region Constructors
@@ -91,7 +106,16 @@ namespace TeamProjectManager.Common.Infrastructure
         private static void OnSelectedTeamProjectCollectionChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<TeamProjectCollectionInfo> e)
         {
             var viewModel = (ViewModelBase)sender;
-            viewModel.OnSelectedTeamProjectCollectionChanged();
+            viewModel.OnSelectedTeamProjectCollectionChangedInternal();
+        }
+
+        private void OnSelectedTeamProjectCollectionChangedInternal()
+        {
+            var supported = this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer != null && IsTfsSupported(this.SelectedTeamProjectCollection.TeamFoundationServer);
+            this.TfsSupportedVisibility = supported ? Visibility.Visible : Visibility.Hidden;
+            this.TfsUnsupportedVisibility = supported ? Visibility.Hidden : Visibility.Visible;
+
+            OnSelectedTeamProjectCollectionChanged();
         }
 
         private static void OnSelectedTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
@@ -170,6 +194,11 @@ namespace TeamProjectManager.Common.Infrastructure
 
         protected virtual void OnSelectedTeamProjectsChanged()
         {
+        }
+
+        protected virtual bool IsTfsSupported(TeamFoundationServerInfo server)
+        {
+            return true;
         }
 
         protected int GetNumberOfSelectedTeamProjects()

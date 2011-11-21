@@ -89,21 +89,6 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         public static ObservableProperty<ICollection<BuildProcessTemplateInfo>> SelectedBuildProcessTemplatesProperty = new ObservableProperty<ICollection<BuildProcessTemplateInfo>, BuildProcessTemplatesViewModel>(o => o.SelectedBuildProcessTemplates);
 
-        public Visibility UnsupportedVisibility
-        {
-            get { return this.GetValue(UnsupportedVisibilityProperty); }
-            set { this.SetValue(UnsupportedVisibilityProperty, value); }
-        }
-        public static ObservableProperty<Visibility> UnsupportedVisibilityProperty = new ObservableProperty<Visibility, BuildProcessTemplatesViewModel>(o => o.UnsupportedVisibility, Visibility.Hidden);
-
-        public Visibility SupportedVisibility
-        {
-            get { return this.GetValue(SupportedVisibilityProperty); }
-            set { this.SetValue(SupportedVisibilityProperty, value); }
-        }
-
-        public static ObservableProperty<Visibility> SupportedVisibilityProperty = new ObservableProperty<Visibility, BuildProcessTemplatesViewModel>(o => o.SupportedVisibility, Visibility.Visible);
-
         #endregion
 
         #region Constructors
@@ -272,18 +257,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         #endregion
 
-        #region Helper Methods
+        #region Overrides
 
-        protected override void OnSelectedTeamProjectCollectionChanged()
+        protected override bool IsTfsSupported(TeamFoundationServerInfo server)
         {
-            var supported = IsTfsSupported();
-            this.SupportedVisibility = supported ? Visibility.Visible : Visibility.Hidden;
-            this.UnsupportedVisibility = supported ? Visibility.Hidden : Visibility.Visible;
-        }
-
-        private bool IsTfsSupported()
-        {
-            return this.SelectedTeamProjectCollection == null || this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.Tfs2010;
+            return server.MajorVersion >= TfsMajorVersion.Tfs2010;
         }
 
         #endregion

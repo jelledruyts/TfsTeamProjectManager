@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -9,11 +9,11 @@ namespace TeamProjectManager.Modules.WorkItemTypes
     public class WorkItemCategoryList
     {
         [XmlElement(ElementName = "CATEGORY", Namespace = "")]
-        public List<WorkItemCategory> Categories { get; set; }
+        public ObservableCollection<WorkItemCategory> Categories { get; set; }
 
         public WorkItemCategoryList()
         {
-            this.Categories = new List<WorkItemCategory>();
+            this.Categories = new ObservableCollection<WorkItemCategory>();
         }
 
         public XmlDocument Save()

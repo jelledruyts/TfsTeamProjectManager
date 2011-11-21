@@ -8,6 +8,7 @@ using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -81,6 +82,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             this.GetWorkItemCategoriesCommand = new RelayCommand(GetWorkItemCategories, CanGetWorkItemCategories);
             this.DeleteSelectedWorkItemCategoriesCommand = new RelayCommand(DeleteSelectedWorkItemCategories, CanDeleteSelectedWorkItemCategories);
             this.LoadWorkItemCategoryListCommand = new RelayCommand(LoadWorkItemCategoryList, CanLoadWorkItemCategoryList);
+            this.AddWorkItemCategoryCommand = new RelayCommand(AddWorkItemCategory, CanAddWorkItemCategory);
+            this.RemoveSelectedWorkItemCategoryCommand = new RelayCommand(RemoveSelectedWorkItemCategory, CanRemoveSelectedWorkItemCategory);
             this.ImportWorkItemCategoryListCommand = new RelayCommand(ImportWorkItemCategoryList, CanImportWorkItemCategoryList);
         }
 
@@ -224,14 +227,40 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 {
                     var teamProjectCollection = dialog.SelectedTeamProjectCollection;
                     var teamProject = dialog.SelectedProjects.First();
-                    using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(teamProjectCollection.Uri))
+
+                    var task = new ApplicationTask("Loading work item category list");
+                    PublishStatus(new StatusEventArgs(task));
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += (sender, e) =>
                     {
-                        var store = tfs.GetService<WorkItemStore>();
-                        var project = store.Projects[teamProject.Name];
-                        var categoriesXml = project.Categories.Export();
-                        this.SelectedWorkItemCategoryList = WorkItemCategoryList.Load(categoriesXml);
-                        this.AvailableWorkItemTypeReferences = project.WorkItemTypes.Cast<WorkItemType>().Select(w => new WorkItemTypeReference { Name = w.Name }).ToList();
-                    }
+                        using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(teamProjectCollection.Uri))
+                        {
+                            var store = tfs.GetService<WorkItemStore>();
+                            var project = store.Projects[teamProject.Name];
+                            var categoriesXml = project.Categories.Export();
+                            var selectedWorkItemCategoryList = WorkItemCategoryList.Load(categoriesXml);
+                            var availableWorkItemTypeReferences = project.WorkItemTypes.Cast<WorkItemType>().Select(w => new WorkItemTypeReference { Name = w.Name }).ToList();
+                            e.Result = new Tuple<WorkItemCategoryList, ICollection<WorkItemTypeReference>>(selectedWorkItemCategoryList, availableWorkItemTypeReferences);
+                        }
+                    };
+                    worker.RunWorkerCompleted += (sender, e) =>
+                    {
+                        if (e.Error != null)
+                        {
+                            Logger.Log("An unexpected exception occurred while importing the work item category list", e.Error);
+                            task.SetError(e.Error);
+                            task.SetComplete("An unexpected exception occurred");
+                        }
+                        else
+                        {
+                            var loadResult = (Tuple<WorkItemCategoryList, ICollection<WorkItemTypeReference>>)e.Result;
+                            this.SelectedWorkItemCategoryList = loadResult.Item1;
+                            this.AvailableWorkItemTypeReferences = loadResult.Item2;
+                            this.SelectedWorkItemCategory = this.SelectedWorkItemCategoryList.Categories.FirstOrDefault();
+                            task.SetComplete("Done");
+                        }
+                    };
+                    worker.RunWorkerAsync();
                 }
             }
         }
@@ -284,10 +313,42 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 }
                 else
                 {
-                    task.SetComplete("Done");
+                    task.SetComplete(task.IsError ? "Failed" : (task.IsWarning ? "Succeeded with warnings" : "Succeeded"));
                 }
             };
             worker.RunWorkerAsync();
+        }
+
+        private bool CanAddWorkItemCategory(object argument)
+        {
+            return this.SelectedWorkItemCategoryList != null;
+        }
+
+        private void AddWorkItemCategory(object argument)
+        {
+            var category = new WorkItemCategory { Name = "New Category" };
+            this.SelectedWorkItemCategoryList.Categories.Add(category);
+            this.SelectedWorkItemCategory = category;
+        }
+
+        private bool CanRemoveSelectedWorkItemCategory(object argument)
+        {
+            return this.SelectedWorkItemCategoryList != null && this.SelectedWorkItemCategory != null;
+        }
+
+        private void RemoveSelectedWorkItemCategory(object argument)
+        {
+            this.SelectedWorkItemCategoryList.Categories.Remove(this.SelectedWorkItemCategory);
+            this.SelectedWorkItemCategory = this.SelectedWorkItemCategoryList.Categories.FirstOrDefault();
+        }
+
+        #endregion
+
+        #region Overrides
+
+        protected override bool IsTfsSupported(TeamFoundationServerInfo server)
+        {
+            return server.MajorVersion >= TfsMajorVersion.Tfs2010;
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
@@ -15,11 +15,11 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public WorkItemTypeReference DefaultWorkItemType { get; set; }
 
         [XmlElement(ElementName = "WORKITEMTYPE", Namespace = "")]
-        public List<WorkItemTypeReference> WorkItemTypes { get; set; }
+        public ObservableCollection<WorkItemTypeReference> WorkItemTypes { get; set; }
 
         public WorkItemCategory()
         {
-            this.WorkItemTypes = new List<WorkItemTypeReference>();
+            this.WorkItemTypes = new ObservableCollection<WorkItemTypeReference>();
         }
     }
 }

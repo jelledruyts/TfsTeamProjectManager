@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using System.Xml;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -175,8 +174,9 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
                             var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
-                            var categories = project.Categories.Export();
-                            var referencingCategories = categories.SelectNodes(string.Format(CultureInfo.InvariantCulture, "//CATEGORY[DEFAULTWORKITEMTYPE[@name='{0}'] | WORKITEMTYPE[@name='{0}']]", workItemType.Name)).Cast<XmlElement>().Select(x => x.Attributes["name"].Value);
+                            var categoriesXml = project.Categories.Export();
+                            var categoryList = WorkItemCategoryList.Load(categoriesXml);
+                            var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
                             results.Add(new WorkItemTypeInfo(teamProjectName, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList()));
                         }
                     }

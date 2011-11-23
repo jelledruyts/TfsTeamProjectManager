@@ -3,10 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemTypes"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type w:WorkItemTypeDefinition}">
+            <TextBlock Text="{Binding Path=Name}" />
+        </DataTemplate>
+    </UserControl.Resources>
     <TabControl>
-        
+
         <TabItem Header="View / Delete">
             <Grid>
                 <Grid.RowDefinitions>
@@ -77,6 +83,49 @@
             </Grid>
         </TabItem>
 
+        <TabItem Header="Compare">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,5,0,0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Column="0" Content="Sources" />
+
+                    <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" Height="70" Margin="5,0,0,0" />
+
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
+                        <TextBlock><Hyperlink Command="{Binding Path=AddComparisonSourceCommand}">add...</Hyperlink></TextBlock>
+                        <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedComparisonSourceCommand}">remove</Hyperlink></TextBlock>
+                    </StackPanel>
+                
+                </Grid>
+
+                <Button Grid.Row="1" Content="Compare Team Projects With Sources" Command="{Binding Path=CompareCommand}" Margin="0,5,0,0" />
+
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Path=ComparisonResults}" SelectedItem="{Binding Path=SelectedComparisonResult}" x:Name="comparisonResultsDataGrid" SelectionMode="Single" MouseDoubleClick="comparisonResultsDataGrid_MouseDoubleClick" IsReadOnly="True" AutoGenerateColumns="False" Margin="0,5,0,0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                        <DataGridTextColumn Header="Best Matching Source" Binding="{Binding Path=BestMatch.Source.Name}" />
+                        <DataGridTextColumn Header="Best Matching %" Binding="{Binding Path=BestMatch.PercentMatch, StringFormat={}{0:0%}}" />
+                        <DataGridTextColumn Header="Summary" Binding="{Binding Path=Summary}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Button Grid.Row="3" Content="View Comparison Details" Command="{Binding Path=ViewSelectedComparisonDetailsCommand}" Margin="0,5,0,0" />
+
+            </Grid>
+        </TabItem>
+
         <TabItem Header="Search">
 
             <Grid>
@@ -101,8 +150,8 @@
                     <Button Grid.Row="0" Grid.Column="2" Content="Search" Command="{Binding Path=SearchCommand}" Padding="5,0,5,0" />
 
                     <WrapPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="5,5,0,0">
-                        <CheckBox IsChecked="{Binding Path=SearchIncludesWorkItemFields}" Content="Include work item fields" Margin="0,0,10,0" />
-                        <CheckBox IsChecked="{Binding Path=SearchUsesExactMatch}" Content="Match exactly" />
+                        <CheckBox IsChecked="{Binding Path=SearchIncludesWorkItemFields}" Content="Include work item fields" ToolTip="Enable this to also search within work item fields" Margin="0,0,10,0" />
+                        <CheckBox IsChecked="{Binding Path=SearchUsesExactMatch}" Content="Match exactly" ToolTip="Enable this to limit search results to those that are equal to the search text (as opposed to containing the search text)" />
                     </WrapPanel>
                 </Grid>
 

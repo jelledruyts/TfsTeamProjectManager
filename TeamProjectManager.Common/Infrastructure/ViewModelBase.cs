@@ -111,7 +111,7 @@ namespace TeamProjectManager.Common.Infrastructure
 
         private void OnSelectedTeamProjectCollectionChangedInternal()
         {
-            var supported = this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer != null && IsTfsSupported(this.SelectedTeamProjectCollection.TeamFoundationServer);
+            var supported = this.SelectedTeamProjectCollection == null || (this.SelectedTeamProjectCollection.TeamFoundationServer != null && IsTfsSupported(this.SelectedTeamProjectCollection.TeamFoundationServer));
             this.TfsSupportedVisibility = supported ? Visibility.Visible : Visibility.Hidden;
             this.TfsUnsupportedVisibility = supported ? Visibility.Hidden : Visibility.Visible;
 

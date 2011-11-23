@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -26,11 +27,18 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public RelayCommand GetWorkItemTypesCommand { get; private set; }
         public RelayCommand ExportSelectedWorkItemTypesCommand { get; private set; }
         public RelayCommand DeleteSelectedWorkItemTypesCommand { get; private set; }
+
         public RelayCommand BrowseWorkItemTypesFilePathCommand { get; private set; }
-        public RelayCommand SearchCommand { get; private set; }
         public RelayCommand ValidateCommand { get; private set; }
         public RelayCommand ValidateAndImportCommand { get; private set; }
         public RelayCommand ImportCommand { get; private set; }
+
+        public RelayCommand AddComparisonSourceCommand { get; private set; }
+        public RelayCommand RemoveSelectedComparisonSourceCommand { get; private set; }
+        public RelayCommand CompareCommand { get; private set; }
+        public RelayCommand ViewSelectedComparisonDetailsCommand { get; private set; }
+
+        public RelayCommand SearchCommand { get; private set; }
 
         #endregion
 
@@ -60,21 +68,21 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public static ObservableProperty<string> WorkItemTypesFilePathProperty = new ObservableProperty<string, WorkItemTypesViewModel>(o => o.WorkItemTypesFilePath, OnWorkItemTypesFilePathChanged);
 
-        public ICollection<WorkItemTypeFile> WorkItemTypeFiles
+        public ICollection<WorkItemTypeDefinition> WorkItemTypeFiles
         {
             get { return this.GetValue(WorkItemTypeFilesProperty); }
             set { this.SetValue(WorkItemTypeFilesProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<WorkItemTypeFile>> WorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeFile>, WorkItemTypesViewModel>(o => o.WorkItemTypeFiles);
+        public static ObservableProperty<ICollection<WorkItemTypeDefinition>> WorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeDefinition>, WorkItemTypesViewModel>(o => o.WorkItemTypeFiles);
 
-        public ICollection<WorkItemTypeFile> SelectedWorkItemTypeFiles
+        public ICollection<WorkItemTypeDefinition> SelectedWorkItemTypeFiles
         {
             get { return this.GetValue(SelectedWorkItemTypeFilesProperty); }
             set { this.SetValue(SelectedWorkItemTypeFilesProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<WorkItemTypeFile>> SelectedWorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeFile>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypeFiles);
+        public static ObservableProperty<ICollection<WorkItemTypeDefinition>> SelectedWorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeDefinition>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypeFiles);
 
         public string SearchText
         {
@@ -108,6 +116,38 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public static ObservableProperty<bool> SearchUsesExactMatchProperty = new ObservableProperty<bool, WorkItemTypesViewModel>(o => o.SearchUsesExactMatch);
 
+        public ObservableCollection<ComparisonSource> ComparisonSources
+        {
+            get { return this.GetValue(ComparisonSourcesProperty); }
+            set { this.SetValue(ComparisonSourcesProperty, value); }
+        }
+
+        public static ObservableProperty<ObservableCollection<ComparisonSource>> ComparisonSourcesProperty = new ObservableProperty<ObservableCollection<ComparisonSource>, WorkItemTypesViewModel>(o => o.ComparisonSources, new ObservableCollection<ComparisonSource>());
+
+        public ComparisonSource SelectedComparisonSource
+        {
+            get { return this.GetValue(SelectedComparisonSourceProperty); }
+            set { this.SetValue(SelectedComparisonSourceProperty, value); }
+        }
+
+        public static ObservableProperty<ComparisonSource> SelectedComparisonSourceProperty = new ObservableProperty<ComparisonSource, WorkItemTypesViewModel>(o => o.SelectedComparisonSource);
+
+        public ICollection<TeamProjectComparisonResult> ComparisonResults
+        {
+            get { return this.GetValue(ComparisonResultsProperty); }
+            set { this.SetValue(ComparisonResultsProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<TeamProjectComparisonResult>> ComparisonResultsProperty = new ObservableProperty<ICollection<TeamProjectComparisonResult>, WorkItemTypesViewModel>(o => o.ComparisonResults);
+
+        public TeamProjectComparisonResult SelectedComparisonResult
+        {
+            get { return this.GetValue(SelectedComparisonResultProperty); }
+            set { this.SetValue(SelectedComparisonResultProperty, value); }
+        }
+
+        public static ObservableProperty<TeamProjectComparisonResult> SelectedComparisonResultProperty = new ObservableProperty<TeamProjectComparisonResult, WorkItemTypesViewModel>(o => o.SelectedComparisonResult);
+
         #endregion
 
         #region Constructors
@@ -119,11 +159,17 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             this.GetWorkItemTypesCommand = new RelayCommand(GetWorkItemTypes, CanGetWorkItemTypes);
             this.ExportSelectedWorkItemTypesCommand = new RelayCommand(ExportSelectedWorkItemTypes, CanExportSelectedWorkItemTypes);
             this.DeleteSelectedWorkItemTypesCommand = new RelayCommand(DeleteSelectedWorkItemTypes, CanDeleteSelectedWorkItemTypes);
+
             this.BrowseWorkItemTypesFilePathCommand = new RelayCommand(BrowseWorkItemTypesFilePath, CanBrowseWorkItemTypesFilePath);
-            this.SearchCommand = new RelayCommand(Search, CanSearch);
             this.ValidateCommand = new RelayCommand(Validate, CanValidate);
             this.ValidateAndImportCommand = new RelayCommand(ValidateAndImport, CanValidateAndImport);
             this.ImportCommand = new RelayCommand(Import, CanImport);
+
+            this.AddComparisonSourceCommand = new RelayCommand(AddComparisonSource, CanAddComparisonSource);
+            this.RemoveSelectedComparisonSourceCommand = new RelayCommand(RemoveSelectedComparisonSource, CanRemoveSelectedComparisonSource);
+            this.CompareCommand = new RelayCommand(Compare, CanCompare);
+            this.ViewSelectedComparisonDetailsCommand = new RelayCommand(ViewSelectedComparisonDetails, CanViewSelectedComparisonDetails);
+            this.SearchCommand = new RelayCommand(Search, CanSearch);
         }
 
         #endregion
@@ -136,7 +182,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var path = viewModel.WorkItemTypesFilePath;
             if (Directory.Exists(path))
             {
-                viewModel.WorkItemTypeFiles = Directory.GetFiles(path, "*.xml").Select(f => new WorkItemTypeFile(f)).ToList();
+                viewModel.WorkItemTypeFiles = Directory.GetFiles(path, "*.xml").Select(f => new WorkItemTypeDefinition(f)).ToList();
             }
             else
             {
@@ -507,6 +553,102 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             PerformImport("Importing work item types", ImportOptions.Import);
         }
 
+        private bool CanAddComparisonSource(object argument)
+        {
+            return true;
+        }
+
+        private void AddComparisonSource(object argument)
+        {
+            var dialog = new ComparisonSourceEditorDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            var result = dialog.ShowDialog();
+            if (result == true)
+            {
+                this.ComparisonSources.Add(dialog.ComparisonSource);
+            }
+        }
+
+        private bool CanRemoveSelectedComparisonSource(object argument)
+        {
+            return this.SelectedComparisonSource != null;
+        }
+
+        private void RemoveSelectedComparisonSource(object argument)
+        {
+            this.ComparisonSources.Remove(this.SelectedComparisonSource);
+        }
+
+        private bool CanCompare(object argument)
+        {
+            return IsAnyTeamProjectSelected() && this.ComparisonSources.Count > 0;
+        }
+
+        private void Compare(object argument)
+        {
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var sources = this.ComparisonSources.ToList();
+            var task = new ApplicationTask("Comparing work item types", teamProjectNames.Count);
+            PublishStatus(new StatusEventArgs(task));
+            var step = 0;
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                {
+                    var store = tfs.GetService<WorkItemStore>();
+
+                    var results = new List<TeamProjectComparisonResult>();
+                    foreach (var teamProjectName in teamProjectNames)
+                    {
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
+                        var project = store.Projects[teamProjectName];
+
+                        var targetWorkItemTypes = new List<WorkItemTypeDefinition>();
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
+                        {
+                            targetWorkItemTypes.Add(new WorkItemTypeDefinition(workItemType.Export(false)));
+                        }
+
+                        var sourceComparisonResults = new List<ComparisonSourceComparisonResult>();
+                        foreach (var source in sources)
+                        {
+                            sourceComparisonResults.Add(WorkItemTypeComparer.Compare(source, targetWorkItemTypes));
+                        }
+                        results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
+                    }
+                    e.Result = results;
+                }
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while comparing work item types", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    this.ComparisonResults = (ICollection<TeamProjectComparisonResult>)e.Result;
+                    task.SetComplete("Done");
+                }
+            };
+            worker.RunWorkerAsync();
+        }
+
+        private bool CanViewSelectedComparisonDetails(object argument)
+        {
+            return this.SelectedComparisonResult != null;
+        }
+
+        private void ViewSelectedComparisonDetails(object argument)
+        {
+            var dialog = new ComparisonResultViewerDialog(this.SelectedComparisonResult);
+            dialog.Owner = Application.Current.MainWindow;
+            dialog.ShowDialog();
+        }
+
         #endregion
 
         #region Helper Methods
@@ -538,7 +680,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             worker.RunWorkerAsync();
         }
 
-        private static int GetTotalNumberOfSteps(ImportOptions options, ICollection<string> teamProjectNames, ICollection<WorkItemTypeFile> workItemTypeFiles)
+        private static int GetTotalNumberOfSteps(ImportOptions options, ICollection<string> teamProjectNames, ICollection<WorkItemTypeDefinition> workItemTypeFiles)
         {
             var numberOfSteps = 0;
             var numberOfImports = teamProjectNames.Count * workItemTypeFiles.Count;

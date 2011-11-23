@@ -1,0 +1,90 @@
+﻿<Window x:Class="TeamProjectManager.Modules.WorkItemTypes.ComparisonResultViewerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemTypes"
+        Title="Comparison Result Details"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Height="300" Width="600">
+    <Window.Resources>
+        <w:MatchingPartsConverter x:Key="matchingPartsConverter" />
+        <w:ComparisonStatusConverter x:Key="comparisonStatusConverter" />
+        <DataTemplate DataType="{x:Type w:ComparisonSourceComparisonResult}">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} ({1:0%})">
+                        <Binding Path="Source.Name" />
+                        <Binding Path="PercentMatch" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type w:WorkItemTypeComparisonResult}">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} ({1:0%})">
+                        <Binding Path="WorkItemTypeName" />
+                        <Binding Path="PercentMatch" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="150" />
+                <ColumnDefinition Width="Auto" MinWidth="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Header="Sources">
+                <ListBox ItemsSource="{Binding Path=SourceResults}" x:Name="sourceResultsListBox" SelectedIndex="0" SelectionChanged="sourceResultsListBox_SelectionChanged" />
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="Work Items" Margin="5,0,0,0">
+                <ListBox ItemsSource="{Binding ElementName=sourceResultsListBox, Path=SelectedItem.WorkItemTypeResults}" x:Name="workItemTypeResultsListBox" SelectionChanged="workItemTypeResultsListBox_SelectionChanged" />
+            </GroupBox>
+
+            <Grid Grid.Column="2" Margin="5,0,0,0" DataContext="{Binding ElementName=workItemTypeResultsListBox, Path=SelectedItem}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Status" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource comparisonStatusConverter}}"  IsReadOnly="True" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Match" Margin="0,5,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=PercentMatch, Mode=OneWay, StringFormat='0%'}" IsReadOnly="True" Margin="0,5,0,0" />
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Equal Parts" Margin="0,5,0,0" />
+                <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Path=MatchingParts, Converter={StaticResource matchingPartsConverter}}" Margin="0,5,0,0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Path=IsSelected, Mode=OneWay}" Content="{Binding Path=Name, Mode=OneWay}" IsEnabled="False" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+                <Button Grid.Row="3" Grid.Column="1" Content="Compare In Diff Tool" x:Name="compareInDiffToolButton" Click="compareInDiffToolButton_Click"  Margin="0,5,0,0" />
+            </Grid>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Content="OK" IsDefault="True" IsCancel="True"  Width="75" x:Name="okButton" Click="okButton_Click" />
+        </StackPanel>
+
+    </Grid>
+</Window>

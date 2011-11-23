@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
@@ -38,7 +39,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         private void workItemTypeFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ViewModel.SelectedWorkItemTypeFiles = this.workItemTypeFilesListBox.SelectedItems.Cast<WorkItemTypeFile>().ToList();
+            this.ViewModel.SelectedWorkItemTypeFiles = this.workItemTypeFilesListBox.SelectedItems.Cast<WorkItemTypeDefinition>().ToList();
         }
 
         private bool CanSelectAll(object argument)
@@ -59,6 +60,14 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         private void SelectNone(object argument)
         {
             this.workItemTypeFilesListBox.SelectedItem = null;
+        }
+
+        private void comparisonResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (this.ViewModel.ViewSelectedComparisonDetailsCommand.CanExecute(null))
+            {
+                this.ViewModel.ViewSelectedComparisonDetailsCommand.Execute(null);
+            }
         }
     }
 }

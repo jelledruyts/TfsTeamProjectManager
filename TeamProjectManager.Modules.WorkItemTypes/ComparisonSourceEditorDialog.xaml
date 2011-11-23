@@ -1,0 +1,42 @@
+﻿<Window x:Class="TeamProjectManager.Modules.WorkItemTypes.ComparisonSourceEditorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Define Comparison Source"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Height="300" Width="600">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Friendly Name" Margin="0,5,0,0" />
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="nameTextBox" TextChanged="nameTextBox_TextChanged" Margin="5,5,0,0" />
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Work Item Types" Margin="0,5,0,0" />
+            <ListBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" x:Name="workItemTypesListBox" />
+
+            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" Margin="5,5,0,0">
+                <TextBlock><Hyperlink x:Name="addWorkItemTypesHyperlink" Click="addWorkItemTypesHyperlink_Click">add...</Hyperlink></TextBlock>
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" IsEnabled="False" />
+            <Button Content="Cancel" IsCancel="True" Width="75" Margin="5,0,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>

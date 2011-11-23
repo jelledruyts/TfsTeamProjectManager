@@ -3,9 +3,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:c="clr-namespace:TeamProjectManager.Common.Converters;assembly=TeamProjectManager.Common">
 
-    <SolidColorBrush x:Key="TextBrush" Color="Pink" />
     <SolidColorBrush x:Key="AccentBrush" Color="#F09609" />
     <SolidColorBrush x:Key="LinkBrush" Color="#2470E3" />
+    <SolidColorBrush x:Key="DisabledLinkBrush" Color="DarkGray" />
     <SolidColorBrush x:Key="UserMessageFontBrush" Color="DarkGray" />
     <SolidColorBrush x:Key="ErrorForegroundBrush" Color="#E51400" />
     <SolidColorBrush x:Key="WarningForegroundBrush" Color="Orange" />
@@ -108,7 +108,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <ContentControl Margin="0,5,10,5" x:Name="tabHeader" Foreground="{StaticResource UnSelectedTabTextBrush}" FontWeight="DemiBold">
+                    <ContentControl Margin="5" x:Name="tabHeader" Foreground="{StaticResource UnSelectedTabTextBrush}" FontWeight="DemiBold">
                         <TextBlock Text="{TemplateBinding Header, Converter={StaticResource caseConverter}}" />
                     </ContentControl>
                     <ControlTemplate.Triggers>
@@ -166,6 +166,7 @@
         <Setter Property="Foreground" Value="{StaticResource LinkBrush}" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource DisabledLinkBrush}" />
                 <Setter Property="TextDecorations" Value="None" />
             </Trigger>
         </Style.Triggers>

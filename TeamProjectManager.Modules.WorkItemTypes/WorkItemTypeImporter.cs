@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml.Schema;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -19,7 +18,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         #region ImportWorkItemTypes
 
-        public void ImportWorkItemTypes(ApplicationTask task, ImportOptions options, Uri projectCollectionUri, ICollection<string> teamProjectNames, ICollection<WorkItemTypeFile> workItemTypeFiles)
+        public void ImportWorkItemTypes(ApplicationTask task, ImportOptions options, Uri projectCollectionUri, ICollection<string> teamProjectNames, ICollection<WorkItemTypeDefinition> workItemTypeFiles)
         {
             this.task = task;
 
@@ -37,11 +36,10 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         var project = store.Projects[teamProjectName];
                         foreach (var workItemTypeFile in workItemTypeFiles)
                         {
-                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.DisplayName, teamProjectName));
-                            var definition = File.ReadAllText(workItemTypeFile.Path);
+                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectName));
                             try
                             {
-                                WorkItemType.Validate(project, definition);
+                                WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
                             }
                             catch (Exception exc)
                             {
@@ -61,11 +59,10 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         project.WorkItemTypes.ImportEventHandler += ImportEventHandler;
                         foreach (var workItemTypeFile in workItemTypeFiles)
                         {
-                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.DisplayName, teamProjectName));
-                            var definition = File.ReadAllText(workItemTypeFile.Path);
+                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectName));
                             try
                             {
-                                project.WorkItemTypes.Import(definition);
+                                project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.OuterXml);
                             }
                             catch (Exception exc)
                             {

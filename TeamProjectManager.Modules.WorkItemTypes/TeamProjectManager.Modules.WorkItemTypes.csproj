@@ -72,6 +72,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComparisonStatus.cs" />
+    <Compile Include="ComparisonResultViewerDialog.xaml.cs">
+      <DependentUpon>ComparisonResultViewerDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ComparisonSource.cs" />
+    <Compile Include="ComparisonSourceComparisonResult.cs" />
+    <Compile Include="ComparisonSourceEditorDialog.xaml.cs">
+      <DependentUpon>ComparisonSourceEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ComparisonStatusConverter.cs" />
+    <Compile Include="MatchingPartsConverter.cs" />
+    <Compile Include="TeamProjectComparisonResult.cs" />
     <Compile Include="WorkItemCategoriesView.xaml.cs">
       <DependentUpon>WorkItemCategoriesView.xaml</DependentUpon>
     </Compile>
@@ -84,9 +96,12 @@
     <Compile Include="WorkItemCategory.cs" />
     <Compile Include="WorkItemCategoryInfo.cs" />
     <Compile Include="WorkItemCategoryList.cs" />
+    <Compile Include="WorkItemTypeComparer.cs" />
+    <Compile Include="WorkItemTypeComparisonResult.cs" />
+    <Compile Include="WorkItemTypeDefinitionPart.cs" />
     <Compile Include="WorkItemTypeReference.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
-    <Compile Include="WorkItemTypeFile.cs" />
+    <Compile Include="WorkItemTypeDefinition.cs" />
     <Compile Include="WorkItemTypeInfo.cs" />
     <Compile Include="WorkItemTypesView.xaml.cs">
       <DependentUpon>WorkItemTypesView.xaml</DependentUpon>
@@ -96,6 +111,14 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ComparisonResultViewerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ComparisonSourceEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WorkItemCategoriesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

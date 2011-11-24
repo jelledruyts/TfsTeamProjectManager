@@ -35,45 +35,79 @@ namespace TeamProjectManager.Common.Infrastructure
             }
         }
 
+        /// <summary>
+        /// The event aggregator that can be used to publish and subscribe to loosely coupled events.
+        /// </summary>
         public IEventAggregator EventAggregator { get; private set; }
 
+        /// <summary>
+        /// The logger that can be used to publish log messages to.
+        /// </summary>
         public ILogger Logger { get; private set; }
 
+        /// <summary>
+        /// The information about the current view model.
+        /// </summary>
         public ViewModelInfo Info { get; private set; }
 
         #endregion
 
         #region Observable Properties
 
+        /// <summary>
+        /// Gets the currently selected Team Project Collection.
+        /// </summary>
         public TeamProjectCollectionInfo SelectedTeamProjectCollection
         {
             get { return this.GetValue(SelectedTeamProjectCollectionProperty); }
-            set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
+            internal set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
         }
 
+        /// <summary>
+        /// The definition of the <see cref="SelectedTeamProjectCollection"/> observable property.
+        /// </summary>
         public static ObservableProperty<TeamProjectCollectionInfo> SelectedTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, ViewModelBase>(o => o.SelectedTeamProjectCollection, OnSelectedTeamProjectCollectionChanged);
 
+        /// <summary>
+        /// Gets the currently selected Team Projects.
+        /// </summary>
         public ICollection<TeamProjectInfo> SelectedTeamProjects
         {
             get { return this.GetValue(SelectedTeamProjectsProperty); }
-            set { this.SetValue(SelectedTeamProjectsProperty, value); }
+            internal set { this.SetValue(SelectedTeamProjectsProperty, value); }
         }
 
+        /// <summary>
+        /// The definition of the <see cref="SelectedTeamProjects"/> observable property.
+        /// </summary>
         public static ObservableProperty<ICollection<TeamProjectInfo>> SelectedTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, ViewModelBase>(o => o.SelectedTeamProjects, OnSelectedTeamProjectsChanged);
 
+        /// <summary>
+        /// Gets the visibility of UI elements that should be shown in case the currently selected Team Foundation Server is unsupported.
+        /// </summary>
         public Visibility TfsUnsupportedVisibility
         {
             get { return this.GetValue(TfsUnsupportedVisibilityProperty); }
-            set { this.SetValue(TfsUnsupportedVisibilityProperty, value); }
+            private set { this.SetValue(TfsUnsupportedVisibilityProperty, value); }
         }
+
+        /// <summary>
+        /// The definition of the <see cref="TfsUnsupportedVisibility"/> observable property.
+        /// </summary>
         public static ObservableProperty<Visibility> TfsUnsupportedVisibilityProperty = new ObservableProperty<Visibility, ViewModelBase>(o => o.TfsUnsupportedVisibility, Visibility.Hidden);
 
+        /// <summary>
+        /// Gets the visibility of UI elements that should be shown in case the currently selected Team Foundation Server is supported.
+        /// </summary>
         public Visibility TfsSupportedVisibility
         {
             get { return this.GetValue(TfsSupportedVisibilityProperty); }
-            set { this.SetValue(TfsSupportedVisibilityProperty, value); }
+            private set { this.SetValue(TfsSupportedVisibilityProperty, value); }
         }
 
+        /// <summary>
+        /// The definition of the <see cref="TfsSupportedVisibility"/> observable property.
+        /// </summary>
         public static ObservableProperty<Visibility> TfsSupportedVisibilityProperty = new ObservableProperty<Visibility, ViewModelBase>(o => o.TfsSupportedVisibility, Visibility.Visible);
 
         #endregion
@@ -83,6 +117,9 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase"/> class.
         /// </summary>
+        /// <param name="eventAggregator">The event aggregator that can be used to publish and subscribe to loosely coupled events.</param>
+        /// <param name="logger">The logger that can be used to publish log messages to.</param>
+        /// <param name="title">The title of the view to be shown in the UI.</param>
         protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title)
             : this(eventAggregator, logger, title, null)
         {
@@ -91,6 +128,10 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase"/> class.
         /// </summary>
+        /// <param name="eventAggregator">The event aggregator that can be used to publish and subscribe to loosely coupled events.</param>
+        /// <param name="logger">The logger that can be used to publish log messages to.</param>
+        /// <param name="title">The title of the view to be shown in the UI.</param>
+        /// <param name="helpText">The help text associated with the view model.</param>
         protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title, string helpText)
         {
             this.EventAggregator = eventAggregator;
@@ -189,29 +230,58 @@ namespace TeamProjectManager.Common.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Called when the selected Team Project Collection changed.
+        /// </summary>
+        /// <remarks>
+        /// Override this to handle any logic that must run when the Team Project Collection changed.
+        /// </remarks>
         protected virtual void OnSelectedTeamProjectCollectionChanged()
         {
         }
 
+        /// <summary>
+        /// Called when the selected Team Projects changed.
+        /// </summary>
+        /// <remarks>
+        /// Override this to handle any logic that must run when the Team Projects changed.
+        /// </remarks>
         protected virtual void OnSelectedTeamProjectsChanged()
         {
         }
 
+        /// <summary>
+        /// Determines if the provided Team Foundation Server is supported by this view model.
+        /// </summary>
+        /// <param name="server">The Team Foundation Server for which to determine if it is supported.</param>
+        /// <returns><see langword="true"/> if the Team Foundation Server is supported; <see langword="false"/> otherwise.</returns>
         protected virtual bool IsTfsSupported(TeamFoundationServerInfo server)
         {
             return true;
         }
 
+        /// <summary>
+        /// Returns the number of currently selected Team Projects.
+        /// </summary>
+        /// <returns></returns>
         protected int GetNumberOfSelectedTeamProjects()
         {
             return (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjects != null ? this.SelectedTeamProjects.Count : 0);
         }
 
+        /// <summary>
+        /// Determines if any Team Project has been selected.
+        /// </summary>
+        /// <returns><see langword="true"/> if any Team Project has been selected; <see langword="false"/> otherwise.</returns>
         protected bool IsAnyTeamProjectSelected()
         {
             return GetNumberOfSelectedTeamProjects() > 0;
         }
 
+        /// <summary>
+        /// Gets the Team Project Collection instance for the currently selected Team Project Collection.
+        /// </summary>
+        /// <returns>The Team Project Collection instance for the currently selected Team Project Collection.</returns>
         protected TfsTeamProjectCollection GetSelectedTfsTeamProjectCollection()
         {
             if (this.SelectedTeamProjectCollection == null)
@@ -224,6 +294,11 @@ namespace TeamProjectManager.Common.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Gets the Team Project Collection instance for the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI of the Team Project Collection.</param>
+        /// <returns>The Team Project Collection instance for the specified URI.</returns>
         protected TfsTeamProjectCollection GetTfsTeamProjectCollection(Uri uri)
         {
             return TfsTeamProjectCollectionCache.GetTfsTeamProjectCollection(uri);

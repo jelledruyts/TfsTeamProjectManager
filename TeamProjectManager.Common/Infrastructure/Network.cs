@@ -2,6 +2,9 @@
 
 namespace TeamProjectManager.Common.Infrastructure
 {
+    /// <summary>
+    /// Provides network information.
+    /// </summary>
     public static class Network
     {
         private static bool? isAvailable;
@@ -11,6 +14,10 @@ namespace TeamProjectManager.Common.Infrastructure
             NetworkChange.NetworkAvailabilityChanged += (sender, e) => { isAvailable = null; };
         }
 
+        /// <summary>
+        /// Determines if a network connection is available.
+        /// </summary>
+        /// <returns><see langword="true"/> if a network connection is available; <see langword="false"/> otherwise.</returns>
         public static bool IsAvailable()
         {
             if (!isAvailable.HasValue)

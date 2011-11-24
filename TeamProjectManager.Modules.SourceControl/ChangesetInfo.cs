@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TeamProjectManager.Modules.LastChangesets
+namespace TeamProjectManager.Modules.SourceControl
 {
     public class ChangesetInfo
     {

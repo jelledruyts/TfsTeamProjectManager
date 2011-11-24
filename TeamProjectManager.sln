@@ -9,12 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Common",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.WorkItemTypes", "TeamProjectManager.Modules.WorkItemTypes\TeamProjectManager.Modules.WorkItemTypes.csproj", "{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.LastChangesets", "TeamProjectManager.Modules.LastChangesets\TeamProjectManager.Modules.LastChangesets.csproj", "{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{418CF9CB-5595-4268-B745-1F8A659D84D1}"
 	ProjectSection(SolutionItems) = preProject
 		TeamProjectManager.snk = TeamProjectManager.snk
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.SourceControl", "TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj", "{FA594433-69DA-461E-9C57-6483529214EA}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -28,15 +28,15 @@ Global
 		SccProjectUniqueName2 = TeamProjectManager.Modules.BuildProcessTemplates\\TeamProjectManager.Modules.BuildProcessTemplates.csproj
 		SccProjectName2 = TeamProjectManager.Modules.BuildProcessTemplates
 		SccLocalPath2 = TeamProjectManager.Modules.BuildProcessTemplates
-		SccProjectUniqueName3 = TeamProjectManager.Modules.LastChangesets\\TeamProjectManager.Modules.LastChangesets.csproj
-		SccProjectName3 = TeamProjectManager.Modules.LastChangesets
-		SccLocalPath3 = TeamProjectManager.Modules.LastChangesets
-		SccProjectUniqueName4 = TeamProjectManager.Modules.WorkItemTypes\\TeamProjectManager.Modules.WorkItemTypes.csproj
-		SccProjectName4 = TeamProjectManager.Modules.WorkItemTypes
-		SccLocalPath4 = TeamProjectManager.Modules.WorkItemTypes
-		SccProjectUniqueName5 = TeamProjectManager.Shell\\TeamProjectManager.Shell.csproj
-		SccProjectName5 = TeamProjectManager.Shell
-		SccLocalPath5 = TeamProjectManager.Shell
+		SccProjectUniqueName3 = TeamProjectManager.Modules.WorkItemTypes\\TeamProjectManager.Modules.WorkItemTypes.csproj
+		SccProjectName3 = TeamProjectManager.Modules.WorkItemTypes
+		SccLocalPath3 = TeamProjectManager.Modules.WorkItemTypes
+		SccProjectUniqueName4 = TeamProjectManager.Shell\\TeamProjectManager.Shell.csproj
+		SccProjectName4 = TeamProjectManager.Shell
+		SccLocalPath4 = TeamProjectManager.Shell
+		SccProjectUniqueName5 = TeamProjectManager.Modules.SourceControl\\TeamProjectManager.Modules.SourceControl.csproj
+		SccProjectName5 = TeamProjectManager.Modules.SourceControl
+		SccLocalPath5 = TeamProjectManager.Modules.SourceControl
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,14 +75,14 @@ Global
 		{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FA594433-69DA-461E-9C57-6483529214EA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,10 +7,10 @@ using TeamProjectManager.Common;
 
 [assembly: AssemblyVersion("1.0.*")] // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
 [assembly: AssemblyInformationalVersion("1.0.0.0")] // Keep this constant as long as possible to avoid the user's settings getting lost (it is used for the LocalUserAppDataPath where the configuration file is stored).
-[assembly: Guid("8c7e97d1-9424-4ad8-93e3-b5d9277a8d70")]
+[assembly: Guid("12bdde76-ccba-4b23-a857-b2d2fb62b915")]
 
 [assembly: AssemblyProduct(Constants.ApplicationName)]
-[assembly: AssemblyTitle(Constants.ApplicationName + " - Last Changesets Module")]
+[assembly: AssemblyTitle(Constants.ApplicationName + " - Source Control Module")]
 [assembly: AssemblyDescription(Constants.ApplicationDescription)]
 [assembly: AssemblyCompany(Constants.ApplicationCompany)]
 [assembly: AssemblyCopyright(Constants.ApplicationCopyright)]

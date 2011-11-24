@@ -139,7 +139,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 }
                 catch (Exception exc)
                 {
-                    var message = "There was a problem showing the internal TFS version control file browser dialog.";
+                    var message = "There was a problem showing the internal TFS Source Control file browser dialog.";
                     Logger.Log(message, exc, TraceEventType.Warning);
                     MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
@@ -224,7 +224,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private void DeleteSelectedBuildProcessTemplates(object argument)
         {
-            var result = MessageBox.Show("This will unregister the selected build process templates. Are you sure you want to continue?" + Environment.NewLine + Environment.NewLine + "Note that the XAML files will not be deleted from version control, they will only be unregistered as build process templates.", "Confirm Unregister", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will unregister the selected build process templates. Are you sure you want to continue?" + Environment.NewLine + Environment.NewLine + "Note that the XAML files will not be deleted from Source Control, they will only be unregistered as build process templates.", "Confirm Unregister", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
                 var buildProcessTemplates = this.SelectedBuildProcessTemplates.Select(p => p.ProcessTemplate).ToList();

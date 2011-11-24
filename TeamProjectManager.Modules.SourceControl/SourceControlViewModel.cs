@@ -15,14 +15,14 @@ using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 
-namespace TeamProjectManager.Modules.LastChangesets
+namespace TeamProjectManager.Modules.SourceControl
 {
     [Export]
-    public class LastChangesetsViewModel : ViewModelBase
+    public class SourceControlViewModel : ViewModelBase
     {
         #region Properties
 
-        public RelayCommand GetLastChangesetsCommand { get; private set; }
+        public RelayCommand GetLatestChangesetsCommand { get; private set; }
         public RelayCommand ViewChangesetDetailsCommand { get; private set; }
 
         #endregion
@@ -35,7 +35,7 @@ namespace TeamProjectManager.Modules.LastChangesets
             set { this.SetValue(ChangesetsProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<ChangesetInfo>> ChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, LastChangesetsViewModel>(o => o.Changesets);
+        public static ObservableProperty<ICollection<ChangesetInfo>> ChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, SourceControlViewModel>(o => o.Changesets);
 
         public ICollection<ChangesetInfo> SelectedChangesets
         {
@@ -43,7 +43,7 @@ namespace TeamProjectManager.Modules.LastChangesets
             set { this.SetValue(SelectedChangesetsProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<ChangesetInfo>> SelectedChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, LastChangesetsViewModel>(o => o.SelectedChangesets);
+        public static ObservableProperty<ICollection<ChangesetInfo>> SelectedChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, SourceControlViewModel>(o => o.SelectedChangesets);
 
         public int NumberOfChangesets
         {
@@ -51,7 +51,7 @@ namespace TeamProjectManager.Modules.LastChangesets
             set { this.SetValue(NumberOfChangesetsProperty, value); }
         }
 
-        public static ObservableProperty<int> NumberOfChangesetsProperty = new ObservableProperty<int, LastChangesetsViewModel>(o => o.NumberOfChangesets, 1);
+        public static ObservableProperty<int> NumberOfChangesetsProperty = new ObservableProperty<int, SourceControlViewModel>(o => o.NumberOfChangesets, 1);
 
         public string Exclusions
         {
@@ -59,17 +59,17 @@ namespace TeamProjectManager.Modules.LastChangesets
             set { this.SetValue(ExclusionsProperty, value); }
         }
 
-        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, LastChangesetsViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update");
+        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update");
 
         #endregion
 
         #region Constructors
 
         [ImportingConstructor]
-        public LastChangesetsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Last Changesets", "Allows you to retrieve the last changesets across Team Projects. This makes it easy to see which projects are still actively being worked on, for example.")
+        public SourceControlViewModel(IEventAggregator eventAggregator, ILogger logger)
+            : base(eventAggregator, logger, "Source Control", "Allows you to manage Source Control settings for Team Projects.")
         {
-            this.GetLastChangesetsCommand = new RelayCommand(GetLastChangesets, CanGetLastChangesets);
+            this.GetLatestChangesetsCommand = new RelayCommand(GetLatestChangesets, CanGetLatestChangesets);
             this.ViewChangesetDetailsCommand = new RelayCommand(ViewChangesetDetails, CanViewChangesetDetails);
         }
 
@@ -77,17 +77,17 @@ namespace TeamProjectManager.Modules.LastChangesets
 
         #region Commands
 
-        private bool CanGetLastChangesets(object argument)
+        private bool CanGetLatestChangesets(object argument)
         {
             return IsAnyTeamProjectSelected() && this.NumberOfChangesets > 0;
         }
 
-        private void GetLastChangesets(object argument)
+        private void GetLatestChangesets(object argument)
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var numberOfChangesetsForProject = this.NumberOfChangesets;
             var exclusions = (string.IsNullOrEmpty(this.Exclusions) ? new string[0] : this.Exclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            var task = new ApplicationTask("Retrieving last changesets", teamProjectNames.Count);
+            var task = new ApplicationTask("Retrieving latest changesets", teamProjectNames.Count);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -136,7 +136,7 @@ namespace TeamProjectManager.Modules.LastChangesets
             {
                 if (e.Error != null)
                 {
-                    Logger.Log("An unexpected exception occurred while retrieving last changesets", e.Error);
+                    Logger.Log("An unexpected exception occurred while retrieving latest changesets", e.Error);
                     task.SetError(e.Error);
                     task.SetComplete("An unexpected exception occurred");
                 }

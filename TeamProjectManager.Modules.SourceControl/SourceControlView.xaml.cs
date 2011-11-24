@@ -3,22 +3,22 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace TeamProjectManager.Modules.LastChangesets
+namespace TeamProjectManager.Modules.SourceControl
 {
     [Export]
-    public partial class LastChangesetsView : UserControl
+    public partial class SourceControlView : UserControl
     {
-        public LastChangesetsView()
+        public SourceControlView()
         {
             InitializeComponent();
         }
 
         [Import]
-        public LastChangesetsViewModel ViewModel
+        public SourceControlViewModel ViewModel
         {
             get
             {
-                return (LastChangesetsViewModel)this.DataContext;
+                return (SourceControlViewModel)this.DataContext;
             }
             set
             {

@@ -157,9 +157,9 @@
       <Project>{BDCA8650-C32C-4131-A622-DDA98C43656C}</Project>
       <Name>TeamProjectManager.Modules.BuildProcessTemplates</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TeamProjectManager.Modules.LastChangesets\TeamProjectManager.Modules.LastChangesets.csproj">
-      <Project>{6B7284A8-F3E9-4FB8-A243-93A1D1BFCE30}</Project>
-      <Name>TeamProjectManager.Modules.LastChangesets</Name>
+    <ProjectReference Include="..\TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj">
+      <Project>{FA594433-69DA-461E-9C57-6483529214EA}</Project>
+      <Name>TeamProjectManager.Modules.SourceControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemTypes\TeamProjectManager.Modules.WorkItemTypes.csproj">
       <Project>{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}</Project>

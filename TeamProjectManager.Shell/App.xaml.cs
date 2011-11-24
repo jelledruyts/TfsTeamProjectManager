@@ -59,6 +59,7 @@ namespace TeamProjectManager.Shell
 
         protected override void OnExit(ExitEventArgs e)
         {
+            TfsTeamProjectCollectionCache.ClearCache();
             this.logger.Log("Application exited", TraceEventType.Information);
             base.OnExit(e);
         }

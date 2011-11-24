@@ -105,25 +105,23 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var store = tfs.GetService<WorkItemStore>();
+
+                var results = new List<WorkItemCategoryInfo>();
+                foreach (var teamProjectName in teamProjectNames)
                 {
-                    var store = tfs.GetService<WorkItemStore>();
+                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
+                    var project = store.Projects[teamProjectName];
 
-                    var results = new List<WorkItemCategoryInfo>();
-                    foreach (var teamProjectName in teamProjectNames)
+                    var categoriesXml = project.Categories.Export();
+                    var categoryList = WorkItemCategoryList.Load(categoriesXml);
+                    foreach (var category in categoryList.Categories)
                     {
-                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                        var project = store.Projects[teamProjectName];
-
-                        var categoriesXml = project.Categories.Export();
-                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
-                        foreach (var category in categoryList.Categories)
-                        {
-                            results.Add(new WorkItemCategoryInfo(teamProjectName, categoryList, category));
-                        }
+                        results.Add(new WorkItemCategoryInfo(teamProjectName, categoryList, category));
                     }
-                    e.Result = results;
                 }
+                e.Result = results;
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -163,35 +161,33 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var store = tfs.GetService<WorkItemStore>();
+                foreach (var categoriesByTeamProject in workItemCategoriesToDelete.GroupBy(c => c.TeamProject).ToList())
                 {
-                    var store = tfs.GetService<WorkItemStore>();
-                    foreach (var categoriesByTeamProject in workItemCategoriesToDelete.GroupBy(c => c.TeamProject).ToList())
-                    {
-                        var project = store.Projects[categoriesByTeamProject.Key];
-                        var categoriesXml = project.Categories.Export();
-                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
+                    var project = store.Projects[categoriesByTeamProject.Key];
+                    var categoriesXml = project.Categories.Export();
+                    var categoryList = WorkItemCategoryList.Load(categoriesXml);
 
-                        foreach (var workItemCategoryToDelete in categoriesByTeamProject)
+                    foreach (var workItemCategoryToDelete in categoriesByTeamProject)
+                    {
+                        try
                         {
-                            try
+                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting work item category \"{0}\" from Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject));
+                            var category = categoryList.Categories.FirstOrDefault(c => string.Equals(c.RefName, workItemCategoryToDelete.WorkItemCategory.RefName, StringComparison.OrdinalIgnoreCase));
+                            if (category != null)
                             {
-                                task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting work item category \"{0}\" from Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject));
-                                var category = categoryList.Categories.FirstOrDefault(c => string.Equals(c.RefName, workItemCategoryToDelete.WorkItemCategory.RefName, StringComparison.OrdinalIgnoreCase));
-                                if (category != null)
-                                {
-                                    categoryList.Categories.Remove(category);
-                                }
-                            }
-                            catch (Exception exc)
-                            {
-                                task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting the work item category \"{0}\" for Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject), exc);
+                                categoryList.Categories.Remove(category);
                             }
                         }
-
-                        categoriesXml = categoryList.Save();
-                        project.Categories.Import(categoriesXml.DocumentElement);
+                        catch (Exception exc)
+                        {
+                            task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting the work item category \"{0}\" for Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject), exc);
+                        }
                     }
+
+                    categoriesXml = categoryList.Save();
+                    project.Categories.Import(categoriesXml.DocumentElement);
                 }
             };
             worker.RunWorkerCompleted += (sender, e) =>
@@ -233,15 +229,13 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     var worker = new BackgroundWorker();
                     worker.DoWork += (sender, e) =>
                     {
-                        using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(teamProjectCollection.Uri))
-                        {
-                            var store = tfs.GetService<WorkItemStore>();
-                            var project = store.Projects[teamProject.Name];
-                            var categoriesXml = project.Categories.Export();
-                            var selectedWorkItemCategoryList = WorkItemCategoryList.Load(categoriesXml);
-                            var availableWorkItemTypeReferences = project.WorkItemTypes.Cast<WorkItemType>().Select(w => new WorkItemTypeReference { Name = w.Name }).ToList();
-                            e.Result = new Tuple<WorkItemCategoryList, ICollection<WorkItemTypeReference>>(selectedWorkItemCategoryList, availableWorkItemTypeReferences);
-                        }
+                        var tfs = GetTfsTeamProjectCollection(teamProjectCollection.Uri);
+                        var store = tfs.GetService<WorkItemStore>();
+                        var project = store.Projects[teamProject.Name];
+                        var categoriesXml = project.Categories.Export();
+                        var selectedWorkItemCategoryList = WorkItemCategoryList.Load(categoriesXml);
+                        var availableWorkItemTypeReferences = project.WorkItemTypes.Cast<WorkItemType>().Select(w => new WorkItemTypeReference { Name = w.Name }).ToList();
+                        e.Result = new Tuple<WorkItemCategoryList, ICollection<WorkItemTypeReference>>(selectedWorkItemCategoryList, availableWorkItemTypeReferences);
                     };
                     worker.RunWorkerCompleted += (sender, e) =>
                     {
@@ -284,22 +278,20 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var store = tfs.GetService<WorkItemStore>();
+                foreach (var teamProject in this.SelectedTeamProjects)
                 {
-                    var store = tfs.GetService<WorkItemStore>();
-                    foreach (var teamProject in this.SelectedTeamProjects)
+                    try
                     {
-                        try
-                        {
-                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing work item category list in Team Project \"{0}\"", teamProject.Name));
-                            var project = store.Projects[teamProject.Name];
-                            var categoriesXml = this.SelectedWorkItemCategoryList.Save();
-                            project.Categories.Import(categoriesXml.DocumentElement);
-                        }
-                        catch (Exception exc)
-                        {
-                            task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while importing the work item category list for Team Project \"{0}\"", teamProject.Name), exc);
-                        }
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing work item category list in Team Project \"{0}\"", teamProject.Name));
+                        var project = store.Projects[teamProject.Name];
+                        var categoriesXml = this.SelectedWorkItemCategoryList.Save();
+                        project.Categories.Import(categoriesXml.DocumentElement);
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while importing the work item category list for Team Project \"{0}\"", teamProject.Name), exc);
                     }
                 }
             };

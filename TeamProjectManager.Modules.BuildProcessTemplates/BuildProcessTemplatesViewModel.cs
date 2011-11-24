@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.Client;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Controls;
 using TeamProjectManager.Common;
@@ -114,35 +113,32 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         private void BrowseTemplateServerPath(object argument)
         {
-            using (var tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(this.SelectedTeamProjectCollection.Uri))
+            var tfs = GetSelectedTfsTeamProjectCollection();
+            var vcs = tfs.GetService<VersionControlServer>();
+            try
             {
-                var vcs = tfs.GetService<VersionControlServer>();
-
-                try
+                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
+                var args = new object[] { vcs };
+                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChooseItem", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
                 {
-                    var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-                    var args = new object[] { vcs };
-                    using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChooseItem", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
+                    dialog.GetType().GetProperty("AllowFileOnly").SetValue(dialog, true, null);
+                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+                    var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                    if (result == System.Windows.Forms.DialogResult.OK)
                     {
-                        dialog.GetType().GetProperty("AllowFileOnly").SetValue(dialog, true, null);
-                        dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                        var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
-                        if (result == System.Windows.Forms.DialogResult.OK)
+                        var item = (Item)dialog.GetType().GetProperty("SelectedItem", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dialog, null);
+                        if (item != null)
                         {
-                            var item = (Item)dialog.GetType().GetProperty("SelectedItem", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dialog, null);
-                            if (item != null)
-                            {
-                                this.TemplateServerPath = item.ServerItem;
-                            }
+                            this.TemplateServerPath = item.ServerItem;
                         }
                     }
                 }
-                catch (Exception exc)
-                {
-                    var message = "There was a problem showing the internal TFS Source Control file browser dialog.";
-                    Logger.Log(message, exc, TraceEventType.Warning);
-                    MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
+            }
+            catch (Exception exc)
+            {
+                var message = "There was a problem showing the internal TFS Source Control file browser dialog.";
+                Logger.Log(message, exc, TraceEventType.Warning);
+                MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -159,7 +155,9 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                e.Result = Tasks.GetBuildProcessTemplates(task, this.SelectedTeamProjectCollection.Uri, teamProjectNames);
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var buildServer = tfs.GetService<IBuildServer>();
+                e.Result = Tasks.GetBuildProcessTemplates(task, buildServer, teamProjectNames);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -198,7 +196,9 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
-                    Tasks.RegisterBuildProcessTemplate(task, this.SelectedTeamProjectCollection.Uri, teamProjectNames, this.TemplateServerPath, this.TemplateType, true, this.UnregisterAllOtherTemplates, this.UnregisterAllOtherTemplatesIncludesUpgradeTemplate, this.Simulate);
+                    var tfs = GetSelectedTfsTeamProjectCollection();
+                    var buildServer = tfs.GetService<IBuildServer>();
+                    Tasks.RegisterBuildProcessTemplate(task, buildServer, teamProjectNames, this.TemplateServerPath, this.TemplateType, true, this.UnregisterAllOtherTemplates, this.UnregisterAllOtherTemplatesIncludesUpgradeTemplate, this.Simulate);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
                 {

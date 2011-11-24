@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Client;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.ObjectModel;
 
@@ -209,6 +210,23 @@ namespace TeamProjectManager.Common.Infrastructure
         protected bool IsAnyTeamProjectSelected()
         {
             return GetNumberOfSelectedTeamProjects() > 0;
+        }
+
+        protected TfsTeamProjectCollection GetSelectedTfsTeamProjectCollection()
+        {
+            if (this.SelectedTeamProjectCollection == null)
+            {
+                return null;
+            }
+            else
+            {
+                return GetTfsTeamProjectCollection(this.SelectedTeamProjectCollection.Uri);
+            }
+        }
+
+        protected TfsTeamProjectCollection GetTfsTeamProjectCollection(Uri uri)
+        {
+            return TfsTeamProjectCollectionCache.GetTfsTeamProjectCollection(uri);
         }
 
         #endregion

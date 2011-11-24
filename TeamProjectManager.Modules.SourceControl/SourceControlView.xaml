@@ -8,7 +8,68 @@
     <Grid>
         
         <TabControl>
-            <TabItem Header="Latest Changesets">
+            
+            <TabItem Header="View Settings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="Get Source Control Settings" Command="{Binding Path=GetSourceControlSettingsCommand}" />
+
+                    <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=SourceControlSettings}" IsReadOnly="True" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                            <DataGridCheckBoxColumn Header="Multiple Check-out" Binding="{Binding Path=EnableMultipleCheckout}" />
+                            <DataGridCheckBoxColumn Header="Get Latest On Check-out" Binding="{Binding Path=EnableGetLatestOnCheckout}" />
+                            <DataGridTextColumn Header="Check-in Notes (* = Required)" Binding="{Binding Path=CheckinNoteFieldsList}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Update Settings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="Load From Team Project" Command="{Binding Path=LoadSourceControlSettingsCommand}" />
+                    
+                    <Grid Grid.Row="1" Margin="0,5,0,0" DataContext="{Binding Path=SelectedSourceControlSettings}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Enable multiple check-out" IsChecked="{Binding Path=EnableMultipleCheckout}" />
+
+                        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" Content="Enable get latest on check-out" IsChecked="{Binding Path=EnableGetLatestOnCheckout}" />
+                        
+                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" Content="Check-in Notes" />
+                        <DataGrid Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" ItemsSource="{Binding Path=CheckinNoteFields}" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" RowHeaderWidth="20">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Display Order" Binding="{Binding Path=DisplayOrder}" />
+                                <DataGridCheckBoxColumn Header="Required" Binding="{Binding Path=Required}" />
+                                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+
+                    <Button Grid.Row="2" Margin="0,5,0,0" Content="Update Source Control Settings" Command="{Binding Path=UpdateSourceControlSettingsCommand}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="View Latest Changesets">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -49,8 +110,8 @@
                     <Button Grid.Row="2" Content="View Changeset Details" Command="{Binding Path=ViewChangesetDetailsCommand}" Margin="0,5,0,0" />
 
                 </Grid>
-
             </TabItem>
+            
         </TabControl>
         
     </Grid>

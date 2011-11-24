@@ -66,8 +66,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChangesetInfo.cs" />
+    <Compile Include="CheckinNoteField.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceControlModule.cs" />
+    <Compile Include="SourceControlSettings.cs" />
     <Compile Include="SourceControlView.xaml.cs">
       <DependentUpon>SourceControlView.xaml</DependentUpon>
     </Compile>

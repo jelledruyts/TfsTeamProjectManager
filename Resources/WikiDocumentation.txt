@@ -1,0 +1,85 @@
+!! Build Process Templates
+
+!!! View / Unregister
+
+Allows you to track the build process templates that are registered for each Team Project, and which build definitions actually use them.
+This can be useful when you want to get an overview of all the builds and their build process templates.
+
+[image:View / Unregister Build Process Templates|BuildProcessTemplates-ViewUnregister.png]
+
+!!! Register / Update
+
+Allows you to register new build process templates across multiple Team Projects, optionally unregistering any other template.
+This can be useful when you want to standardize on a single build process template for a selection of Team Projects in your organization.
+
+[image:Register / Update Build Process Templates|BuildProcessTemplates-RegisterUpdate.png]
+
+!! Source Control
+
+!!! View Settings
+
+Allows you to get an overview of the source control settings for each Team Project: whether or not "multiple check-out" and "get latest on check-out" are enabled, and which check-in notes are configured. Note that viewing the configured check-in policies is not supported at this time.
+
+[image:View Source Control Settings|SourceControl-ViewSettings.png]
+
+!!! Update Settings
+
+Allows you to change the source control settings across multiple Team Projects.
+Note that configuring check-in policies is not supported at this time.
+
+[image:Update Source Control Settings|SourceControl-UpdateSettings.png]
+
+!!! View Latest Changesets
+
+Allows you to retrieve the latest changesets across Team Projects, optionally excluding changesets with specific comments.
+This can be useful if you want to see which projects are still actively being worked on, for example.
+
+[image:View Latest Changesets|SourceControl-ViewLatestChangesets.png]
+
+!! Work Item Types
+
+!!! View / Export / Delete
+
+Allows you to get an overview of the work item type definitions across multiple Team Projects, how many work items have been created from them, and in which work item categories they are used.
+You can also export their definitions to XML files, and delete the work item types from the Team Projects.
+
+[image:View / Export / Delete Work Item Types|WorkItemTypes-ViewExportDelete.png]
+
+!!! Import
+
+Allows you to validate and import new work item type definitions in existing Team Projects.
+This can be useful if you want to change the work item types being used, e.g. to upgrade them from a previous version.
+
+[image:Import Work Item Types|WorkItemTypes-Import.png]
+
+!!! Compare
+
+Allows you to compare the work item types used by Team Projects with local work item definition files.
+This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item type definitions from a standard set.
+
+[image:Compare Work Item Types|WorkItemTypes-Compare.png]
+
+[image:Comparison Details|WorkItemTypes-CompareDetails.png]
+
+!!! Search
+
+Allows you to search for work item types and/or fields within them.
+This can be useful if you want to know if certain work items or fields are present in selected Team Projects.
+
+[image:Search Work Item Types|WorkItemTypes-Search.png]
+
+!! Work Item Categories
+
+!!! View / Delete
+
+Allows you to get an overview of all work item categories across Team Projects, and the work items that belong to them.
+You can even delete work item categories from Team Projects.
+
+[image:View / Delete Work Item Categories|WorkItemCategories-ViewDelete.png]
+
+!!! Update / Import
+
+Allows you to define work item categories across Team Projects, by creating them from scratch or by importing them from an existing Team Project.
+This can be useful if you want to change work item categories or if you want to delete work item types that are part of categories (in which case you have to remove them from any categories first).
+
+[image:Update / Import Work Item Categories|WorkItemCategories-UpdateImport.png]

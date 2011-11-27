@@ -16,6 +16,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.SourceControl", "TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj", "{FA594433-69DA-461E-9C57-6483529214EA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{B9D7B2AC-66F2-4AB7-B50F-A5ED7EEE4C9E}"
+	ProjectSection(SolutionItems) = preProject
+		Resources\BuildProcessTemplates-RegisterUpdate.png = Resources\BuildProcessTemplates-RegisterUpdate.png
+		Resources\BuildProcessTemplates-ViewUnregister.png = Resources\BuildProcessTemplates-ViewUnregister.png
+		Resources\SourceControl-UpdateSettings.png = Resources\SourceControl-UpdateSettings.png
+		Resources\SourceControl-ViewLatestChangesets.png = Resources\SourceControl-ViewLatestChangesets.png
+		Resources\SourceControl-ViewSettings.png = Resources\SourceControl-ViewSettings.png
+		Resources\WikiDocumentation.txt = Resources\WikiDocumentation.txt
+		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
+		Resources\WorkItemCategories-UpdateImport.png = Resources\WorkItemCategories-UpdateImport.png
+		Resources\WorkItemCategories-ViewDelete.png = Resources\WorkItemCategories-ViewDelete.png
+		Resources\WorkItemTypes-Compare.png = Resources\WorkItemTypes-Compare.png
+		Resources\WorkItemTypes-CompareDetails.png = Resources\WorkItemTypes-CompareDetails.png
+		Resources\WorkItemTypes-Import.png = Resources\WorkItemTypes-Import.png
+		Resources\WorkItemTypes-Search.png = Resources\WorkItemTypes-Search.png
+		Resources\WorkItemTypes-ViewExportDelete.png = Resources\WorkItemTypes-ViewExportDelete.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 6

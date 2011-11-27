@@ -1,0 +1,30 @@
+!! Introduction
+
+TFS Team Project Manager automates various tasks across Team Projects in Team Foundation Server. If you find yourself managing multiple Team Projects for an organization and have recurring tasks and questions that repeat themselves over and over again, Team Project Manager probably has some answers for you.
+
+Team Project Manager can help you...
+
+* Manage build process templates (understanding which build templates are used by which build definitions, uploading new build process templates, unregistering existing ones, ...)
+* Manage source control settings (e.g. to standardize settings for multiple check-out, get latest on check-out, check-in notes, ...)
+* Retrieve the latest changesets (e.g. to see which projects are still active)
+* Manage work item type definitions (understanding with projects use which work item types and how many work items there are of each, importing work item types to various projects, comparing them with local sources e.g. to determine which Process Template was likely used to create Team Projects, ...)
+* Manage work item categories (adding and removing categories and managing the work item types they contain)
+
+If you can think of other great features, please let us know through the discussion forums or the issue tracker! Or (even better) because it's built with a very modular framework ([url:Microsoft Prism|http://compositewpf.codeplex.com/]) you can also contribute by building your own modules!
+
+For more details on how all this works, see the [Documentation] page.
+
+In the meantime, here's a gratuitous teaser screenshot:
+
+[image:Compare Work Item Types|WorkItemTracking-Compare.png]
+
+!! Free Software
+
+This application is completely free to use. If you feel it saves you a lot of time and you like it so much that you want to support the countless hours that have gone in developing this - please do feel free to donate!
+
+[image:Donate|https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif|https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=GJDYX8VK62BBG&lc=US&item_name=TFS%20Team%20Project%20Manager&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted]
+
+!! What's New?
+
+* v1.0 (November 27, 2011)
+** Initial release.

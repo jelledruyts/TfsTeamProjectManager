@@ -60,7 +60,7 @@ namespace TeamProjectManager.Common.Infrastructure
         public TeamProjectCollectionInfo SelectedTeamProjectCollection
         {
             get { return this.GetValue(SelectedTeamProjectCollectionProperty); }
-            internal set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
+            set { this.SetValue(SelectedTeamProjectCollectionProperty, value); }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace TeamProjectManager.Common.Infrastructure
         public ICollection<TeamProjectInfo> SelectedTeamProjects
         {
             get { return this.GetValue(SelectedTeamProjectsProperty); }
-            internal set { this.SetValue(SelectedTeamProjectsProperty, value); }
+            set { this.SetValue(SelectedTeamProjectsProperty, value); }
         }
 
         /// <summary>
@@ -131,12 +131,12 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <param name="eventAggregator">The event aggregator that can be used to publish and subscribe to loosely coupled events.</param>
         /// <param name="logger">The logger that can be used to publish log messages to.</param>
         /// <param name="title">The title of the view to be shown in the UI.</param>
-        /// <param name="helpText">The help text associated with the view model.</param>
-        protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title, string helpText)
+        /// <param name="description">The description associated with the view.</param>
+        protected ViewModelBase(IEventAggregator eventAggregator, ILogger logger, string title, string description)
         {
             this.EventAggregator = eventAggregator;
             this.Logger = logger;
-            this.Info = new ViewModelInfo(title, helpText);
+            this.Info = new ViewModelInfo(title, description);
             this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection);
             this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjects = e.SelectedTeamProjects);
         }

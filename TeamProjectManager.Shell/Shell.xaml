@@ -39,7 +39,20 @@
 
             <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
 
-            <TabControl Grid.Column="2" Style="{StaticResource ShellTabControlStyle}" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" SelectedIndex="0" />
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TabControl Grid.Row="0" Style="{StaticResource ShellTabControlStyle}" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" SelectedIndex="0" />
+
+                <Border Grid.Row="1" BorderThickness="0,1,0,0" Margin="0,5,0,0" BorderBrush="{StaticResource AccentBrush}">
+                    <Expander Header="Info" IsExpanded="True" Foreground="{StaticResource UserMessageFontBrush}" Margin="0,2,0,0">
+                        <ContentPresenter Content="{Binding HelpContent, Mode=OneWay, Converter={StaticResource helpContentConverter}}" />
+                    </Expander>
+                </Border>
+            </Grid>
+
         </Grid>
 
     </Grid>

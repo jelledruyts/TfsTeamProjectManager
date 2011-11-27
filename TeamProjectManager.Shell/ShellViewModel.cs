@@ -27,6 +27,14 @@ namespace TeamProjectManager.Shell
 
         public static ObservableProperty<string> WindowTitleProperty = new ObservableProperty<string, ShellViewModel>(o => o.WindowTitle);
 
+        public object HelpContent
+        {
+            get { return this.GetValue(HelpContentProperty); }
+            set { this.SetValue(HelpContentProperty, value); }
+        }
+
+        public static ObservableProperty<object> HelpContentProperty = new ObservableProperty<object, ShellViewModel>(o => o.HelpContent);
+
         #endregion
 
         #region Constructors
@@ -37,6 +45,7 @@ namespace TeamProjectManager.Shell
         {
             this.WindowTitle = InternalConstants.DefaultWindowTitle;
             this.TaskbarItemInfo = new TaskbarItemInfo();
+            HelpProvider.HelpContentUpdateRequested += (sender, e) => { this.HelpContent = e.HelpContent; };
         }
 
         #endregion

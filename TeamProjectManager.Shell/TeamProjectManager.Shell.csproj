@@ -89,6 +89,7 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Infrastructure\CodePlexClient.cs" />
+    <Compile Include="Infrastructure\HelpContentConverter.cs" />
     <Compile Include="Infrastructure\IStatusService.cs" />
     <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Infrastructure\LoggerAdapter.cs" />

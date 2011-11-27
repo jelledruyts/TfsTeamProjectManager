@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -10,7 +11,7 @@
 
         <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
 
-            <TabItem Header="View / Delete">
+            <TabItem Header="View / Delete" i:HelpProvider.HelpContent="Allows you to get an overview of all work item categories across Team Projects, and the work items that belong to them. You can even delete work item categories from Team Projects.">
 
                 <Grid>
                     <Grid.RowDefinitions>
@@ -35,7 +36,7 @@
 
             </TabItem>
 
-            <TabItem Header="Update / Import">
+            <TabItem Header="Update / Import" i:HelpProvider.HelpContent="Allows you to define work item categories across Team Projects, by creating them from scratch or by importing them from an existing Team Project. This can be useful if you want to change work item categories or if you want to delete work item types that are part of categories (in which case you have to remove them from any categories first).">
 
                 <Grid>
                     <Grid.RowDefinitions>
@@ -79,16 +80,16 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Row="0" Grid.Column="0" Content="Name" />
-                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=SelectedWorkItemCategory.Name}" />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=SelectedWorkItemCategory.Name}" Margin="5,0,0,0" />
 
-                            <Label Grid.Row="1" Grid.Column="0" Content="Reference Name" />
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=SelectedWorkItemCategory.RefName}" />
+                            <Label Grid.Row="1" Grid.Column="0" Content="Reference Name" Margin="0,5,0,0" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=SelectedWorkItemCategory.RefName}" Margin="5,5,0,0" />
 
-                            <Label Grid.Row="2" Grid.Column="0" Content="Default Work Item Type" />
-                            <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Path=AvailableWorkItemTypeReferences}" SelectedItem="{Binding Path=SelectedWorkItemCategory.DefaultWorkItemType}" DisplayMemberPath="Name" />
+                            <Label Grid.Row="2" Grid.Column="0" Content="Default Work Item Type" Margin="0,5,0,0" />
+                            <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Path=AvailableWorkItemTypeReferences}" SelectedItem="{Binding Path=SelectedWorkItemCategory.DefaultWorkItemType}" DisplayMemberPath="Name" Margin="5,5,0,0" />
 
-                            <Label Grid.Row="3" Grid.Column="0" Content="Other Work Item Types" />
-                            <ListBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Path=AvailableWorkItemTypeReferences}" DisplayMemberPath="Name" SelectionMode="Extended" x:Name="workItemTypesListBox" SelectionChanged="workItemTypesListBox_SelectionChanged" />
+                            <Label Grid.Row="3" Grid.Column="0" Content="Other Work Item Types" Margin="0,5,0,0" />
+                            <ListBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Path=AvailableWorkItemTypeReferences}" DisplayMemberPath="Name" SelectionMode="Extended" x:Name="workItemTypesListBox" SelectionChanged="workItemTypesListBox_SelectionChanged" Margin="5,5,0,0" />
                         </Grid>
 
                     </Grid>

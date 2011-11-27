@@ -12,19 +12,19 @@ namespace TeamProjectManager.Common.Infrastructure
         public string Title { get; private set; }
 
         /// <summary>
-        /// Gets the help text associated with the view model.
+        /// Gets the description associated with the view.
         /// </summary>
-        public string HelpText { get; private set; }
+        public string Description { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelInfo"/> class.
         /// </summary>
         /// <param name="title">The title of the view to be shown in the UI.</param>
-        /// <param name="helpText">The help text associated with the view model.</param>
-        public ViewModelInfo(string title, string helpText)
+        /// <param name="description">The description associated with the view.</param>
+        public ViewModelInfo(string title, string description)
         {
             this.Title = title;
-            this.HelpText = helpText;
+            this.Description = description;
         }
     }
 }

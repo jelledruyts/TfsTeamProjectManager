@@ -77,6 +77,8 @@
     <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />
     <Compile Include="Infrastructure\FileSystem.cs" />
+    <Compile Include="Infrastructure\HelpContentEventArgs.cs" />
+    <Compile Include="Infrastructure\HelpProvider.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\Network.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />

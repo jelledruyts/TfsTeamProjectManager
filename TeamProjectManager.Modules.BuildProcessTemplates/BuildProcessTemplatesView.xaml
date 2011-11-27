@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -10,7 +11,7 @@
 
         <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
 
-            <TabItem Header="View / Unregister">
+            <TabItem Header="View / Unregister" i:HelpProvider.HelpContent="Allows you to track the build process templates that are registered for each Team Project, and which build definitions actually use them. This can be useful when you want to get an overview of all the builds and their build process templates.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -30,7 +31,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Register / Update">
+            <TabItem Header="Register / Update" i:HelpProvider.HelpContent="Allows you to register new build process templates across multiple Team Projects, optionally unregistering any other template. This can be useful when you want to standardize on a single build process template for a selection of Team Projects in your organization.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -50,8 +51,8 @@
                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=TemplateServerPath, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
                     <Button Grid.Row="0" Grid.Column="2" Content="..." Command="{Binding Path=BrowseTemplateServerPathCommand}" Padding="5,0,5,0" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="Template Type" />
-                    <ComboBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="5,0,0,0">
+                    <Label Grid.Row="1" Grid.Column="0" Content="Template Type" Margin="0,5,0,0" />
+                    <ComboBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="5,5,0,0">
                         <ComboBoxItem Content="Default" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Default}" />
                         <ComboBoxItem Content="Upgrade" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Upgrade}" />
                         <ComboBoxItem Content="Custom" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Custom}" />

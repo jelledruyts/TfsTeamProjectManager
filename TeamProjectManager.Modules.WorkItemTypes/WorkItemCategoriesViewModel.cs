@@ -112,13 +112,19 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var project = store.Projects[teamProjectName];
-
-                    var categoriesXml = project.Categories.Export();
-                    var categoryList = WorkItemCategoryList.Load(categoriesXml);
-                    foreach (var category in categoryList.Categories)
+                    try
                     {
-                        results.Add(new WorkItemCategoryInfo(teamProjectName, categoryList, category));
+                        var project = store.Projects[teamProjectName];
+                        var categoriesXml = project.Categories.Export();
+                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
+                        foreach (var category in categoryList.Categories)
+                        {
+                            results.Add(new WorkItemCategoryInfo(teamProjectName, categoryList, category));
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
                 }
                 e.Result = results;
@@ -165,29 +171,38 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 var store = tfs.GetService<WorkItemStore>();
                 foreach (var categoriesByTeamProject in workItemCategoriesToDelete.GroupBy(c => c.TeamProject).ToList())
                 {
-                    var project = store.Projects[categoriesByTeamProject.Key];
-                    var categoriesXml = project.Categories.Export();
-                    var categoryList = WorkItemCategoryList.Load(categoriesXml);
-
-                    foreach (var workItemCategoryToDelete in categoriesByTeamProject)
+                    var teamProjectName = categoriesByTeamProject.Key;
+                    try
                     {
-                        try
+                        var project = store.Projects[teamProjectName];
+                        var categoriesXml = project.Categories.Export();
+                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
+
+                        foreach (var workItemCategoryToDelete in categoriesByTeamProject)
                         {
-                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting work item category \"{0}\" from Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject));
-                            var category = categoryList.Categories.FirstOrDefault(c => string.Equals(c.RefName, workItemCategoryToDelete.WorkItemCategory.RefName, StringComparison.OrdinalIgnoreCase));
-                            if (category != null)
+                            try
                             {
-                                categoryList.Categories.Remove(category);
+                                task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting work item category \"{0}\" from Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject));
+                                var category = categoryList.Categories.FirstOrDefault(c => string.Equals(c.RefName, workItemCategoryToDelete.WorkItemCategory.RefName, StringComparison.OrdinalIgnoreCase));
+                                if (category != null)
+                                {
+                                    categoryList.Categories.Remove(category);
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting the work item category \"{0}\" for Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject), exc);
                             }
                         }
-                        catch (Exception exc)
-                        {
-                            task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting the work item category \"{0}\" for Team Project \"{1}\"", workItemCategoryToDelete.WorkItemCategory.Name, workItemCategoryToDelete.TeamProject), exc);
-                        }
+
+                        categoriesXml = categoryList.Save();
+                        project.Categories.Import(categoriesXml.DocumentElement);
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
 
-                    categoriesXml = categoryList.Save();
-                    project.Categories.Import(categoriesXml.DocumentElement);
                 }
             };
             worker.RunWorkerCompleted += (sender, e) =>

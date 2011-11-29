@@ -17,20 +17,26 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             foreach (var teamProjectName in teamProjectNames)
             {
                 task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-
-                var teamProjectBuildDefinitions = buildServer.QueryBuildDefinitions(teamProjectName, QueryOptions.Process);
-
-                foreach (var processTemplate in buildServer.QueryProcessTemplates(teamProjectName))
+                try
                 {
-                    var processTemplateBuildDefinitions = new List<IBuildDefinition>();
-                    foreach (var teamProjectBuildDefinition in teamProjectBuildDefinitions)
+                    var teamProjectBuildDefinitions = buildServer.QueryBuildDefinitions(teamProjectName, QueryOptions.Process);
+
+                    foreach (var processTemplate in buildServer.QueryProcessTemplates(teamProjectName))
                     {
-                        if (teamProjectBuildDefinition.Process != null && BuildProcessTemplateInfo.AreEquivalent(teamProjectBuildDefinition.Process, processTemplate))
+                        var processTemplateBuildDefinitions = new List<IBuildDefinition>();
+                        foreach (var teamProjectBuildDefinition in teamProjectBuildDefinitions)
                         {
-                            processTemplateBuildDefinitions.Add(teamProjectBuildDefinition);
+                            if (teamProjectBuildDefinition.Process != null && BuildProcessTemplateInfo.AreEquivalent(teamProjectBuildDefinition.Process, processTemplate))
+                            {
+                                processTemplateBuildDefinitions.Add(teamProjectBuildDefinition);
+                            }
                         }
+                        processTemplates.Add(new BuildProcessTemplateInfo(processTemplate, processTemplateBuildDefinitions));
                     }
-                    processTemplates.Add(new BuildProcessTemplateInfo(processTemplate, processTemplateBuildDefinitions));
+                }
+                catch (Exception exc)
+                {
+                    task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                 }
             }
             return processTemplates;

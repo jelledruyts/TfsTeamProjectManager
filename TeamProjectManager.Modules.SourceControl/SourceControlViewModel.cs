@@ -122,33 +122,40 @@ namespace TeamProjectManager.Modules.SourceControl
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var foundChangesetsForProject = 0;
-                    VersionSpec versionTo = null;
-                    while (foundChangesetsForProject < numberOfChangesetsForProject)
+                    try
                     {
-                        const int pageCount = 10;
-                        var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
-                        foreach (Changeset changeset in history)
+                        var foundChangesetsForProject = 0;
+                        VersionSpec versionTo = null;
+                        while (foundChangesetsForProject < numberOfChangesetsForProject)
                         {
-                            if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                            const int pageCount = 10;
+                            var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
+                            foreach (Changeset changeset in history)
                             {
-                                foundChangesetsForProject++;
-                                task.SetProgressForCurrentStep((double)foundChangesetsForProject / (double)numberOfChangesetsForProject);
-                                changesets.Add(new ChangesetInfo(teamProjectName, changeset.ChangesetId, changeset.Committer, changeset.CreationDate, changeset.Comment));
-                                if (foundChangesetsForProject == numberOfChangesetsForProject)
+                                if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
                                 {
-                                    break;
+                                    foundChangesetsForProject++;
+                                    task.SetProgressForCurrentStep((double)foundChangesetsForProject / (double)numberOfChangesetsForProject);
+                                    changesets.Add(new ChangesetInfo(teamProjectName, changeset.ChangesetId, changeset.Committer, changeset.CreationDate, changeset.Comment));
+                                    if (foundChangesetsForProject == numberOfChangesetsForProject)
+                                    {
+                                        break;
+                                    }
                                 }
                             }
+                            if (history.Count == pageCount)
+                            {
+                                versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                        if (history.Count == pageCount)
-                        {
-                            versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
                 }
                 e.Result = changesets;
@@ -218,8 +225,15 @@ namespace TeamProjectManager.Modules.SourceControl
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var projectSettings = GetSourceControlSettings(vcs, teamProjectName);
-                    settings.Add(projectSettings);
+                    try
+                    {
+                        var projectSettings = GetSourceControlSettings(vcs, teamProjectName);
+                        settings.Add(projectSettings);
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
                 }
                 e.Result = settings;
             };
@@ -314,11 +328,18 @@ namespace TeamProjectManager.Modules.SourceControl
                     foreach (var teamProjectName in teamProjectNames)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                        var project = vcs.GetTeamProject(teamProjectName);
-                        project.ExclusiveCheckout = !settings.EnableMultipleCheckout;
-                        project.GetLatestOnCheckout = settings.EnableGetLatestOnCheckout;
-                        var checkinNoteFields = settings.CheckinNoteFields.Select(f => new CheckinNoteFieldDefinition(f.Name, f.Required, f.DisplayOrder)).ToArray();
-                        project.SetCheckinNoteFields(checkinNoteFields);
+                        try
+                        {
+                            var project = vcs.GetTeamProject(teamProjectName);
+                            project.ExclusiveCheckout = !settings.EnableMultipleCheckout;
+                            project.GetLatestOnCheckout = settings.EnableGetLatestOnCheckout;
+                            var checkinNoteFields = settings.CheckinNoteFields.Select(f => new CheckinNoteFieldDefinition(f.Name, f.Required, f.DisplayOrder)).ToArray();
+                            project.SetCheckinNoteFields(checkinNoteFields);
+                        }
+                        catch (Exception exc)
+                        {
+                            task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                        }
                     }
                 };
                 worker.RunWorkerCompleted += (sender, e) =>

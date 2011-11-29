@@ -214,15 +214,22 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var project = store.Projects[teamProjectName];
-                    var categoriesXml = project.Categories.Export();
-                    var categoryList = WorkItemCategoryList.Load(categoriesXml);
-
-                    foreach (WorkItemType workItemType in project.WorkItemTypes)
+                    try
                     {
-                        var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
-                        var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
-                        results.Add(new WorkItemTypeInfo(teamProjectName, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList()));
+                        var project = store.Projects[teamProjectName];
+                        var categoriesXml = project.Categories.Export();
+                        var categoryList = WorkItemCategoryList.Load(categoriesXml);
+
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
+                        {
+                            var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
+                            var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
+                            results.Add(new WorkItemTypeInfo(teamProjectName, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList()));
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
                 }
                 e.Result = results;
@@ -399,11 +406,18 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     foreach (var workItemTypeToExport in workItemTypesToExport)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Exporting work item type \"{0}\" from Team Project \"{1}\"", workItemTypeToExport.Item1.Name, workItemTypeToExport.Item1.TeamProject));
-                        Directory.CreateDirectory(Path.GetDirectoryName(workItemTypeToExport.Item2));
-                        var project = store.Projects[workItemTypeToExport.Item1.TeamProject];
-                        var workItemType = project.WorkItemTypes[workItemTypeToExport.Item1.Name];
-                        var workItemTypeXml = workItemType.Export(false);
-                        workItemTypeXml.Save(workItemTypeToExport.Item2);
+                        try
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(workItemTypeToExport.Item2));
+                            var project = store.Projects[workItemTypeToExport.Item1.TeamProject];
+                            var workItemType = project.WorkItemTypes[workItemTypeToExport.Item1.Name];
+                            var workItemTypeXml = workItemType.Export(false);
+                            workItemTypeXml.Save(workItemTypeToExport.Item2);
+                        }
+                        catch (Exception exc)
+                        {
+                            task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting work item type \"{0}\"", workItemTypeToExport.Item1.Name), exc);
+                        }
                     }
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
@@ -464,35 +478,42 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var project = store.Projects[teamProjectName];
-                    foreach (WorkItemType workItemType in project.WorkItemTypes)
+                    try
                     {
-                        if (Matches(searchText, searchUsesExactMatch, workItemType.Name))
+                        var project = store.Projects[teamProjectName];
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
-                            results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
-                        }
-                        else if (Matches(searchText, searchUsesExactMatch, workItemType.Description))
-                        {
-                            results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
-                        }
-                        if (searchIncludesWorkItemFields)
-                        {
-                            foreach (FieldDefinition field in workItemType.FieldDefinitions)
+                            if (Matches(searchText, searchUsesExactMatch, workItemType.Name))
                             {
-                                if (Matches(searchText, searchUsesExactMatch, field.Name))
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item name: \"{0}\"", workItemType.Name)));
+                            }
+                            else if (Matches(searchText, searchUsesExactMatch, workItemType.Description))
+                            {
+                                results.Add(new SearchResult(teamProjectName, "Work Item", workItemType.Name, string.Format(CultureInfo.CurrentCulture, "Matching work item description: \"{0}\"", workItemType.Description)));
+                            }
+                            if (searchIncludesWorkItemFields)
+                            {
+                                foreach (FieldDefinition field in workItemType.FieldDefinitions)
                                 {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
-                                }
-                                else if (Matches(searchText, searchUsesExactMatch, field.ReferenceName))
-                                {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
-                                }
-                                else if (Matches(searchText, searchUsesExactMatch, field.HelpText))
-                                {
-                                    results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
+                                    if (Matches(searchText, searchUsesExactMatch, field.Name))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field name: \"{0}\"", field.Name)));
+                                    }
+                                    else if (Matches(searchText, searchUsesExactMatch, field.ReferenceName))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field reference name: \"{0}\"", field.ReferenceName)));
+                                    }
+                                    else if (Matches(searchText, searchUsesExactMatch, field.HelpText))
+                                    {
+                                        results.Add(new SearchResult(teamProjectName, "Work Item Field", string.Concat(workItemType.Name, ".", field.Name), string.Format(CultureInfo.CurrentCulture, "Matching field help text: \"{0}\"", field.HelpText)));
+                                    }
                                 }
                             }
                         }
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
                 }
                 e.Result = results;
@@ -592,20 +613,27 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 foreach (var teamProjectName in teamProjectNames)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    var project = store.Projects[teamProjectName];
-
-                    var targetWorkItemTypes = new List<WorkItemTypeDefinition>();
-                    foreach (WorkItemType workItemType in project.WorkItemTypes)
+                    try
                     {
-                        targetWorkItemTypes.Add(new WorkItemTypeDefinition(workItemType.Export(false)));
-                    }
+                        var project = store.Projects[teamProjectName];
 
-                    var sourceComparisonResults = new List<ComparisonSourceComparisonResult>();
-                    foreach (var source in sources)
-                    {
-                        sourceComparisonResults.Add(WorkItemTypeComparer.Compare(source, targetWorkItemTypes));
+                        var targetWorkItemTypes = new List<WorkItemTypeDefinition>();
+                        foreach (WorkItemType workItemType in project.WorkItemTypes)
+                        {
+                            targetWorkItemTypes.Add(new WorkItemTypeDefinition(workItemType.Export(false)));
+                        }
+
+                        var sourceComparisonResults = new List<ComparisonSourceComparisonResult>();
+                        foreach (var source in sources)
+                        {
+                            sourceComparisonResults.Add(WorkItemTypeComparer.Compare(source, targetWorkItemTypes));
+                        }
+                        results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
                     }
-                    results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
                 }
                 e.Result = results;
             };

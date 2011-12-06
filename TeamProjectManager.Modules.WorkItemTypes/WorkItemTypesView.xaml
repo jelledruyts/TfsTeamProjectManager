@@ -84,7 +84,7 @@
             </Grid>
         </TabItem>
 
-        <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item types used by Team Projects with local work item definition files. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item type definitions from a standard set.">
+        <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item types used by Team Projects with work item type definition files on disk (e.g. from a Process Template) or from other Team Projects. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item type definitions from a standard set.">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -102,11 +102,13 @@
                     
                     <Label Grid.Column="0" Content="Sources" />
 
-                    <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" Height="70" Margin="5,0,0,0" />
+                    <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" MinHeight="70" Margin="5,0,0,0" />
 
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
                         <TextBlock><Hyperlink Command="{Binding Path=AddComparisonSourceCommand}">add...</Hyperlink></TextBlock>
                         <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedComparisonSourceCommand}">remove</Hyperlink></TextBlock>
+                        <TextBlock><Hyperlink Command="{Binding Path=LoadComparisonSourcesCommand}">load...</Hyperlink></TextBlock>
+                        <TextBlock><Hyperlink Command="{Binding Path=SaveComparisonSourcesCommand}">save...</Hyperlink></TextBlock>
                     </StackPanel>
                 
                 </Grid>
@@ -117,7 +119,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                         <DataGridTextColumn Header="Best Matching Source" Binding="{Binding Path=BestMatch.Source.Name}" />
-                        <DataGridTextColumn Header="Best Matching %" Binding="{Binding Path=BestMatch.PercentMatch, StringFormat={}{0:0%}}" />
+                        <DataGridTextColumn Header="Best Matching %" Binding="{Binding Path=BestMatch.PercentMatch, StringFormat='{}{0:0%}'}" />
                         <DataGridTextColumn Header="Summary" Binding="{Binding Path=Summary}" />
                     </DataGrid.Columns>
                 </DataGrid>

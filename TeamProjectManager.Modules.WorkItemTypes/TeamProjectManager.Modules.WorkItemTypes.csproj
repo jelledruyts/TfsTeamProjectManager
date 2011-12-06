@@ -72,6 +72,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComparisonSourceList.cs" />
     <Compile Include="ComparisonStatus.cs" />
     <Compile Include="ComparisonResultViewerDialog.xaml.cs">
       <DependentUpon>ComparisonResultViewerDialog.xaml</DependentUpon>
@@ -82,7 +83,6 @@
       <DependentUpon>ComparisonSourceEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ComparisonStatusConverter.cs" />
-    <Compile Include="MatchingPartsConverter.cs" />
     <Compile Include="TeamProjectComparisonResult.cs" />
     <Compile Include="WorkItemCategoriesView.xaml.cs">
       <DependentUpon>WorkItemCategoriesView.xaml</DependentUpon>
@@ -99,6 +99,7 @@
     <Compile Include="WorkItemTypeComparer.cs" />
     <Compile Include="WorkItemTypeComparisonResult.cs" />
     <Compile Include="WorkItemTypeDefinitionPart.cs" />
+    <Compile Include="WorkItemTypePartComparisonResult.cs" />
     <Compile Include="WorkItemTypeReference.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
     <Compile Include="WorkItemTypeDefinition.cs" />

@@ -81,6 +81,7 @@
     <Compile Include="Infrastructure\HelpProvider.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\Network.cs" />
+    <Compile Include="Infrastructure\SerializationProvider.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Infrastructure\ViewModelInfo.cs" />

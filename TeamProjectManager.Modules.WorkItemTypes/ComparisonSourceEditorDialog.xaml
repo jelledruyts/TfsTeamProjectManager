@@ -26,10 +26,12 @@
             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="nameTextBox" TextChanged="nameTextBox_TextChanged" Margin="5,5,0,0" />
 
             <Label Grid.Row="1" Grid.Column="0" Content="Work Item Types" Margin="0,5,0,0" />
-            <ListBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" x:Name="workItemTypesListBox" />
+            <ListBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" x:Name="workItemTypesListBox" DisplayMemberPath="Name" SelectionMode="Extended" SelectionChanged="workItemTypesListBox_SelectionChanged" />
 
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" Margin="5,5,0,0">
-                <TextBlock><Hyperlink x:Name="addWorkItemTypesHyperlink" Click="addWorkItemTypesHyperlink_Click">add...</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink x:Name="addWorkItemTypesFromFilesHyperlink" Click="addWorkItemTypesFromFilesHyperlink_Click">add from files...</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink x:Name="addWorkItemTypesFromTeamProjectHyperlink" Click="addWorkItemTypesFromTeamProjectHyperlink_Click">add from team project...</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink x:Name="removeHyperlink" Click="removeHyperlink_Click" IsEnabled="False">remove</Hyperlink></TextBlock>
             </StackPanel>
 
         </Grid>

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Xml;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.Win32;
@@ -34,6 +35,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public RelayCommand AddComparisonSourceCommand { get; private set; }
         public RelayCommand RemoveSelectedComparisonSourceCommand { get; private set; }
+        public RelayCommand LoadComparisonSourcesCommand { get; private set; }
+        public RelayCommand SaveComparisonSourcesCommand { get; private set; }
         public RelayCommand CompareCommand { get; private set; }
         public RelayCommand ViewSelectedComparisonDetailsCommand { get; private set; }
 
@@ -166,6 +169,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
             this.AddComparisonSourceCommand = new RelayCommand(AddComparisonSource, CanAddComparisonSource);
             this.RemoveSelectedComparisonSourceCommand = new RelayCommand(RemoveSelectedComparisonSource, CanRemoveSelectedComparisonSource);
+            this.LoadComparisonSourcesCommand = new RelayCommand(LoadComparisonSources, CanLoadComparisonSources);
+            this.SaveComparisonSourcesCommand = new RelayCommand(SaveComparisonSources, CanSaveComparisonSources);
             this.CompareCommand = new RelayCommand(Compare, CanCompare);
             this.ViewSelectedComparisonDetailsCommand = new RelayCommand(ViewSelectedComparisonDetails, CanViewSelectedComparisonDetails);
             this.SearchCommand = new RelayCommand(Search, CanSearch);
@@ -589,6 +594,68 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         private void RemoveSelectedComparisonSource(object argument)
         {
             this.ComparisonSources.Remove(this.SelectedComparisonSource);
+        }
+
+        private bool CanLoadComparisonSources(object argument)
+        {
+            return true;
+        }
+
+        private void LoadComparisonSources(object argument)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Please select the comparison source list (*.xml) to load.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    var persistedSources = SerializationProvider.Read<PersistedComparisonSource[]>(dialog.FileName);
+                    this.ComparisonSources.Clear();
+                    foreach (var persistedSource in persistedSources)
+                    {
+                        var workItemTypes = new List<WorkItemTypeDefinition>();
+                        foreach (var workItemType in persistedSource.WorkItemTypeDefinitions)
+                        {
+                            var doc = new XmlDocument();
+                            doc.LoadXml(workItemType);
+                            workItemTypes.Add(new WorkItemTypeDefinition(doc));
+                        }
+                        this.ComparisonSources.Add(new ComparisonSource(persistedSource.Name, workItemTypes));
+                    }
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the comparison source list from \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while loading the comparison source list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private bool CanSaveComparisonSources(object argument)
+        {
+            return true;
+        }
+
+        private void SaveComparisonSources(object argument)
+        {
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Please select the comparison source list (*.xml) to save.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    SerializationProvider.Write<PersistedComparisonSource[]>(this.ComparisonSources.Select(c => new PersistedComparisonSource(c)).ToArray(), dialog.FileName);
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while saving the comparison source list to \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while saving the comparison source list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
         }
 
         private bool CanCompare(object argument)

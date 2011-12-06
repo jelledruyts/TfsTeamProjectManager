@@ -12,8 +12,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public ComparisonSourceComparisonResult(ComparisonSource source, ICollection<WorkItemTypeComparisonResult> workItemTypeResults)
         {
             this.Source = source;
-            this.WorkItemTypeResults = workItemTypeResults;
-            this.PercentMatch = workItemTypeResults.Sum(r => r.PercentMatch) / workItemTypeResults.Count;
+            this.WorkItemTypeResults = workItemTypeResults ?? new WorkItemTypeComparisonResult[0];
+            this.PercentMatch = this.WorkItemTypeResults.Count == 0 ? 1.0 : this.WorkItemTypeResults.Sum(r => r.PercentMatch) / (double)this.WorkItemTypeResults.Count;
         }
     }
 }

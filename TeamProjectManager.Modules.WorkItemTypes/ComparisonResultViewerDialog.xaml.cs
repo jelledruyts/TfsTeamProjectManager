@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Win32;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
@@ -27,37 +28,62 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             this.Close();
         }
 
-        private void sourceResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void sourceResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.workItemTypeResultsListBox.SelectedIndex = 0;
+            this.workItemTypeResultsDataGrid.SelectedIndex = 0;
         }
 
-        private void workItemTypeResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void workItemTypeResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsListBox.SelectedItem;
-            this.compareInDiffToolButton.IsEnabled = this.diffMergeFileName != null && workItemTypeComparison != null && (workItemTypeComparison.Status == ComparisonStatus.AreDifferent || workItemTypeComparison.Status == ComparisonStatus.AreEqual);
+            var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsDataGrid.SelectedItem;
+            this.compareInDiffToolButton.IsEnabled = CanCompareInDiffTool(workItemTypeComparison);
+        }
+
+        private bool CanCompareInDiffTool(WorkItemTypeComparisonResult workItemTypeComparison)
+        {
+            return this.diffMergeFileName != null && this.sourceResultsDataGrid.SelectedItem != null && workItemTypeComparison != null && (workItemTypeComparison.Status == ComparisonStatus.AreDifferent || workItemTypeComparison.Status == ComparisonStatus.AreEqual);
+        }
+
+        private void workItemTypeResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            CompareInDiffTool();
         }
 
         private void compareInDiffToolButton_Click(object sender, RoutedEventArgs e)
         {
-            var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsListBox.SelectedItem;
-            var sourceFile = Path.GetTempFileName();
-            var targetFile = Path.GetTempFileName();
-            try
-            {
-                workItemTypeComparison.SourceWorkItemType.XmlDefinition.Save(sourceFile);
-                workItemTypeComparison.TargetWorkItemType.XmlDefinition.Save(targetFile);
+            CompareInDiffTool();
+        }
 
-                // TODO: Allow customization of diffmerge tool and use parameters documented at
-                // http://blogs.msdn.com/b/jmanning/archive/2006/02/20/diff-merge-configuration-in-team-foundation-common-command-and-argument-values.aspx
-                var processInfo = new ProcessStartInfo(this.diffMergeFileName, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\"", sourceFile, targetFile));
-                var process = Process.Start(processInfo);
-                process.WaitForExit();
-            }
-            finally
+        private void CompareInDiffTool()
+        {
+            if (this.workItemTypeResultsDataGrid.SelectedItem != null)
             {
-                File.Delete(sourceFile);
-                File.Delete(targetFile);
+                var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsDataGrid.SelectedItem;
+                if (CanCompareInDiffTool(workItemTypeComparison))
+                {
+                    var sourceResult = (ComparisonSourceComparisonResult)this.sourceResultsDataGrid.SelectedItem;
+                    var sourceFile = Path.GetTempFileName();
+                    var targetFile = Path.GetTempFileName();
+                    try
+                    {
+                        workItemTypeComparison.NormalizedSourceDefinition.OwnerDocument.Save(sourceFile);
+                        workItemTypeComparison.NormalizedTargetDefinition.OwnerDocument.Save(targetFile);
+
+                        var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", workItemTypeComparison.WorkItemTypeName, sourceResult.Source.Name);
+                        var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", workItemTypeComparison.WorkItemTypeName, this.Comparison.TeamProject);
+
+                        // TODO: Allow customization of diffmerge tool (make sure to replace environment variables in the filename) and use parameters documented at
+                        // http://blogs.msdn.com/b/jmanning/archive/2006/02/20/diff-merge-configuration-in-team-foundation-common-command-and-argument-values.aspx
+                        var processInfo = new ProcessStartInfo(this.diffMergeFileName, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" \"{2}\" \"{3}\" /ignorespace", sourceFile, targetFile, sourceLabel, targetLabel));
+                        var process = Process.Start(processInfo);
+                        process.WaitForExit();
+                    }
+                    finally
+                    {
+                        File.Delete(sourceFile);
+                        File.Delete(targetFile);
+                    }
+                }
             }
         }
 

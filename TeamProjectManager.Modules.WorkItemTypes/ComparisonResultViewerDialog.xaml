@@ -5,30 +5,9 @@
         Title="Comparison Result Details"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Height="300" Width="600">
+        Height="350" Width="700">
     <Window.Resources>
-        <w:MatchingPartsConverter x:Key="matchingPartsConverter" />
         <w:ComparisonStatusConverter x:Key="comparisonStatusConverter" />
-        <DataTemplate DataType="{x:Type w:ComparisonSourceComparisonResult}">
-            <TextBlock>
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} ({1:0%})">
-                        <Binding Path="Source.Name" />
-                        <Binding Path="PercentMatch" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type w:WorkItemTypeComparisonResult}">
-            <TextBlock>
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} ({1:0%})">
-                        <Binding Path="WorkItemTypeName" />
-                        <Binding Path="PercentMatch" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-        </DataTemplate>
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -40,46 +19,58 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="150" />
                 <ColumnDefinition Width="Auto" MinWidth="150" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" MinWidth="150" />
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0" Header="Sources">
-                <ListBox ItemsSource="{Binding Path=SourceResults}" x:Name="sourceResultsListBox" SelectedIndex="0" SelectionChanged="sourceResultsListBox_SelectionChanged" />
+                <DataGrid ItemsSource="{Binding Path=SourceResults}" x:Name="sourceResultsDataGrid" SelectedIndex="0" SelectionChanged="sourceResultsDataGrid_SelectionChanged" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Source" Binding="{Binding Path=Source.Name}" />
+                        <DataGridTextColumn Header="Match" Binding="{Binding Path=PercentMatch, StringFormat='{}{0:0%}'}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </GroupBox>
 
-            <GroupBox Grid.Column="1" Header="Work Items" Margin="5,0,0,0">
-                <ListBox ItemsSource="{Binding ElementName=sourceResultsListBox, Path=SelectedItem.WorkItemTypeResults}" x:Name="workItemTypeResultsListBox" SelectionChanged="workItemTypeResultsListBox_SelectionChanged" />
+            <GroupBox Grid.Column="1" Header="Work Item Types" Margin="5,0,0,0">
+                <DataGrid ItemsSource="{Binding ElementName=sourceResultsDataGrid, Path=SelectedItem.WorkItemTypeResults}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="workItemTypeResultsDataGrid" SelectionChanged="workItemTypeResultsDataGrid_SelectionChanged" MouseDoubleClick="workItemTypeResultsDataGrid_MouseDoubleClick" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Path=Status, Converter={StaticResource comparisonStatusConverter}, ConverterParameter=short}" TextBlock.TextAlignment="Center" />
+                        <DataGridTextColumn Header="Work Item Type" Binding="{Binding Path=WorkItemTypeName}" />
+                        <DataGridTextColumn Header="Match" Binding="{Binding Path=PercentMatch, StringFormat='{}{0:0%}'}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </GroupBox>
 
-            <Grid Grid.Column="2" Margin="5,0,0,0" DataContext="{Binding ElementName=workItemTypeResultsListBox, Path=SelectedItem}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="2" Header="Comparison" Margin="5,0,0,0">
+                <Grid Grid.Column="2" DataContext="{Binding ElementName=workItemTypeResultsDataGrid, Path=SelectedItem}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Status" />
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource comparisonStatusConverter}}"  IsReadOnly="True" />
+                    <Label Grid.Row="0" Grid.Column="0" Content="Status" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource comparisonStatusConverter}}" IsReadOnly="True" Margin="5,5,0,0" />
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Match" Margin="0,5,0,0" />
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=PercentMatch, Mode=OneWay, StringFormat='0%'}" IsReadOnly="True" Margin="0,5,0,0" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Match" Margin="0,5,0,0" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=PercentMatch, Mode=OneWay, StringFormat='{}{0:0%}'}" IsReadOnly="True" Margin="5,5,0,0" />
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Equal Parts" Margin="0,5,0,0" />
-                <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Path=MatchingParts, Converter={StaticResource matchingPartsConverter}}" Margin="0,5,0,0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding Path=IsSelected, Mode=OneWay}" Content="{Binding Path=Name, Mode=OneWay}" IsEnabled="False" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                
-                <Button Grid.Row="3" Grid.Column="1" Content="Compare In Diff Tool" x:Name="compareInDiffToolButton" Click="compareInDiffToolButton_Click"  Margin="0,5,0,0" />
-            </Grid>
+                    <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Path=WorkItemTypePartResults}" Margin="0,5,0,0" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="Equal" Binding="{Binding Path=Status, Converter={StaticResource comparisonStatusConverter}, ConverterParameter=bool, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Part" Binding="{Binding Path=Part, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Relative Size" Binding="{Binding Path=RelativeSize, StringFormat='{}{0:0%}', Mode=OneWay}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Compare In Diff Tool" x:Name="compareInDiffToolButton" Click="compareInDiffToolButton_Click" HorizontalAlignment="Stretch" Margin="0,5,0,0" />
+                </Grid>
+            </GroupBox>
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">

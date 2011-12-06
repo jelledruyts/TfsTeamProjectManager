@@ -9,18 +9,27 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var status = (ComparisonStatus)value;
-            switch (status)
+            var boolFormat = parameter != null && string.Equals("bool", parameter.ToString(), StringComparison.OrdinalIgnoreCase);
+            if (boolFormat)
             {
-                case ComparisonStatus.AreEqual:
-                    return "Exact match";
-                case ComparisonStatus.AreDifferent:
-                    return "Different";
-                case ComparisonStatus.ExistsOnlyInSource:
-                    return "Exists only in the source";
-                case ComparisonStatus.ExistsOnlyInTarget:
-                    return "Does not exist in the source";
-                default:
-                    return status.ToString();
+                return status == ComparisonStatus.AreEqual;
+            }
+            else
+            {
+                var shortFormat = parameter != null && string.Equals("short", parameter.ToString(), StringComparison.OrdinalIgnoreCase);
+                switch (status)
+                {
+                    case ComparisonStatus.AreEqual:
+                        return shortFormat ? "==" : "Exact match";
+                    case ComparisonStatus.AreDifferent:
+                        return shortFormat ? "<>" : "Different";
+                    case ComparisonStatus.ExistsOnlyInSource:
+                        return shortFormat ? "<-" : "Exists only in the source";
+                    case ComparisonStatus.ExistsOnlyInTarget:
+                        return shortFormat ? "->" : "Does not exist in the source";
+                    default:
+                        return status.ToString();
+                }
             }
         }
 

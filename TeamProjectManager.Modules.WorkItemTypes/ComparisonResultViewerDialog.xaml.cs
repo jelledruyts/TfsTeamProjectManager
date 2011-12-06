@@ -72,8 +72,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", workItemTypeComparison.WorkItemTypeName, sourceResult.Source.Name);
                         var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", workItemTypeComparison.WorkItemTypeName, this.Comparison.TeamProject);
 
-                        // TODO: Allow customization of diffmerge tool (make sure to replace environment variables in the filename) and use parameters documented at
-                        // http://blogs.msdn.com/b/jmanning/archive/2006/02/20/diff-merge-configuration-in-team-foundation-common-command-and-argument-values.aspx
                         var processInfo = new ProcessStartInfo(this.diffMergeFileName, string.Format(CultureInfo.InvariantCulture, "\"{0}\" \"{1}\" \"{2}\" \"{3}\" /ignorespace", sourceFile, targetFile, sourceLabel, targetLabel));
                         var process = Process.Start(processInfo);
                         process.WaitForExit();

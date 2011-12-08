@@ -5,6 +5,7 @@ TFS Team Project Manager automates various tasks across Team Projects in Team Fo
 Team Project Manager can help you...
 
 * Manage build process templates (understanding which build templates are used by which build definitions, uploading new build process templates, unregistering existing ones, ...)
+* Manage security groups (understanding which groups have which members, adding groups, ...)
 * Manage source control settings (e.g. to standardize settings for multiple check-out, get latest on check-out, check-in notes, ...)
 * Retrieve the latest changesets (e.g. to see which projects are still active)
 * Manage work item type definitions (understanding with projects use which work item types and how many work items there are of each, importing work item types to various projects, comparing them with various sources e.g. to determine which Process Template was likely used to create Team Projects, ...)
@@ -16,7 +17,7 @@ If you can think of other great features, please let us know through the discuss
 
 In the meantime, here's a gratuitous teaser screenshot:
 
-[image:Compare Work Item Types|WorkItemTracking-Compare.png]
+[image:Compare Work Item Types|WorkItemTypes-Compare.png]
 
 !! Free Software
 
@@ -26,7 +27,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v1.1 (December, 2011)
+* v1.1 (December 8, 2011)
 ** Improved work item type comparisons.
 ** Added support for saving and loading work item comparison sources.
 ** Added security module that allows Team Project security groups to be retrieved, deleted and added.

@@ -70,7 +70,7 @@ This can be useful if you want to change the work item types being used, e.g. to
 
 !!! Compare
 
-Allows you to compare the work item types used by Team Projects with local work item definition files.
+Allows you to compare the work item types used by Team Projects with work item type definition files on disk (e.g. from a Process Template) or from other Team Projects.
 This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item type definitions from a standard set.
 
 [image:Compare Work Item Types|WorkItemTypes-Compare.png]

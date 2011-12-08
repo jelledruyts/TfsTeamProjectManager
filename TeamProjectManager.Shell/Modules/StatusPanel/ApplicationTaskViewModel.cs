@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 
@@ -96,7 +97,7 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
             if (this.Task.StatusHistory != null)
             {
                 var status = string.Empty;
-                foreach (string item in this.Task.StatusHistory)
+                foreach (string item in this.Task.StatusHistory.ToList())
                 {
                     status += Environment.NewLine + item;
                     Log(item);

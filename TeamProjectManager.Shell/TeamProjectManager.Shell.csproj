@@ -158,6 +158,10 @@
       <Project>{BDCA8650-C32C-4131-A622-DDA98C43656C}</Project>
       <Name>TeamProjectManager.Modules.BuildProcessTemplates</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj">
+      <Project>{412C41B9-CE97-47CA-9607-BBC22418B547}</Project>
+      <Name>TeamProjectManager.Modules.Security</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj">
       <Project>{FA594433-69DA-461E-9C57-6483529214EA}</Project>
       <Name>TeamProjectManager.Modules.SourceControl</Name>

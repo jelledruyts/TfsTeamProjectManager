@@ -29,5 +29,6 @@ This application is completely free to use. If you feel it saves you a lot of ti
 * v1.1 (December, 2011)
 ** Improved work item type comparisons.
 ** Added support for saving and loading work item comparison sources.
+** Added security module that allows Team Project security groups to be retrieved, deleted and added.
 * v1.0 (November 27, 2011)
 ** Initial release.

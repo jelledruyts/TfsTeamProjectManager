@@ -14,6 +14,22 @@ This can be useful when you want to standardize on a single build process templa
 
 [image:Register / Update Build Process Templates|BuildProcessTemplates-RegisterUpdate.png]
 
+!! Security
+
+!!! View / Delete Groups
+
+Allows you to view and delete the security groups that are defined for each Team Project.
+This can be useful when you want to get an overview of all the security groups being used.
+
+[image:View / Delete Groups|Security-ViewDeleteGroups.png]
+
+!!! Add Group
+
+Allows you to add security groups across multiple Team Projects.
+This can be useful when you want to have consistent security groups or when you want to import new work item types that require certain security groups to be present.
+
+[image:Add Group|Security-AddGroup.png]
+
 !! Source Control
 
 !!! View Settings

@@ -113,10 +113,9 @@ namespace TeamProjectManager.Modules.Security
                             if (membershipMode != QueryMembership.None)
                             {
                                 var applicationGroupWithMembers = securityService.ReadIdentity(SearchFactor.Sid, applicationGroup.Sid, membershipMode);
-                                foreach (var memberSid in applicationGroupWithMembers.Members)
+                                if (applicationGroupWithMembers.Members != null && applicationGroupWithMembers.Members.Any())
                                 {
-                                    var member = securityService.ReadIdentity(SearchFactor.Sid, memberSid, QueryMembership.None);
-                                    members.Add(member.DisplayName);
+                                    members.AddRange(securityService.ReadIdentities(SearchFactor.Sid, applicationGroupWithMembers.Members, QueryMembership.None).Select(m => m.DisplayName));
                                 }
                             }
                             var securityGroup = new SecurityGroupInfo(teamProject, applicationGroup.Sid, applicationGroup.DisplayName, applicationGroup.Description, members);

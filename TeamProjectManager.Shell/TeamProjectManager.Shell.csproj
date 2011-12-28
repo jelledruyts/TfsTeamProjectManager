@@ -154,6 +154,10 @@
       <Project>{6034E65E-4E00-46FA-B683-65AB8F3C47E7}</Project>
       <Name>TeamProjectManager.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TeamProjectManager.Modules.BuildDefinitions\TeamProjectManager.Modules.BuildDefinitions.csproj">
+      <Project>{59B5B1FA-EB79-430B-83CF-C1F9419AF573}</Project>
+      <Name>TeamProjectManager.Modules.BuildDefinitions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj">
       <Project>{BDCA8650-C32C-4131-A622-DDA98C43656C}</Project>
       <Name>TeamProjectManager.Modules.BuildProcessTemplates</Name>

@@ -1,3 +1,12 @@
+!! Build Definitions
+
+Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions.
+This can be useful when you want to get an overview of all the builds or want to standardize certain build properties across Team Projects.
+
+[image:View / Update / Delete Build Definitions|BuildDefinitions-ViewUpdateDelete.png]
+
+[image:Update Build Definitions|BuildDefinitions-Update.png]
+
 !! Build Process Templates
 
 !!! View / Unregister

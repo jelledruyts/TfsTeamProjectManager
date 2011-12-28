@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.BuildDefinitions.BuildDefinitionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:b="clr-namespace:TeamProjectManager.Modules.BuildDefinitions"
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <b:ContinuousIntegrationTypeConverter x:Key="continuousIntegrationTypeConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
+
+        <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
+
+            <TabItem Header="View / Update / Delete" i:HelpProvider.HelpContent="Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions. This can be useful when you want to get an overview of all the builds or want to standardize certain build properties across Team Projects.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Get Build Definitions" Margin="0,5,0,5" Command="{Binding Path=GetBuildDefinitionsCommand}" />
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildDefinitions}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildDefinitionsDataGrid" SelectionChanged="buildDefinitionsDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
+                            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Path=Enabled, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Build Controller" Binding="{Binding Path=BuildControllerName}" />
+                            <DataGridTextColumn Header="Default Drop Location" Binding="{Binding Path=DefaultDropLocation}" />
+                            <DataGridTextColumn Header="Trigger" Binding="{Binding Path=ContinuousIntegrationType, Converter={StaticResource continuousIntegrationTypeConverter}}" />
+                            <DataGridTextColumn Header="Process Template" Binding="{Binding Path=ProcessTemplate}" />
+                            <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
+                            <DataGridTextColumn Header="Clean Workspace" Binding="{Binding Path=CleanWorkspace}" />
+                            <DataGridTextColumn Header="Logging Verbosity" Binding="{Binding Path=Verbosity}" />
+                            <DataGridTextColumn Header="Code Analysis" Binding="{Binding Path=RunCodeAnalysis}" />
+                            <DataGridCheckBoxColumn Header="Source Server" Binding="{Binding Path=SourceServerEnabled, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Symbol Server" Binding="{Binding Path=SymbolServerPath}" />
+                            <DataGridTextColumn Header="MSBuild Arguments" Binding="{Binding Path=MSBuildArguments}" />
+                            <DataGridTextColumn Header="MSBuild Platform" Binding="{Binding Path=MSBuildPlatform}" />
+                            <DataGridTextColumn Header="Private Drop Location" Binding="{Binding Path=PrivateDropLocation}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Update Selected Build Definitions..." Command="{Binding Path=UpdateSelectedBuildDefinitionsCommand}" />
+                        <Button Content="Delete Selected Build Definitions" Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+</UserControl>

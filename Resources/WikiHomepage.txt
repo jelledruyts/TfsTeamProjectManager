@@ -4,6 +4,7 @@ TFS Team Project Manager automates various tasks across Team Projects in Team Fo
 
 Team Project Manager can help you...
 
+* Manage build definitions (viewing and deleting build definitions, as well as bulk updating common properties within the build definition)
 * Manage build process templates (understanding which build templates are used by which build definitions, uploading new build process templates, unregistering existing ones, ...)
 * Manage security groups (understanding which groups have which members, adding groups, ...)
 * Manage source control settings (e.g. to standardize settings for multiple check-out, get latest on check-out, check-in notes, ...)
@@ -27,6 +28,8 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.2 (December 28, 2011)
+** Added support for viewing, editing and deleting build definitions.
 * v1.1 (December 8, 2011)
 ** Improved work item type comparisons.
 ** Added support for saving and loading work item comparison sources.

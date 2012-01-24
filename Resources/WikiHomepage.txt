@@ -28,7 +28,9 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v1.2 (December 28, 2011)
+* v1.2.4406 (January 24, 2012)
+** Added a column to the build definitions list to show scheduled build times.
+* v1.2.4379 (December 28, 2011)
 ** Added support for viewing, editing and deleting build definitions.
 * v1.1 (December 8, 2011)
 ** Improved work item type comparisons.

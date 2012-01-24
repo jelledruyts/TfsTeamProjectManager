@@ -144,7 +144,7 @@
                     <TabPanel x:Name="HeaderPanel" IsItemsHost="True" Panel.ZIndex="1" Grid.Column="0" Grid.Row="0" KeyboardNavigation.TabIndex="1"/>
                 </Border>
             </ScrollViewer>
-            <Border x:Name="ContentPanel" Background="{TemplateBinding Background}" BorderThickness="1" Grid.Column="0" Grid.Row="1" KeyboardNavigation.DirectionalNavigation="Contained" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
+            <Border x:Name="ContentPanel" BorderThickness="1" Grid.Column="0" Grid.Row="1" KeyboardNavigation.DirectionalNavigation="Contained" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
                 <ContentPresenter x:Name="PART_SelectedContentHost" Margin="0" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Content="{TemplateBinding SelectedContent}" ContentSource="SelectedContent" ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" ContentTemplate="{TemplateBinding SelectedContentTemplate}"/>
             </Border>
         </Grid>

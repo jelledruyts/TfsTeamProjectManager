@@ -31,6 +31,7 @@
                             <DataGridTextColumn Header="Build Controller" Binding="{Binding Path=BuildControllerName}" />
                             <DataGridTextColumn Header="Default Drop Location" Binding="{Binding Path=DefaultDropLocation}" />
                             <DataGridTextColumn Header="Trigger" Binding="{Binding Path=ContinuousIntegrationType, Converter={StaticResource continuousIntegrationTypeConverter}}" />
+                            <DataGridTextColumn Header="Schedule" Binding="{Binding Path=ScheduleDescription}" />
                             <DataGridTextColumn Header="Process Template" Binding="{Binding Path=ProcessTemplate}" />
                             <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
                             <DataGridTextColumn Header="Clean Workspace" Binding="{Binding Path=CleanWorkspace}" />

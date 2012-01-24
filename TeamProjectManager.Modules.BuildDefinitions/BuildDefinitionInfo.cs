@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text;
 using System.Xml;
 using Microsoft.TeamFoundation.Build.Client;
 using Microsoft.TeamFoundation.Build.Workflow;
@@ -53,6 +55,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         public ContinuousIntegrationType ContinuousIntegrationType { get; set; }
         public bool Enabled { get; set; }
         public string ProcessTemplate { get; set; }
+        public string ScheduleDescription { get; set; }
 
         // Process Template-Specific Basic Properties
         public string BuildNumberFormat { get; set; }
@@ -86,6 +89,18 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             this.ContinuousIntegrationType = buildDefinition.ContinuousIntegrationType;
             this.Enabled = buildDefinition.Enabled;
             this.ProcessTemplate = buildDefinition.Process == null ? null : buildDefinition.Process.ServerPath;
+
+            var scheduleDescription = new StringBuilder();
+            foreach (var schedule in buildDefinition.Schedules)
+            {
+                if (scheduleDescription.Length > 0)
+                {
+                    scheduleDescription.Append("; ");
+                }
+                var time = TimeSpan.FromSeconds(schedule.StartTime);
+                scheduleDescription.AppendFormat(CultureInfo.CurrentCulture, "{0} at {1}", schedule.DaysToBuild.ToString(), time.ToString("g"));
+            }
+            this.ScheduleDescription = scheduleDescription.ToString();
 
             if (!string.IsNullOrEmpty(buildDefinition.ProcessParameters))
             {

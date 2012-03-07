@@ -124,6 +124,12 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 comment.ParentNode.RemoveChild(comment);
             }
 
+            // Remove all empty CustomControlOptions.
+            foreach (var customControlOptionsNode in root.SelectNodes("//CustomControlOptions").Cast<XmlElement>().Where(n => !n.HasChildNodes))
+            {
+                customControlOptionsNode.ParentNode.RemoveChild(customControlOptionsNode);
+            }
+
             // Remove the "expanditems" attribute for ALLOWEDVALUES and SUGGESTEDVALUES when it is true (the default).
             foreach (XmlAttribute expandItemsAttribute in root.SelectNodes("//ALLOWEDVALUES[@expanditems='true']/@expanditems | //SUGGESTEDVALUES[@expanditems='true']/@expanditems"))
             {
@@ -210,6 +216,16 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     {
                         nameAttribute.Value = "HyperLinkCount";
                     }
+
+                    // The AreaID and IterationID field not only had spaces removed but also a case change on the 'D'.
+                    if (string.Equals(nameAttribute.Value, "AreaId", StringComparison.OrdinalIgnoreCase))
+                    {
+                        nameAttribute.Value = "AreaID";
+                    }
+                    if (string.Equals(nameAttribute.Value, "IterationId", StringComparison.OrdinalIgnoreCase))
+                    {
+                        nameAttribute.Value = "IterationID";
+                    }
                 }
             }
 
@@ -242,6 +258,12 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 SortChildNodes(allowedValuesList);
             }
 
+            // Sort child nodes of suggested values.
+            foreach (XmlNode suggestedValuesList in root.SelectNodes("//SUGGESTEDVALUES"))
+            {
+                SortChildNodes(suggestedValuesList);
+            }
+
             // Sort child nodes of transitions.
             foreach (XmlNode transitionList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION"))
             {
@@ -252,6 +274,18 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             foreach (XmlNode transitionReasonList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/REASONS"))
             {
                 SortChildNodes(transitionReasonList);
+            }
+
+            // Sort child nodes of links control options.
+            foreach (XmlNode linksControlOptionList in root.SelectNodes("//LinksControlOptions"))
+            {
+                SortChildNodes(linksControlOptionList);
+            }
+
+            // Sort all attributes.
+            foreach (XmlNode node in root.SelectNodes("//*"))
+            {
+                SortAttributes(node);
             }
         }
 
@@ -294,7 +328,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         private static void SortChildNodes(XmlNode node, Func<XmlNode, string> identitySelector)
         {
-            SortAttributes(node);
             foreach (var nodeElement in node.ChildNodes.Cast<XmlNode>().OrderBy(n => identitySelector == null ? n.OuterXml : identitySelector(n)).ToList())
             {
                 node.RemoveChild(nodeElement);

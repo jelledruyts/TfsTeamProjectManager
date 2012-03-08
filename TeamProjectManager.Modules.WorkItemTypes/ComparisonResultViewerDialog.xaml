@@ -73,9 +73,14 @@
             </GroupBox>
         </Grid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-            <Button Content="OK" IsDefault="True" IsCancel="True"  Width="75" x:Name="okButton" Click="okButton_Click" />
-        </StackPanel>
+        <Grid Grid.Row="1" Margin="0,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" x:Name="infoLabel" VerticalAlignment="Center" FontStyle="Italic" Foreground="Gray" />
+            <Button Grid.Column="1" Content="OK" IsDefault="True" IsCancel="True"  Width="75" x:Name="okButton" Click="okButton_Click" Margin="5,0,0,0" />
+        </Grid>
 
     </Grid>
 </Window>

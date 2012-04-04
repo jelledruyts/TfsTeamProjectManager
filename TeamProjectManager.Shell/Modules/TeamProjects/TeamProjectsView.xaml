@@ -30,17 +30,17 @@
 
         <Grid Grid.Row="3" Visibility="{Binding Path=TeamProjectsVisibility}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <ListBox Grid.Row="0" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=SelectedTeamProjectCollection.TeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
-
-            <WrapPanel Grid.Row="1">
+            <WrapPanel Grid.Row="0">
                 <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>
                 <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
                 <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=RefreshTeamProjectsCommand}">refresh</Hyperlink></TextBlock>
             </WrapPanel>
+
+            <ListBox Grid.Row="1" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=SelectedTeamProjectCollection.TeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" />
         </Grid>
 
     </Grid>

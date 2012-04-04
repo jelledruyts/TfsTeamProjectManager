@@ -9,8 +9,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         #region Properties
 
         public string WorkItemTypeName { get; private set; }
-        public XmlNode NormalizedSourceDefinition { get; private set; }
-        public XmlNode NormalizedTargetDefinition { get; private set; }
+        public XmlDocument NormalizedSourceDefinition { get; private set; }
+        public XmlDocument NormalizedTargetDefinition { get; private set; }
         public ComparisonStatus Status { get; private set; }
         public ICollection<WorkItemTypePartComparisonResult> WorkItemTypePartResults { get; private set; }
         public double PercentMatch { get; private set; }
@@ -19,17 +19,17 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         #region Constructors
 
-        public WorkItemTypeComparisonResult(XmlNode normalizedSourceDefinition, XmlNode normalizedTargetDefinition, string workItemTypeName, ComparisonStatus status)
+        public WorkItemTypeComparisonResult(XmlDocument normalizedSourceDefinition, XmlDocument normalizedTargetDefinition, string workItemTypeName, ComparisonStatus status)
             : this(normalizedSourceDefinition, normalizedTargetDefinition, workItemTypeName, null, status)
         {
         }
 
-        public WorkItemTypeComparisonResult(XmlNode normalizedSourceDefinition, XmlNode normalizedTargetDefinition, string workItemTypeName, ICollection<WorkItemTypePartComparisonResult> workItemTypePartResults)
+        public WorkItemTypeComparisonResult(XmlDocument normalizedSourceDefinition, XmlDocument normalizedTargetDefinition, string workItemTypeName, ICollection<WorkItemTypePartComparisonResult> workItemTypePartResults)
             : this(normalizedSourceDefinition, normalizedTargetDefinition, workItemTypeName, workItemTypePartResults, null)
         {
         }
 
-        private WorkItemTypeComparisonResult(XmlNode normalizedSourceDefinition, XmlNode normalizedTargetDefinition, string workItemTypeName, ICollection<WorkItemTypePartComparisonResult> workItemTypePartResults, ComparisonStatus? status)
+        private WorkItemTypeComparisonResult(XmlDocument normalizedSourceDefinition, XmlDocument normalizedTargetDefinition, string workItemTypeName, ICollection<WorkItemTypePartComparisonResult> workItemTypePartResults, ComparisonStatus? status)
         {
             this.NormalizedSourceDefinition = normalizedSourceDefinition;
             this.NormalizedTargetDefinition = normalizedTargetDefinition;

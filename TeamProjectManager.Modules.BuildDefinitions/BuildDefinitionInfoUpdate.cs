@@ -76,7 +76,8 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             }
             if (UpdateDefaultDropLocation)
             {
-                buildDefinition.DefaultDropLocation = this.DefaultDropLocation;
+                // To disable the drop location, do not set to null but always use an empty string (null only works for TFS 2010 and before, an empty string always works).
+                buildDefinition.DefaultDropLocation = this.DefaultDropLocation ?? string.Empty;
             }
             if (UpdateContinuousIntegrationType)
             {

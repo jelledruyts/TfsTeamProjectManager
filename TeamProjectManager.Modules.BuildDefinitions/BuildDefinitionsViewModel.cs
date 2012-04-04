@@ -242,7 +242,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
 
         protected override bool IsTfsSupported(TeamFoundationServerInfo server)
         {
-            return server.MajorVersion >= TfsMajorVersion.Tfs2010;
+            return server.MajorVersion >= TfsMajorVersion.V10;
         }
 
         #endregion

@@ -49,32 +49,5 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         }
 
         #endregion
-
-        #region GetPart
-
-        public XmlElement GetPart(WorkItemTypeDefinitionPart part)
-        {
-            string xpath;
-            switch (part)
-            {
-                case WorkItemTypeDefinitionPart.Description:
-                    xpath = "//WORKITEMTYPE/DESCRIPTION";
-                    break;
-                case WorkItemTypeDefinitionPart.Fields:
-                    xpath = "//WORKITEMTYPE/FIELDS";
-                    break;
-                case WorkItemTypeDefinitionPart.Workflow:
-                    xpath = "//WORKITEMTYPE/WORKFLOW";
-                    break;
-                case WorkItemTypeDefinitionPart.Form:
-                    xpath = "//WORKITEMTYPE/FORM";
-                    break;
-                default:
-                    throw new ArgumentException("The requested part is invalid: " + part.ToString());
-            }
-            return (XmlElement)this.XmlDefinition.SelectSingleNode(xpath);
-        }
-
-        #endregion
     }
 }

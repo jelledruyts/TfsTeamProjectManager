@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
@@ -177,6 +178,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                         task.SetComplete("Retrieved " + teamProjectCollectionToRefresh.TeamProjects.Count.ToCountString("team project"));
                     }
                     this.IsTeamProjectsLoadComplete = true;
+                    CommandManager.InvalidateRequerySuggested();
                 };
                 worker.RunWorkerAsync();
             }
@@ -204,8 +206,15 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var frameworkEntries = registrationService.GetRegistrationEntries("Framework");
                 if (frameworkEntries.Length > 0)
                 {
-                    // We are talking to TFS 2010, which is v10.
-                    return TfsMajorVersion.Tfs2010;
+                    // We are talking to at least TFS 2010.
+                    if (frameworkEntries.Any(e => e.ServiceInterfaces != null && e.ServiceInterfaces.Any(i => i.Url.IndexOf("v4.0", StringComparison.OrdinalIgnoreCase) >= 0)))
+                    {
+                        return TfsMajorVersion.V11;
+                    }
+                    else
+                    {
+                        return TfsMajorVersion.V10;
+                    }
                 }
                 else
                 {
@@ -229,12 +238,12 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                         if (groupSecurity2Found)
                         {
                             // We are talking to TFS 2008, which is v9.
-                            return TfsMajorVersion.Tfs2008;
+                            return TfsMajorVersion.V9;
                         }
                         else
                         {
                             // We are talking to TFS 2005, which is v8.
-                            return TfsMajorVersion.Tfs2005;
+                            return TfsMajorVersion.V8;
                         }
                     }
                 }

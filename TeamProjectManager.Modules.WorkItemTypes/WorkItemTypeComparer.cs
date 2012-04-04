@@ -3,54 +3,84 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
     public static class WorkItemTypeComparer
     {
-        #region Fields
+        #region Static Fields & Constructor
 
-        private static readonly string[] KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName" };
-        private static readonly string[] KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
-        private static readonly string[] KnownFieldsWithReportableMeasure = new string[] { "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
-        private static readonly string[] KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy" };
-        private static readonly string[] KnownFieldsWithFormulaSum = new string[] { "Microsoft.VSTS.Scheduling.OriginalEstimate", "Microsoft.VSTS.Scheduling.StoryPoints", "Microsoft.VSTS.Scheduling.CompletedWork", "Microsoft.VSTS.Scheduling.RemainingWork", "Microsoft.VSTS.Scheduling.BaselineWork", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
-        private static readonly string[] KnwonFieldsWithNamesToRemoveSpaces = new string[] { "Microsoft.VSTS.TCM.ReproSteps", "System.AreaId", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount", "System.IterationId", "System.RelatedLinkCount", "Microsoft.VSTS.TCM.AutomatedTestId", "Microsoft.VSTS.TCM.AutomatedTestName", "Microsoft.VSTS.TCM.AutomatedTestStorage", "Microsoft.VSTS.TCM.AutomatedTestType", "Microsoft.VSTS.TCM.LocalDataSource" };
-        private static readonly string[] FieldRuleElementNames = new string[] { "WHEN", "WHENCHANGED", "WHENNOT", "WHENNOTCHANGED" };
-        private static readonly Dictionary<string, Dictionary<string, string>> SystemFields = new Dictionary<string, Dictionary<string, string>>
+        private static readonly string[] KnownFieldsWithReportableDimension;
+        private static readonly string[] KnownFieldsWithReportableDetail;
+        private static readonly string[] KnownFieldsWithReportableMeasure;
+        private static readonly string[] KnownFieldsWithSyncNameChanges;
+        private static readonly string[] KnownFieldsWithFormulaSum;
+        private static readonly string[] KnwonFieldsWithNamesToRemoveSpaces;
+        private static readonly string[] FieldRuleElementNames;
+        private static readonly Dictionary<TfsMajorVersion, Dictionary<string, Dictionary<string, string>>> SystemFields;
+
+        static WorkItemTypeComparer()
         {
-            { "System.AreaId", new Dictionary<string, string> { { "refname", "System.AreaId" }, { "name", "Area ID" }, { "type", "Integer" } } },
-            { "System.AreaPath", new Dictionary<string, string> { { "refname", "System.AreaPath" }, { "name", "Area Path" }, { "type", "TreePath" }, { "reportable", "dimension" } } },
-            { "System.AssignedTo", new Dictionary<string, string> { { "refname", "System.AssignedTo" }, { "name", "Assigned To" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
-            { "System.AttachedFileCount", new Dictionary<string, string> { { "refname", "System.AttachedFileCount" }, { "name", "Attached File Count" }, { "type", "Integer" } } },
-            { "System.AuthorizedAs", new Dictionary<string, string> { { "refname", "System.AuthorizedAs" }, { "name", "Authorized As" }, { "type", "String" }, { "syncnamechanges", "true" } } },
-            { "System.ChangedBy", new Dictionary<string, string> { { "refname", "System.ChangedBy" }, { "name", "Changed By" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
-            { "System.ChangedDate", new Dictionary<string, string> { { "refname", "System.ChangedDate" }, { "name", "Changed Date" }, { "type", "DateTime" }, { "reportable", "dimension" } } },
-            { "System.CreatedBy", new Dictionary<string, string> { { "refname", "System.CreatedBy" }, { "name", "Created By" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
-            { "System.CreatedDate", new Dictionary<string, string> { { "refname", "System.CreatedDate" }, { "name", "Created Date" }, { "type", "DateTime" }, { "reportable", "dimension" } } },
-            { "System.Description", new Dictionary<string, string> { { "refname", "System.Description" }, { "name", "Description" }, { "type", "PlainText" } } },
-            { "System.ExternalLinkCount", new Dictionary<string, string> { { "refname", "System.ExternalLinkCount" }, { "name", "External Link Count" }, { "type", "Integer" } } },
-            { "System.History", new Dictionary<string, string> { { "refname", "System.History" }, { "name", "History" }, { "type", "History" } } },
-            { "System.HyperLinkCount", new Dictionary<string, string> { { "refname", "System.HyperLinkCount" }, { "name", "Hyperlink Count" }, { "type", "Integer" } } },
-            { "System.Id", new Dictionary<string, string> { { "refname", "System.Id" }, { "name", "ID" }, { "type", "Integer" }, { "reportable", "dimension" } } },
-            { "System.IterationId", new Dictionary<string, string> { { "refname", "System.IterationId" }, { "name", "Iteration ID" }, { "type", "Integer" } } },
-            { "System.IterationPath", new Dictionary<string, string> { { "refname", "System.IterationPath" }, { "name", "Iteration Path" }, { "type", "TreePath" }, { "reportable", "dimension" } } },
-            { "System.NodeName", new Dictionary<string, string> { { "refname", "System.NodeName" }, { "name", "Node Name" }, { "type", "String" } } },
-            { "System.Reason", new Dictionary<string, string> { { "refname", "System.Reason" }, { "name", "Reason" }, { "type", "String" }, { "reportable", "dimension" } } },
-            { "System.RelatedLinkCount", new Dictionary<string, string> { { "refname", "System.RelatedLinkCount" }, { "name", "Related Link Count" }, { "type", "Integer" } } },
-            { "System.Rev", new Dictionary<string, string> { { "refname", "System.Rev" }, { "name", "Rev" }, { "type", "Integer" }, { "reportable", "dimension" } } },
-            { "System.RevisedDate", new Dictionary<string, string> { { "refname", "System.RevisedDate" }, { "name", "Revised Date" }, { "type", "DateTime" }, { "reportable", "detail" } } },
-            { "System.State", new Dictionary<string, string> { { "refname", "System.State" }, { "name", "State" }, { "type", "String" }, { "reportable", "dimension" } } },
-            { "System.TeamProject", new Dictionary<string, string> { { "refname", "System.TeamProject" }, { "name", "Team Project" }, { "type", "String" }, { "reportable", "dimension" } } },
-            { "System.Title", new Dictionary<string, string> { { "refname", "System.Title" }, { "name", "Title" }, { "type", "String" }, { "reportable", "dimension" } } },
-            { "System.WorkItemType", new Dictionary<string, string> { { "refname", "System.WorkItemType" }, { "name", "Work Item Type" }, { "type", "String" }, { "reportable", "dimension" } } }
-        };
+            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName" };
+            KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
+            KnownFieldsWithReportableMeasure = new string[] { "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
+            KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy" };
+            KnownFieldsWithFormulaSum = new string[] { "Microsoft.VSTS.Scheduling.OriginalEstimate", "Microsoft.VSTS.Scheduling.StoryPoints", "Microsoft.VSTS.Scheduling.CompletedWork", "Microsoft.VSTS.Scheduling.RemainingWork", "Microsoft.VSTS.Scheduling.BaselineWork", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
+            KnwonFieldsWithNamesToRemoveSpaces = new string[] { "Microsoft.VSTS.TCM.ReproSteps", "System.AreaId", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount", "System.IterationId", "System.RelatedLinkCount", "Microsoft.VSTS.TCM.AutomatedTestId", "Microsoft.VSTS.TCM.AutomatedTestName", "Microsoft.VSTS.TCM.AutomatedTestStorage", "Microsoft.VSTS.TCM.AutomatedTestType", "Microsoft.VSTS.TCM.LocalDataSource" };
+            FieldRuleElementNames = new string[] { "WHEN", "WHENCHANGED", "WHENNOT", "WHENNOTCHANGED" };
+            
+            // Create a lookup table of common system fields where the key is the refname.
+            var baseSystemFields = new Dictionary<string, Dictionary<string, string>>
+            {
+                { "System.AreaId", new Dictionary<string, string> { { "refname", "System.AreaId" }, { "name", "Area ID" }, { "type", "Integer" } } },
+                { "System.AreaPath", new Dictionary<string, string> { { "refname", "System.AreaPath" }, { "name", "Area Path" }, { "type", "TreePath" }, { "reportable", "dimension" } } },
+                { "System.AssignedTo", new Dictionary<string, string> { { "refname", "System.AssignedTo" }, { "name", "Assigned To" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
+                { "System.AttachedFileCount", new Dictionary<string, string> { { "refname", "System.AttachedFileCount" }, { "name", "Attached File Count" }, { "type", "Integer" } } },
+                { "System.AuthorizedAs", new Dictionary<string, string> { { "refname", "System.AuthorizedAs" }, { "name", "Authorized As" }, { "type", "String" }, { "syncnamechanges", "true" } } },
+                { "System.AuthorizedDate", new Dictionary<string, string> { { "refname", "System.AuthorizedDate" }, { "name", "Authorized Date" }, { "type", "DateTime" } } },
+                { "System.ChangedBy", new Dictionary<string, string> { { "refname", "System.ChangedBy" }, { "name", "Changed By" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
+                { "System.ChangedDate", new Dictionary<string, string> { { "refname", "System.ChangedDate" }, { "name", "Changed Date" }, { "type", "DateTime" }, { "reportable", "dimension" } } },
+                { "System.CreatedBy", new Dictionary<string, string> { { "refname", "System.CreatedBy" }, { "name", "Created By" }, { "type", "String" }, { "reportable", "dimension" }, { "syncnamechanges", "true" } } },
+                { "System.CreatedDate", new Dictionary<string, string> { { "refname", "System.CreatedDate" }, { "name", "Created Date" }, { "type", "DateTime" }, { "reportable", "dimension" } } },
+                { "System.Description", new Dictionary<string, string> { { "refname", "System.Description" }, { "name", "Description" }, { "type", "PlainText" } } },
+                { "System.ExternalLinkCount", new Dictionary<string, string> { { "refname", "System.ExternalLinkCount" }, { "name", "External Link Count" }, { "type", "Integer" } } },
+                { "System.History", new Dictionary<string, string> { { "refname", "System.History" }, { "name", "History" }, { "type", "History" } } },
+                { "System.HyperLinkCount", new Dictionary<string, string> { { "refname", "System.HyperLinkCount" }, { "name", "Hyperlink Count" }, { "type", "Integer" } } },
+                { "System.Id", new Dictionary<string, string> { { "refname", "System.Id" }, { "name", "ID" }, { "type", "Integer" }, { "reportable", "dimension" } } },
+                { "System.IterationId", new Dictionary<string, string> { { "refname", "System.IterationId" }, { "name", "Iteration ID" }, { "type", "Integer" } } },
+                { "System.IterationPath", new Dictionary<string, string> { { "refname", "System.IterationPath" }, { "name", "Iteration Path" }, { "type", "TreePath" }, { "reportable", "dimension" } } },
+                { "System.NodeName", new Dictionary<string, string> { { "refname", "System.NodeName" }, { "name", "Node Name" }, { "type", "String" } } },
+                { "System.Reason", new Dictionary<string, string> { { "refname", "System.Reason" }, { "name", "Reason" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.RelatedLinkCount", new Dictionary<string, string> { { "refname", "System.RelatedLinkCount" }, { "name", "Related Link Count" }, { "type", "Integer" } } },
+                { "System.Rev", new Dictionary<string, string> { { "refname", "System.Rev" }, { "name", "Rev" }, { "type", "Integer" }, { "reportable", "dimension" } } },
+                { "System.RevisedDate", new Dictionary<string, string> { { "refname", "System.RevisedDate" }, { "name", "Revised Date" }, { "type", "DateTime" }, { "reportable", "detail" } } },
+                { "System.State", new Dictionary<string, string> { { "refname", "System.State" }, { "name", "State" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.TeamProject", new Dictionary<string, string> { { "refname", "System.TeamProject" }, { "name", "Team Project" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.Title", new Dictionary<string, string> { { "refname", "System.Title" }, { "name", "Title" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.Watermark", new Dictionary<string, string> { { "refname", "System.Watermark" }, { "name", "Watermark" }, { "type", "Integer" } } },
+                { "System.WorkItemType", new Dictionary<string, string> { { "refname", "System.WorkItemType" }, { "name", "Work Item Type" }, { "type", "String" }, { "reportable", "dimension" } } }
+            };
+
+            // TFS 11 by default now uses HTML for the description.
+            var tfs11SystemFields = new Dictionary<string, Dictionary<string, string>>(baseSystemFields);
+            tfs11SystemFields["System.Description"] = new Dictionary<string, string> { { "refname", "System.Description" }, { "name", "Description" }, { "type", "HTML" } };
+
+            // Create a lookup table of system fields per major version of TFS.
+            SystemFields = new Dictionary<TfsMajorVersion, Dictionary<string, Dictionary<string, string>>>
+            {
+                { TfsMajorVersion.V8, baseSystemFields },
+                { TfsMajorVersion.V9, baseSystemFields },
+                { TfsMajorVersion.V10, baseSystemFields },
+                { TfsMajorVersion.V11, tfs11SystemFields }
+            };
+        }
 
         #endregion
 
         #region Compare
 
-        public static ComparisonSourceComparisonResult Compare(ComparisonSource source, ICollection<WorkItemTypeDefinition> targetWorkItemTypes)
+        public static ComparisonSourceComparisonResult Compare(TfsMajorVersion tfsMajorVersion, ComparisonSource source, ICollection<WorkItemTypeDefinition> targetWorkItemTypes)
         {
             var workItemTypeResults = new List<WorkItemTypeComparisonResult>();
 
@@ -68,25 +98,27 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 }
                 else
                 {
-                    var sourceDefinition = sourceWorkItemType.XmlDefinition.DocumentElement;
-                    var targetDefinition = targetWorkItemType.XmlDefinition.DocumentElement;
+                    var normalizedSourceDefinition = new XmlDocument();
+                    normalizedSourceDefinition.LoadXml(sourceWorkItemType.XmlDefinition.OuterXml);
+                    var normalizedTargetDefinition = new XmlDocument();
+                    normalizedTargetDefinition.LoadXml(targetWorkItemType.XmlDefinition.OuterXml);
                     var workItemTypeName = sourceWorkItemType.Name;
 
-                    Normalize(sourceWorkItemType.XmlDefinition);
-                    Normalize(targetWorkItemType.XmlDefinition);
+                    Normalize(tfsMajorVersion, normalizedSourceDefinition);
+                    Normalize(tfsMajorVersion, normalizedTargetDefinition);
 
                     var partResults = new List<WorkItemTypePartComparisonResult>();
-                    var totalSize = Enum.GetValues(typeof(WorkItemTypeDefinitionPart)).Cast<WorkItemTypeDefinitionPart>().Sum(p => sourceWorkItemType.GetPart(p).OuterXml.Length);
+                    var totalSize = Enum.GetValues(typeof(WorkItemTypeDefinitionPart)).Cast<WorkItemTypeDefinitionPart>().Sum(p => GetPart(normalizedSourceDefinition, p).OuterXml.Length);
                     foreach (WorkItemTypeDefinitionPart part in Enum.GetValues(typeof(WorkItemTypeDefinitionPart)))
                     {
-                        var sourcePart = sourceWorkItemType.GetPart(part);
-                        var targetPart = targetWorkItemType.GetPart(part);
+                        var sourcePart = GetPart(normalizedSourceDefinition, part);
+                        var targetPart = GetPart(normalizedTargetDefinition, part);
                         var status = string.Equals(GetValue(sourcePart), GetValue(targetPart), StringComparison.Ordinal) ? ComparisonStatus.AreEqual : ComparisonStatus.AreDifferent;
                         var relativeSize = sourcePart.OuterXml.Length / (double)totalSize;
                         partResults.Add(new WorkItemTypePartComparisonResult(part, status, relativeSize));
                     }
 
-                    workItemTypeResults.Add(new WorkItemTypeComparisonResult(sourceDefinition, targetDefinition, workItemTypeName, partResults));
+                    workItemTypeResults.Add(new WorkItemTypeComparisonResult(normalizedSourceDefinition, normalizedTargetDefinition, workItemTypeName, partResults));
                 }
             }
 
@@ -97,7 +129,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         #region Normalize
 
-        private static void Normalize(XmlDocument root)
+        private static void Normalize(TfsMajorVersion tfsMajorVersion, XmlDocument root)
         {
             // To allow better comparisons between source XML files from Process Templates
             // and the actual exported work item type definition, process some special cases.
@@ -158,13 +190,14 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
             // Add certain fields that are auto-generated if they're not present.
             var fieldDefinitionsNode = root.SelectSingleNode("//WORKITEMTYPE/FIELDS");
-            foreach (var refname in SystemFields.Keys)
+            var currentSystemFields = SystemFields[tfsMajorVersion];
+            foreach (var refname in currentSystemFields.Keys)
             {
                 var field = fieldDefinitionsNode.SelectSingleNode(string.Format(CultureInfo.InvariantCulture, "FIELD[@refname='{0}']", refname));
                 if (field == null)
                 {
                     field = root.CreateElement("FIELD");
-                    foreach (var attributeEntry in SystemFields[refname])
+                    foreach (var attributeEntry in currentSystemFields[refname])
                     {
                         var attribute = root.CreateAttribute(attributeEntry.Key);
                         attribute.Value = attributeEntry.Value;
@@ -276,6 +309,12 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                 SortChildNodes(transitionReasonList);
             }
 
+            // Sort child nodes of transition actions.
+            foreach (XmlNode transitionActionList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/ACTIONS"))
+            {
+                SortChildNodes(transitionActionList);
+            }
+
             // Sort child nodes of links control options.
             foreach (XmlNode linksControlOptionList in root.SelectNodes("//LinksControlOptions"))
             {
@@ -347,6 +386,29 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         private static string GetValue(XmlNode node)
         {
             return (node == null ? null : node is XmlAttribute ? node.Value : node.OuterXml);
+        }
+
+        private static XmlElement GetPart(XmlDocument workItemType, WorkItemTypeDefinitionPart part)
+        {
+            string xpath;
+            switch (part)
+            {
+                case WorkItemTypeDefinitionPart.Description:
+                    xpath = "//WORKITEMTYPE/DESCRIPTION";
+                    break;
+                case WorkItemTypeDefinitionPart.Fields:
+                    xpath = "//WORKITEMTYPE/FIELDS";
+                    break;
+                case WorkItemTypeDefinitionPart.Workflow:
+                    xpath = "//WORKITEMTYPE/WORKFLOW";
+                    break;
+                case WorkItemTypeDefinitionPart.Form:
+                    xpath = "//WORKITEMTYPE/FORM";
+                    break;
+                default:
+                    throw new ArgumentException("The requested part is invalid: " + part.ToString());
+            }
+            return (XmlElement)workItemType.SelectSingleNode(xpath);
         }
 
         #endregion

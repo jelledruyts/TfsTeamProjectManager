@@ -102,7 +102,7 @@
                     
                     <Label Grid.Column="0" Content="Sources" />
 
-                    <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" MinHeight="70" Margin="5,0,0,0" />
+                    <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" MinHeight="70" MaxHeight="150" Margin="5,0,0,0" />
 
                     <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
                         <TextBlock><Hyperlink Command="{Binding Path=AddComparisonSourceCommand}">add...</Hyperlink></TextBlock>

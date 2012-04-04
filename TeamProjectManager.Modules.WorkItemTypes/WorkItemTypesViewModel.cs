@@ -693,7 +693,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         var sourceComparisonResults = new List<ComparisonSourceComparisonResult>();
                         foreach (var source in sources)
                         {
-                            sourceComparisonResults.Add(WorkItemTypeComparer.Compare(source, targetWorkItemTypes));
+                            sourceComparisonResults.Add(WorkItemTypeComparer.Compare(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, source, targetWorkItemTypes));
                         }
                         results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
                     }

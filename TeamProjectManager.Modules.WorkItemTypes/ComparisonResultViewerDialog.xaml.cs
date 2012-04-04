@@ -69,8 +69,8 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     var targetFile = Path.GetTempFileName();
                     try
                     {
-                        workItemTypeComparison.NormalizedSourceDefinition.OwnerDocument.Save(sourceFile);
-                        workItemTypeComparison.NormalizedTargetDefinition.OwnerDocument.Save(targetFile);
+                        workItemTypeComparison.NormalizedSourceDefinition.Save(sourceFile);
+                        workItemTypeComparison.NormalizedTargetDefinition.Save(targetFile);
 
                         var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", workItemTypeComparison.WorkItemTypeName, sourceResult.Source.Name);
                         var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", workItemTypeComparison.WorkItemTypeName, this.Comparison.TeamProject);
@@ -110,6 +110,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     var devenvPath = (string)regKey.GetValue("EnvironmentPath");
                     if (File.Exists(devenvPath))
                     {
+                        // TODO: Rename display name to final version when it RTMs.
                         return new DiffTool("Visual Studio 11", devenvPath, "/diff %1 %2 %6 %7");
                     }
                 }

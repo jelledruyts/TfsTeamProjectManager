@@ -12,18 +12,23 @@ namespace TeamProjectManager.Common
         Unknown = 0,
 
         /// <summary>
-        /// Represents Team Foundation Server 2005.
+        /// Represents Team Foundation Server 8 (TFS 2005).
         /// </summary>
-        Tfs2005 = 8,
+        V8 = 8,
 
         /// <summary>
-        /// Represents Team Foundation Server 2008.
+        /// Represents Team Foundation Server 9 (TFS 2008).
         /// </summary>
-        Tfs2008 = 9,
+        V9 = 9,
 
         /// <summary>
-        /// Represents Team Foundation Server 2010.
+        /// Represents Team Foundation Server 10 (TFS 2010).
         /// </summary>
-        Tfs2010 = 10
+        V10 = 10,
+
+        /// <summary>
+        /// Represents Team Foundation Server 11.
+        /// </summary>
+        V11 = 11
     }
 }

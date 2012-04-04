@@ -30,17 +30,22 @@ namespace TeamProjectManager.Common
             this.MajorVersion = majorVersion;
             switch (this.MajorVersion)
             {
-                case TfsMajorVersion.Tfs2005:
+                case TfsMajorVersion.V8:
                     this.DisplayVersion = "Team Foundation Server 2005";
                     this.ShortDisplayVersion = "TFS 2005";
                     break;
-                case TfsMajorVersion.Tfs2008:
+                case TfsMajorVersion.V9:
                     this.DisplayVersion = "Team Foundation Server 2008";
                     this.ShortDisplayVersion = "TFS 2008";
                     break;
-                case TfsMajorVersion.Tfs2010:
+                case TfsMajorVersion.V10:
                     this.DisplayVersion = "Team Foundation Server 2010";
                     this.ShortDisplayVersion = "TFS 2010";
+                    break;
+                case TfsMajorVersion.V11:
+                    // TODO: Rename display name to final version when it RTMs.
+                    this.DisplayVersion = "Team Foundation Server 11";
+                    this.ShortDisplayVersion = "TFS 11";
                     break;
                 default:
                     this.DisplayVersion = "Unknown version of Team Foundation Server";

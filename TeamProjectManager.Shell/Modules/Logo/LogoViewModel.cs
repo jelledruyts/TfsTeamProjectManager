@@ -92,7 +92,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
             : base(eventAggregator, logger, "Logo")
         {
             this.HeaderTitle = InternalConstants.DefaultWindowTitle;
-            this.HeaderSubtitle = "v" + App.ApplicationVersion.ToString(3);
+            this.HeaderSubtitle = string.Format(CultureInfo.CurrentCulture, "v{0} - {1}", App.ApplicationVersion.ToString(3), InternalConstants.EditionName);
             this.OpenLogFileCommand = new RelayCommand(OpenLogFile, CanOpenLogFile);
             this.OpenHomepageCommand = new RelayCommand(OpenHomepage, CanOpenHomepage);
             CheckForUpdates();

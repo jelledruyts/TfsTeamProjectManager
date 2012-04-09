@@ -3,6 +3,7 @@ namespace TeamProjectManager.Shell
 {
     internal static class InternalConstants
     {
+        public const string EditionName = "<Edition Name>";
         public const string DefaultWindowTitle = "TFS Team Project Manager";
 
         public const string RegionNameLogo = "Logo";

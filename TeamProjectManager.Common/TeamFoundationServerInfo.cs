@@ -43,9 +43,8 @@ namespace TeamProjectManager.Common
                     this.ShortDisplayVersion = "TFS 2010";
                     break;
                 case TfsMajorVersion.V11:
-                    // TODO: Rename display name to final version when it RTMs.
-                    this.DisplayVersion = "Team Foundation Server 11";
-                    this.ShortDisplayVersion = "TFS 11";
+                    this.DisplayVersion = "Team Foundation Server 2012";
+                    this.ShortDisplayVersion = "TFS 2012";
                     break;
                 default:
                     this.DisplayVersion = "Unknown version of Team Foundation Server";

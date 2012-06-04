@@ -27,7 +27,7 @@ namespace TeamProjectManager.Common
         V10 = 10,
 
         /// <summary>
-        /// Represents Team Foundation Server 11.
+        /// Represents Team Foundation Server 11 (TFS 2012).
         /// </summary>
         V11 = 11
     }

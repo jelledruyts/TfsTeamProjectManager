@@ -102,7 +102,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         private static DiffTool GetVisualStudioDiffTool()
         {
-            // Visual Studio 11 has a built-in diff tool, call devenv.exe directly.
+            // Visual Studio 2012 has a built-in diff tool, call devenv.exe directly.
             using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS"))
             {
                 if (regKey != null)
@@ -110,8 +110,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                     var devenvPath = (string)regKey.GetValue("EnvironmentPath");
                     if (File.Exists(devenvPath))
                     {
-                        // TODO: Rename display name to final version when it RTMs.
-                        return new DiffTool("Visual Studio 11", devenvPath, "/diff %1 %2 %6 %7");
+                        return new DiffTool("Visual Studio 2012", devenvPath, "/diff %1 %2 %6 %7");
                     }
                 }
             }

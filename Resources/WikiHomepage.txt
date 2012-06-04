@@ -29,7 +29,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 !! What's New?
 
 * v1.2.4450 (March 8th, 2012)
-** When Visual Studio 11 is detected, its built-in Diff Tool is now used by default.
+** When Visual Studio 2012 is detected, its built-in Diff Tool is now used by default.
 ** Added support for customization of the Diff Tool in the work item type comparer (see the TeamProjectManager.exe.config file).
 * v1.2.4406 (January 24, 2012)
 ** Added a column to the build definitions list to show scheduled build times.

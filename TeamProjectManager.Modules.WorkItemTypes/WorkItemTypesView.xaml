@@ -14,7 +14,7 @@
     </UserControl.Resources>
     <TabControl>
 
-        <TabItem Header="View / Export / Delete" i:HelpProvider.HelpContent="Allows you to get an overview of the work item type definitions across multiple Team Projects, how many work items have been created from them, and in which work item categories they are used. You can also export their definitions to XML files, and delete the work item types from the Team Projects.">
+        <TabItem Header="View / Export / Delete / Edit" i:HelpProvider.HelpContent="Allows you to get an overview of the work item type definitions across multiple Team Projects, how many work items have been created from them, and in which work item categories they are used. You can also export their definitions to XML files, edit them in-place, and delete the work item types from the Team Projects.">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -24,7 +24,7 @@
                 <Button Grid.Row="0" Content="Get Work Item Types" Margin="0,5,0,5" Command="{Binding Path=GetWorkItemTypesCommand}" />
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Path=WorkItemTypes}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="workItemTypesDataGrid" SelectionChanged="workItemTypesDataGrid_SelectionChanged">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
                         <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
                         <DataGridTextColumn Header="Number Of Work Items" Binding="{Binding Path=WorkItemCount}" />
                         <DataGridTextColumn Header="Used In Categories" Binding="{Binding Path=WorkItemCategoriesList}" />
@@ -32,8 +32,9 @@
                     </DataGrid.Columns>
                 </DataGrid>
                 <WrapPanel Grid.Row="2" Margin="0,5,0,0">
-                    <Button Content="Export Selected Work Item Types" Margin="0,0,5,0" Command="{Binding Path=ExportSelectedWorkItemTypesCommand}" />
-                    <Button Content="Delete Selected Work Item Types" Command="{Binding Path=DeleteSelectedWorkItemTypesCommand}" />
+                    <Button Content="Export Selected Work Item Types" Command="{Binding Path=ExportSelectedWorkItemTypesCommand}" />
+                    <Button Content="Delete Selected Work Item Types" Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedWorkItemTypesCommand}" />
+                    <Button Content="Edit Selected Work Item Types" Margin="5,0,0,0" Command="{Binding Path=EditSelectedWorkItemTypesCommand}" />
                 </WrapPanel>
             </Grid>
         </TabItem>

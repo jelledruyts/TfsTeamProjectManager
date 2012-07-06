@@ -9,7 +9,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         #region Properties
 
         public string Name { get; private set; }
-        public XmlDocument XmlDefinition { get; private set; }
+        public XmlDocument XmlDefinition { get; set; }
 
         #endregion
 

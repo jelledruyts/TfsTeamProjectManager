@@ -69,6 +69,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\CaseConverter.cs" />
     <Compile Include="Converters\SingleLineConverter.cs" />
+    <Compile Include="Converters\XmlDocumentConverter.cs" />
     <Compile Include="Events\TeamProjectCollectionSelectionChangedEventArgs.cs" />
     <Compile Include="Events\TeamProjectCollectionSelectionChangedEvent.cs" />
     <Compile Include="Events\StatusEvent.cs" />

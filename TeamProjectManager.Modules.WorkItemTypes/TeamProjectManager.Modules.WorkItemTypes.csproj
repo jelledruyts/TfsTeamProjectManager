@@ -100,6 +100,10 @@
     <Compile Include="WorkItemTypeComparer.cs" />
     <Compile Include="WorkItemTypeComparisonResult.cs" />
     <Compile Include="WorkItemTypeDefinitionPart.cs" />
+    <Compile Include="WorkItemTypeEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemTypeEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemTypeExport.cs" />
     <Compile Include="WorkItemTypePartComparisonResult.cs" />
     <Compile Include="WorkItemTypeReference.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
@@ -124,6 +128,10 @@
     <Page Include="WorkItemCategoriesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WorkItemTypeEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WorkItemTypesView.xaml">
       <SubType>Designer</SubType>

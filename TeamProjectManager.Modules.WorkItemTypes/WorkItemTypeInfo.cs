@@ -1,17 +1,18 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using TeamProjectManager.Common;
+
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
     public class WorkItemTypeInfo
     {
-        public string TeamProject { get; private set; }
+        public TeamProjectInfo TeamProject { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
         public int WorkItemCount { get; private set; }
         public ICollection<string> WorkItemCategories { get; private set; }
         public string WorkItemCategoriesList { get; private set; }
 
-        public WorkItemTypeInfo(string teamProject, string name, string description, int workItemCount, ICollection<string> workItemCategories)
+        public WorkItemTypeInfo(TeamProjectInfo teamProject, string name, string description, int workItemCount, ICollection<string> workItemCategories)
         {
             this.TeamProject = teamProject;
             this.Name = name;

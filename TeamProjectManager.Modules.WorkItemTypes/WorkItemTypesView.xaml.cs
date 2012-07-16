@@ -61,13 +61,5 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         {
             this.workItemTypeFilesListBox.SelectedItem = null;
         }
-
-        private void comparisonResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (this.ViewModel.ViewSelectedComparisonDetailsCommand.CanExecute(null))
-            {
-                this.ViewModel.ViewSelectedComparisonDetailsCommand.Execute(null);
-            }
-        }
     }
 }

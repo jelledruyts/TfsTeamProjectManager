@@ -11,7 +11,8 @@
     <RootNamespace>TeamProjectManager.Modules.WorkItemTypes</RootNamespace>
     <AssemblyName>TeamProjectManager.Modules.WorkItemTypes</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -49,11 +50,15 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\References\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\ReferenceAssemblies\v4.5\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
@@ -73,15 +78,21 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComparisonSourceList.cs" />
+    <Compile Include="AgileProjectConfigurationPart.cs" />
+    <Compile Include="CommonProjectConfigurationPart.cs" />
+    <Compile Include="WorkItemConfigurationItem.cs" />
+    <Compile Include="WorkItemConfigurationItemPart.cs" />
+    <Compile Include="WorkItemConfigurationItemType.cs" />
+    <Compile Include="WorkItemConfigurationItemTypeConverter.cs" />
+    <Compile Include="WorkItemConfigurationPersistenceData.cs" />
     <Compile Include="ComparisonStatus.cs" />
     <Compile Include="ComparisonResultViewerDialog.xaml.cs">
       <DependentUpon>ComparisonResultViewerDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ComparisonSource.cs" />
-    <Compile Include="ComparisonSourceComparisonResult.cs" />
-    <Compile Include="ComparisonSourceEditorDialog.xaml.cs">
-      <DependentUpon>ComparisonSourceEditorDialog.xaml</DependentUpon>
+    <Compile Include="WorkItemConfiguration.cs" />
+    <Compile Include="WorkItemConfigurationComparisonResult.cs" />
+    <Compile Include="WorkItemConfigurationEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemConfigurationEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ComparisonStatusConverter.cs" />
     <Compile Include="TeamProjectComparisonResult.cs" />
@@ -97,14 +108,18 @@
     <Compile Include="WorkItemCategory.cs" />
     <Compile Include="WorkItemCategoryInfo.cs" />
     <Compile Include="WorkItemCategoryList.cs" />
-    <Compile Include="WorkItemTypeComparer.cs" />
-    <Compile Include="WorkItemTypeComparisonResult.cs" />
+    <Compile Include="WorkItemConfigurationComparer.cs" />
+    <Compile Include="WorkItemConfigurationItemComparisonResult.cs" />
+    <Compile Include="WorkItemConfigurationView.xaml.cs">
+      <DependentUpon>WorkItemConfigurationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfigurationViewModel.cs" />
     <Compile Include="WorkItemTypeDefinitionPart.cs" />
     <Compile Include="WorkItemTypeEditorDialog.xaml.cs">
       <DependentUpon>WorkItemTypeEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorkItemTypeExport.cs" />
-    <Compile Include="WorkItemTypePartComparisonResult.cs" />
+    <Compile Include="WorkItemConfigurationItemPartComparisonResult.cs" />
     <Compile Include="WorkItemTypeReference.cs" />
     <Compile Include="WorkItemTypeImporter.cs" />
     <Compile Include="WorkItemTypeDefinition.cs" />
@@ -115,19 +130,24 @@
     <Compile Include="WorkItemTypesViewModel.cs" />
     <Compile Include="WorkItemTypesModule.cs" />
     <AppDesigner Include="Properties\" />
+    <Compile Include="XmlNormalizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="ComparisonResultViewerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ComparisonSourceEditorDialog.xaml">
+    <Page Include="WorkItemConfigurationEditorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WorkItemCategoriesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WorkItemConfigurationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WorkItemTypeEditorDialog.xaml">
       <SubType>Designer</SubType>

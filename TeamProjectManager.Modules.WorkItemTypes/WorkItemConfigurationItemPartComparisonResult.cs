@@ -1,15 +1,15 @@
 ﻿
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
-    public class WorkItemTypePartComparisonResult
+    public class WorkItemConfigurationItemPartComparisonResult
     {
-        public WorkItemTypeDefinitionPart Part { get; private set; }
+        public string PartName { get; private set; }
         public ComparisonStatus Status { get; private set; }
         public double RelativeSize { get; private set; }
 
-        public WorkItemTypePartComparisonResult(WorkItemTypeDefinitionPart part, ComparisonStatus status, double relativeSize)
+        public WorkItemConfigurationItemPartComparisonResult(string partName, ComparisonStatus status, double relativeSize)
         {
-            this.Part = part;
+            this.PartName = partName;
             this.Status = status;
             this.RelativeSize = relativeSize;
         }

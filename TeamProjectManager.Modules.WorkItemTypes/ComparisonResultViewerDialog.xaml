@@ -8,6 +8,7 @@
         Height="350" Width="700">
     <Window.Resources>
         <w:ComparisonStatusConverter x:Key="comparisonStatusConverter" />
+        <w:WorkItemConfigurationItemTypeConverter x:Key="workItemConfigurationItemTypeConverter" />
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -23,7 +24,7 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0" Header="Sources">
-                <DataGrid ItemsSource="{Binding Path=SourceResults}" x:Name="sourceResultsDataGrid" SelectedIndex="0" SelectionChanged="sourceResultsDataGrid_SelectionChanged" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                <DataGrid ItemsSource="{Binding Path=WorkItemConfigurationResults}" x:Name="workItemConfigurationResultsDataGrid" SelectedIndex="0" SelectionChanged="workItemConfigurationResultsDataGrid_SelectionChanged" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Source" Binding="{Binding Path=Source.Name}" />
                         <DataGridTextColumn Header="Match" Binding="{Binding Path=PercentMatch, StringFormat='{}{0:0%}'}" />
@@ -31,19 +32,21 @@
                 </DataGrid>
             </GroupBox>
 
-            <GroupBox Grid.Column="1" Header="Work Item Types" Margin="5,0,0,0">
-                <DataGrid ItemsSource="{Binding ElementName=sourceResultsDataGrid, Path=SelectedItem.WorkItemTypeResults}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="workItemTypeResultsDataGrid" SelectionChanged="workItemTypeResultsDataGrid_SelectionChanged" MouseDoubleClick="workItemTypeResultsDataGrid_MouseDoubleClick" SelectionMode="Single">
+            <GroupBox Grid.Column="1" Header="Items" Margin="5,0,0,0">
+                <DataGrid ItemsSource="{Binding ElementName=workItemConfigurationResultsDataGrid, Path=SelectedItem.ItemResults}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="workItemConfigurationItemResultsDataGrid" SelectionChanged="workItemConfigurationItemResultsDataGrid_SelectionChanged" MouseDoubleClick="workItemConfigurationItemResultsDataGrid_MouseDoubleClick" SelectionMode="Single">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Status" Binding="{Binding Path=Status, Converter={StaticResource comparisonStatusConverter}, ConverterParameter=short}" TextBlock.TextAlignment="Center" />
-                        <DataGridTextColumn Header="Work Item Type" Binding="{Binding Path=WorkItemTypeName}" />
+                        <DataGridTextColumn Header="Item" Binding="{Binding Path=ItemName}" />
                         <DataGridTextColumn Header="Match" Binding="{Binding Path=PercentMatch, StringFormat='{}{0:0%}'}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
 
-            <GroupBox Grid.Column="2" Header="Comparison" Margin="5,0,0,0">
-                <Grid Grid.Column="2" DataContext="{Binding ElementName=workItemTypeResultsDataGrid, Path=SelectedItem}">
+            <GroupBox Grid.Column="2" Header="Item Details" Margin="5,0,0,0">
+                <Grid Grid.Column="2" DataContext="{Binding ElementName=workItemConfigurationItemResultsDataGrid, Path=SelectedItem}">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -54,21 +57,27 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Content="Status" />
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource comparisonStatusConverter}}" IsReadOnly="True" Margin="5,5,0,0" />
+                    <Label Grid.Row="0" Grid.Column="0" Content="Name" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=ItemName, Mode=OneWay}" IsReadOnly="True" Margin="5,5,0,0" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="Match" Margin="0,5,0,0" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=PercentMatch, Mode=OneWay, StringFormat='{}{0:0%}'}" IsReadOnly="True" Margin="5,5,0,0" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Type" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Type, Mode=OneWay, Converter={StaticResource workItemConfigurationItemTypeConverter}}" IsReadOnly="True" Margin="5,5,0,0" />
 
-                    <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Path=WorkItemTypePartResults}" Margin="0,5,0,0" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                    <Label Grid.Row="2" Grid.Column="0" Content="Status" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource comparisonStatusConverter}}" IsReadOnly="True" Margin="5,5,0,0" />
+
+                    <Label Grid.Row="3" Grid.Column="0" Content="Match" Margin="0,5,0,0" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=PercentMatch, Mode=OneWay, StringFormat='{}{0:0%}'}" IsReadOnly="True" Margin="5,5,0,0" />
+
+                    <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Path=PartResults}" Margin="0,5,0,0" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="Equal" Binding="{Binding Path=Status, Converter={StaticResource comparisonStatusConverter}, ConverterParameter=bool, Mode=OneWay}" />
-                            <DataGridTextColumn Header="Part" Binding="{Binding Path=Part, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=PartName, Mode=OneWay}" />
                             <DataGridTextColumn Header="Relative Size" Binding="{Binding Path=RelativeSize, StringFormat='{}{0:0%}', Mode=OneWay}" />
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Compare In Diff Tool" x:Name="compareInDiffToolButton" Click="compareInDiffToolButton_Click" HorizontalAlignment="Stretch" Margin="0,5,0,0" />
+                    <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Compare In Diff Tool" x:Name="compareInDiffToolButton" Click="compareInDiffToolButton_Click" HorizontalAlignment="Stretch" Margin="0,5,0,0" />
                 </Grid>
             </GroupBox>
         </Grid>

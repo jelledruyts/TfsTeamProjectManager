@@ -12,16 +12,17 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 {
     public partial class ComparisonResultViewerDialog : Window
     {
-        public TeamProjectComparisonResult Comparison { get; private set; }
+        private TeamProjectComparisonResult comparisonResult;
         private DiffTool diffTool;
 
-        public ComparisonResultViewerDialog(TeamProjectComparisonResult comparison)
+        public ComparisonResultViewerDialog(TeamProjectComparisonResult comparisonResult)
         {
             InitializeComponent();
-            this.Comparison = comparison;
-            this.DataContext = this.Comparison;
-            this.Title = string.Format(CultureInfo.CurrentCulture, "Comparison result details for Team Project \"{0}\"", this.Comparison.TeamProject);
+            this.comparisonResult = comparisonResult;
+            this.DataContext = this.comparisonResult;
+            this.Title = string.Format(CultureInfo.CurrentCulture, "Comparison result details for Team Project \"{0}\"", this.comparisonResult.TeamProject);
             this.diffTool = GetDiffTool();
+            // TODO: Replace by dropdown that allows user to choose diff tool.
             this.infoLabel.Text = this.diffTool == null ? "No Diff Tool Detected" : string.Format(CultureInfo.CurrentCulture, "Using {0} Diff Tool", this.diffTool.Name);
         }
 
@@ -31,23 +32,18 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             this.Close();
         }
 
-        private void sourceResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void workItemConfigurationResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.workItemTypeResultsDataGrid.SelectedIndex = 0;
+            this.workItemConfigurationItemResultsDataGrid.SelectedIndex = 0;
         }
 
-        private void workItemTypeResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void workItemConfigurationItemResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsDataGrid.SelectedItem;
-            this.compareInDiffToolButton.IsEnabled = CanCompareInDiffTool(workItemTypeComparison);
+            var itemComparisonResult = (WorkItemConfigurationItemComparisonResult)this.workItemConfigurationItemResultsDataGrid.SelectedItem;
+            this.compareInDiffToolButton.IsEnabled = CanCompareInDiffTool(itemComparisonResult);
         }
 
-        private bool CanCompareInDiffTool(WorkItemTypeComparisonResult workItemTypeComparison)
-        {
-            return this.diffTool != null && this.sourceResultsDataGrid.SelectedItem != null && workItemTypeComparison != null && (workItemTypeComparison.Status == ComparisonStatus.AreDifferent || workItemTypeComparison.Status == ComparisonStatus.AreEqual);
-        }
-
-        private void workItemTypeResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void workItemConfigurationItemResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             CompareInDiffTool();
         }
@@ -57,23 +53,28 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             CompareInDiffTool();
         }
 
+        private bool CanCompareInDiffTool(WorkItemConfigurationItemComparisonResult itemComparisonResult)
+        {
+            return this.diffTool != null && this.workItemConfigurationResultsDataGrid.SelectedItem != null && itemComparisonResult != null && itemComparisonResult.Status != ComparisonStatus.ExistsOnlyInSource && itemComparisonResult.Status != ComparisonStatus.ExistsOnlyInTarget;
+        }
+
         private void CompareInDiffTool()
         {
-            if (this.workItemTypeResultsDataGrid.SelectedItem != null)
+            if (this.workItemConfigurationItemResultsDataGrid.SelectedItem != null)
             {
-                var workItemTypeComparison = (WorkItemTypeComparisonResult)this.workItemTypeResultsDataGrid.SelectedItem;
-                if (CanCompareInDiffTool(workItemTypeComparison))
+                var itemComparisonResult = (WorkItemConfigurationItemComparisonResult)this.workItemConfigurationItemResultsDataGrid.SelectedItem;
+                if (CanCompareInDiffTool(itemComparisonResult))
                 {
-                    var sourceResult = (ComparisonSourceComparisonResult)this.sourceResultsDataGrid.SelectedItem;
+                    var configurationComparisonResult = (WorkItemConfigurationComparisonResult)this.workItemConfigurationResultsDataGrid.SelectedItem;
                     var sourceFile = Path.GetTempFileName();
                     var targetFile = Path.GetTempFileName();
                     try
                     {
-                        workItemTypeComparison.NormalizedSourceDefinition.Save(sourceFile);
-                        workItemTypeComparison.NormalizedTargetDefinition.Save(targetFile);
+                        itemComparisonResult.NormalizedSourceDefinition.Save(sourceFile);
+                        itemComparisonResult.NormalizedTargetDefinition.Save(targetFile);
 
-                        var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", workItemTypeComparison.WorkItemTypeName, sourceResult.Source.Name);
-                        var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", workItemTypeComparison.WorkItemTypeName, this.Comparison.TeamProject);
+                        var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", itemComparisonResult.ItemName, configurationComparisonResult.Source.Name);
+                        var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", itemComparisonResult.ItemName, this.comparisonResult.TeamProject);
 
                         this.diffTool.Launch(sourceFile, targetFile, sourceLabel, targetLabel);
                     }

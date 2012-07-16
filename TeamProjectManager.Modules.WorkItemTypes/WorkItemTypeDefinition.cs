@@ -1,51 +1,38 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Xml;
+using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
-    public class WorkItemTypeDefinition
+    public class WorkItemTypeDefinition : WorkItemConfigurationItem
     {
-        #region Properties
+        #region Static Factory Methods
 
-        public string Name { get; private set; }
-        public XmlDocument XmlDefinition { get; set; }
+        public static new WorkItemTypeDefinition FromFile(string path)
+        {
+            return WorkItemConfigurationItem.FromFile<WorkItemTypeDefinition>(path);
+        }
+
+        public static new WorkItemTypeDefinition FromXml(string xmlDefinition)
+        {
+            return WorkItemConfigurationItem.FromXml<WorkItemTypeDefinition>(xmlDefinition);
+        }
+
+        public static new WorkItemTypeDefinition FromXml(XmlDocument xmlDefinition)
+        {
+            return WorkItemConfigurationItem.FromXml<WorkItemTypeDefinition>(xmlDefinition);
+        }
 
         #endregion
 
         #region Constructors
 
-        public WorkItemTypeDefinition(string path)
+        public WorkItemTypeDefinition(string name, XmlDocument xmlDefinition)
+            : base(WorkItemConfigurationItemType.WorkItemType, name, xmlDefinition)
         {
-            if (File.Exists(path))
-            {
-                try
-                {
-                    var xmlDefinition = new XmlDocument();
-                    xmlDefinition.Load(path);
-                    Initialize(xmlDefinition);
-                }
-                catch
-                {
-                    // Ignore exceptions from XML parsing.
-                }
-            }
-            if (string.IsNullOrEmpty(this.Name))
-            {
-                this.Name = new FileInfo(path).Name;
-            }
-        }
-
-        public WorkItemTypeDefinition(XmlDocument xmlDefinition)
-        {
-            Initialize(xmlDefinition);
-        }
-
-        private void Initialize(XmlDocument xmlDefinition)
-        {
-            this.XmlDefinition = xmlDefinition;
-            var nameNode = this.XmlDefinition.SelectSingleNode("//WORKITEMTYPE/@name");
-            this.Name = nameNode == null ? null : nameNode.Value;
         }
 
         #endregion

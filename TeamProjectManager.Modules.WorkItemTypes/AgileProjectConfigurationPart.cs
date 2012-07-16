@@ -2,11 +2,9 @@
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
     // Note: the enum names must match the element names inside the XML definition.
-    public enum WorkItemTypeDefinitionPart
+    public enum AgileProjectConfigurationPart
     {
-        Description,
-        Fields,
-        Workflow,
-        Form
+        ProductBacklog,
+        IterationBacklog
     }
 }

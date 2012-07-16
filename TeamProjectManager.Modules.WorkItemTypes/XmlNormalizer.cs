@@ -7,7 +7,7 @@ using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.WorkItemTypes
 {
-    public static class WorkItemTypeComparer
+    public static class XmlNormalizer
     {
         #region Static Fields & Constructor
 
@@ -20,7 +20,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         private static readonly string[] FieldRuleElementNames;
         private static readonly Dictionary<TfsMajorVersion, Dictionary<string, Dictionary<string, string>>> SystemFields;
 
-        static WorkItemTypeComparer()
+        static XmlNormalizer()
         {
             KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName" };
             KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
@@ -29,7 +29,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             KnownFieldsWithFormulaSum = new string[] { "Microsoft.VSTS.Scheduling.OriginalEstimate", "Microsoft.VSTS.Scheduling.StoryPoints", "Microsoft.VSTS.Scheduling.CompletedWork", "Microsoft.VSTS.Scheduling.RemainingWork", "Microsoft.VSTS.Scheduling.BaselineWork", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
             KnwonFieldsWithNamesToRemoveSpaces = new string[] { "Microsoft.VSTS.TCM.ReproSteps", "System.AreaId", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount", "System.IterationId", "System.RelatedLinkCount", "Microsoft.VSTS.TCM.AutomatedTestId", "Microsoft.VSTS.TCM.AutomatedTestName", "Microsoft.VSTS.TCM.AutomatedTestStorage", "Microsoft.VSTS.TCM.AutomatedTestType", "Microsoft.VSTS.TCM.LocalDataSource" };
             FieldRuleElementNames = new string[] { "WHEN", "WHENCHANGED", "WHENNOT", "WHENNOTCHANGED" };
-            
+
             // Create a lookup table of common system fields where the key is the refname.
             var baseSystemFields = new Dictionary<string, Dictionary<string, string>>
             {
@@ -78,128 +78,128 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         #endregion
 
-        #region Compare
+        #region GetNormalizedXmlDefinition
 
-        public static ComparisonSourceComparisonResult Compare(TfsMajorVersion tfsMajorVersion, ComparisonSource source, ICollection<WorkItemTypeDefinition> targetWorkItemTypes)
+        public static XmlDocument GetNormalizedXmlDefinition(WorkItemConfigurationItem item, TfsMajorVersion tfsMajorVersion)
         {
-            var workItemTypeResults = new List<WorkItemTypeComparisonResult>();
+            var normalizedXmlDefinition = new XmlDocument();
+            normalizedXmlDefinition.LoadXml(item.XmlDefinition.OuterXml);
 
-            foreach (var workItemTypeOnlyInSource in source.WorkItemTypes.Where(s => !targetWorkItemTypes.Any(t => string.Equals(s.Name, t.Name, StringComparison.OrdinalIgnoreCase))))
+            // Perform pre-normalization.
+            PreNormalizeXml(normalizedXmlDefinition);
+
+            // Perform type-specific normalization.
+            if (item.Type == WorkItemConfigurationItemType.WorkItemType)
             {
-                workItemTypeResults.Add(new WorkItemTypeComparisonResult(workItemTypeOnlyInSource.XmlDefinition, null, workItemTypeOnlyInSource.Name, ComparisonStatus.ExistsOnlyInSource));
+                NormalizeWorkItemTypeDefinition(normalizedXmlDefinition, tfsMajorVersion);
+            }
+            else if (item.Type == WorkItemConfigurationItemType.AgileConfiguration)
+            {
+                NormalizeAgileConfiguration(normalizedXmlDefinition);
+            }
+            else if (item.Type == WorkItemConfigurationItemType.CommonConfiguration)
+            {
+                NormalizeCommonConfiguration(normalizedXmlDefinition);
+            }
+            else if (item.Type == WorkItemConfigurationItemType.Categories)
+            {
+                NormalizeCategories(normalizedXmlDefinition);
             }
 
-            foreach (var targetWorkItemType in targetWorkItemTypes)
-            {
-                var sourceWorkItemType = source.WorkItemTypes.FirstOrDefault(s => string.Equals(s.Name, targetWorkItemType.Name, StringComparison.OrdinalIgnoreCase));
-                if (sourceWorkItemType == null)
-                {
-                    workItemTypeResults.Add(new WorkItemTypeComparisonResult(null, targetWorkItemType.XmlDefinition, targetWorkItemType.Name, ComparisonStatus.ExistsOnlyInTarget));
-                }
-                else
-                {
-                    var normalizedSourceDefinition = new XmlDocument();
-                    normalizedSourceDefinition.LoadXml(sourceWorkItemType.XmlDefinition.OuterXml);
-                    var normalizedTargetDefinition = new XmlDocument();
-                    normalizedTargetDefinition.LoadXml(targetWorkItemType.XmlDefinition.OuterXml);
-                    var workItemTypeName = sourceWorkItemType.Name;
+            // Perform other normalization after the specific normalization (nodes could have been added or removed).
+            PostNormalizeXml(normalizedXmlDefinition);
 
-                    Normalize(tfsMajorVersion, normalizedSourceDefinition);
-                    Normalize(tfsMajorVersion, normalizedTargetDefinition);
-
-                    var partResults = new List<WorkItemTypePartComparisonResult>();
-                    var totalSize = Enum.GetValues(typeof(WorkItemTypeDefinitionPart)).Cast<WorkItemTypeDefinitionPart>().Sum(p => GetPart(normalizedSourceDefinition, p).OuterXml.Length);
-                    foreach (WorkItemTypeDefinitionPart part in Enum.GetValues(typeof(WorkItemTypeDefinitionPart)))
-                    {
-                        var sourcePart = GetPart(normalizedSourceDefinition, part);
-                        var targetPart = GetPart(normalizedTargetDefinition, part);
-                        var status = string.Equals(GetValue(sourcePart), GetValue(targetPart), StringComparison.Ordinal) ? ComparisonStatus.AreEqual : ComparisonStatus.AreDifferent;
-                        var relativeSize = sourcePart.OuterXml.Length / (double)totalSize;
-                        partResults.Add(new WorkItemTypePartComparisonResult(part, status, relativeSize));
-                    }
-
-                    workItemTypeResults.Add(new WorkItemTypeComparisonResult(normalizedSourceDefinition, normalizedTargetDefinition, workItemTypeName, partResults));
-                }
-            }
-
-            return new ComparisonSourceComparisonResult(source, workItemTypeResults);
+            return normalizedXmlDefinition;
         }
 
         #endregion
 
-        #region Normalize
+        #region Pre & Post NormalizeXml
 
-        private static void Normalize(TfsMajorVersion tfsMajorVersion, XmlDocument root)
+        private static void PreNormalizeXml(XmlDocument normalizedXmlDefinition)
         {
-            // To allow better comparisons between source XML files from Process Templates
-            // and the actual exported work item type definition, process some special cases.
-
             // First normalize the entire node.
-            root.Normalize();
+            normalizedXmlDefinition.Normalize();
 
             // Remove the XML declaration.
-            var xmlDeclaration = root.ChildNodes.Cast<XmlNode>().Where(n => n.NodeType == XmlNodeType.XmlDeclaration).SingleOrDefault();
+            var xmlDeclaration = normalizedXmlDefinition.ChildNodes.Cast<XmlNode>().Where(n => n.NodeType == XmlNodeType.XmlDeclaration).SingleOrDefault();
             if (xmlDeclaration != null)
             {
-                root.RemoveChild(xmlDeclaration);
+                normalizedXmlDefinition.RemoveChild(xmlDeclaration);
             }
 
+            // Remove all comments.
+            foreach (var comment in normalizedXmlDefinition.SelectNodes("//comment()").Cast<XmlNode>())
+            {
+                comment.ParentNode.RemoveChild(comment);
+            }
+        }
+
+        private static void PostNormalizeXml(XmlDocument normalizedXmlDefinition)
+        {
             // Close non-empty tags without child elements.
-            foreach (XmlElement emptyNode in root.SelectNodes("//*[not(node())]").Cast<XmlElement>().Where(n => !n.IsEmpty && !n.HasChildNodes))
+            foreach (XmlElement emptyNode in normalizedXmlDefinition.SelectNodes("//*[not(node())]").Cast<XmlElement>().Where(n => !n.IsEmpty && !n.HasChildNodes))
             {
                 emptyNode.IsEmpty = true;
             }
 
-            // Remove all comments.
-            foreach (var comment in root.SelectNodes("//comment()").Cast<XmlNode>())
+            // Sort all attributes.
+            foreach (XmlNode node in normalizedXmlDefinition.SelectNodes("//*"))
             {
-                comment.ParentNode.RemoveChild(comment);
+                SortAttributes(node);
             }
+        }
 
+        #endregion
+
+        #region NormalizeWorkItemTypeDefinition
+
+        private static void NormalizeWorkItemTypeDefinition(XmlDocument normalizedXmlDefinition, TfsMajorVersion tfsMajorVersion)
+        {
             // Remove all empty CustomControlOptions.
-            foreach (var customControlOptionsNode in root.SelectNodes("//CustomControlOptions").Cast<XmlElement>().Where(n => !n.HasChildNodes))
+            foreach (var customControlOptionsNode in normalizedXmlDefinition.SelectNodes("//CustomControlOptions").Cast<XmlElement>().Where(n => !n.HasChildNodes))
             {
                 customControlOptionsNode.ParentNode.RemoveChild(customControlOptionsNode);
             }
 
             // Remove the "expanditems" attribute for ALLOWEDVALUES and SUGGESTEDVALUES when it is true (the default).
-            foreach (XmlAttribute expandItemsAttribute in root.SelectNodes("//ALLOWEDVALUES[@expanditems='true']/@expanditems | //SUGGESTEDVALUES[@expanditems='true']/@expanditems"))
+            foreach (XmlAttribute expandItemsAttribute in normalizedXmlDefinition.SelectNodes("//ALLOWEDVALUES[@expanditems='true']/@expanditems | //SUGGESTEDVALUES[@expanditems='true']/@expanditems"))
             {
                 expandItemsAttribute.OwnerElement.Attributes.Remove(expandItemsAttribute);
             }
 
             // Remove global list references (these are typically lists of builds for the Team Project).
-            foreach (XmlNode buildsGlobalList in root.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD/SUGGESTEDVALUES[@filteritems='excludegroups' and count(GLOBALLIST) = 1]"))
+            foreach (XmlNode buildsGlobalList in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD/SUGGESTEDVALUES[@filteritems='excludegroups' and count(GLOBALLIST) = 1]"))
             {
                 buildsGlobalList.ParentNode.RemoveChild(buildsGlobalList);
             }
 
             // Normalize certain casing differences.
-            foreach (XmlAttribute closedInErrorAttribute in root.SelectNodes("//DEFAULTREASON[@value='Closed in error']/@value | //REASON[@value='Closed in error']/@value"))
+            foreach (XmlAttribute closedInErrorAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Closed in error']/@value | //REASON[@value='Closed in error']/@value"))
             {
                 closedInErrorAttribute.Value = "Closed in Error";
             }
-            foreach (XmlAttribute overtakenByEventsAttribute in root.SelectNodes("//DEFAULTREASON[@value='Overtaken by events']/@value | //REASON[@value='Overtaken by events']/@value"))
+            foreach (XmlAttribute overtakenByEventsAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Overtaken by events']/@value | //REASON[@value='Overtaken by events']/@value"))
             {
                 overtakenByEventsAttribute.Value = "Overtaken by Events";
             }
-            foreach (XmlAttribute fieldIdAttribute in root.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD[@refname='System.Id']/@name"))
+            foreach (XmlAttribute fieldIdAttribute in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD[@refname='System.Id']/@name"))
             {
                 fieldIdAttribute.Value = "ID";
             }
 
             // Add certain fields that are auto-generated if they're not present.
-            var fieldDefinitionsNode = root.SelectSingleNode("//WORKITEMTYPE/FIELDS");
+            var fieldDefinitionsNode = normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE/FIELDS");
             var currentSystemFields = SystemFields[tfsMajorVersion];
             foreach (var refname in currentSystemFields.Keys)
             {
                 var field = fieldDefinitionsNode.SelectSingleNode(string.Format(CultureInfo.InvariantCulture, "FIELD[@refname='{0}']", refname));
                 if (field == null)
                 {
-                    field = root.CreateElement("FIELD");
+                    field = normalizedXmlDefinition.CreateElement("FIELD");
                     foreach (var attributeEntry in currentSystemFields[refname])
                     {
-                        var attribute = root.CreateAttribute(attributeEntry.Key);
+                        var attribute = normalizedXmlDefinition.CreateAttribute(attributeEntry.Key);
                         attribute.Value = attributeEntry.Value;
                         field.Attributes.Append(attribute);
                     }
@@ -208,7 +208,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             }
 
             // Process fields.
-            foreach (XmlElement field in root.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD"))
+            foreach (XmlElement field in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD"))
             {
                 var refname = field.Attributes["refname"].Value;
 
@@ -222,7 +222,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         AddElementIfNeeded(field.SelectSingleNode(ruleElementName), "ALLOWEXISTINGVALUE");
                     }
 
-                    foreach (XmlNode fieldReference in root.SelectNodes(string.Format(CultureInfo.InvariantCulture, "//WORKITEMTYPE/WORKFLOW/STATES/STATE/FIELDS/FIELD[@refname='{0}'] | //WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/FIELDS/FIELD[@refname='{0}']", refname)))
+                    foreach (XmlNode fieldReference in normalizedXmlDefinition.SelectNodes(string.Format(CultureInfo.InvariantCulture, "//WORKITEMTYPE/WORKFLOW/STATES/STATE/FIELDS/FIELD[@refname='{0}'] | //WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/FIELDS/FIELD[@refname='{0}']", refname)))
                     {
                         AddElementIfNeeded(fieldReference, "ALLOWEXISTINGVALUE");
                     }
@@ -263,68 +263,132 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             }
 
             // Sort field definitions by "refname" everywhere.
-            SortChildNodes(root.SelectSingleNode("//WORKITEMTYPE/FIELDS"), n => GetValue(n.Attributes["refname"]));
-            foreach (XmlNode stateFieldsNode in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/STATES/STATE/FIELDS"))
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE/FIELDS"), n => GetValue(n.Attributes["refname"]));
+            foreach (XmlNode stateFieldsNode in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/WORKFLOW/STATES/STATE/FIELDS"))
             {
                 SortChildNodes(stateFieldsNode, n => GetValue(n.Attributes["refname"]));
             }
-            foreach (XmlNode transitionFieldsNode in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/FIELDS"))
+            foreach (XmlNode transitionFieldsNode in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/FIELDS"))
             {
                 SortChildNodes(transitionFieldsNode, n => GetValue(n.Attributes["refname"]));
             }
 
             // Sort workflow states by "value".
-            SortChildNodes(root.SelectSingleNode("//WORKITEMTYPE/WORKFLOW/STATES"), n => GetValue(n.Attributes["value"]));
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE/WORKFLOW/STATES"), n => GetValue(n.Attributes["value"]));
 
             // Sort transitions by combination of "from" and "to".
-            SortChildNodes(root.SelectSingleNode("//WORKITEMTYPE/WORKFLOW/TRANSITIONS"), n => string.Concat(GetValue(n.Attributes["from"]), " -> ", GetValue(n.Attributes["to"])));
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE/WORKFLOW/TRANSITIONS"), n => string.Concat(GetValue(n.Attributes["from"]), " -> ", GetValue(n.Attributes["to"])));
 
             // Sort child nodes of fields anywhere.
-            foreach (XmlNode field in root.SelectNodes("//FIELDS/FIELD"))
+            foreach (XmlNode field in normalizedXmlDefinition.SelectNodes("//FIELDS/FIELD"))
+            {
+                SortChildNodes(field);
+            }
+
+            // Sort child nodes of FIELD/WHEN, FIELD/WHENNOT, FIELD/WHENCHANGED, FIELD/WHENNOTCHANGED.
+            foreach (XmlNode field in normalizedXmlDefinition.SelectNodes("//FIELDS/FIELD/WHEN"))
+            {
+                SortChildNodes(field);
+            }
+            foreach (XmlNode field in normalizedXmlDefinition.SelectNodes("//FIELDS/FIELD/WHENNOT"))
+            {
+                SortChildNodes(field);
+            }
+            foreach (XmlNode field in normalizedXmlDefinition.SelectNodes("//FIELDS/FIELD/WHENCHANGED"))
+            {
+                SortChildNodes(field);
+            }
+            foreach (XmlNode field in normalizedXmlDefinition.SelectNodes("//FIELDS/FIELD/WHENNOTCHANGED"))
             {
                 SortChildNodes(field);
             }
 
             // Sort child nodes of allowed values.
-            foreach (XmlNode allowedValuesList in root.SelectNodes("//ALLOWEDVALUES"))
+            foreach (XmlNode allowedValuesList in normalizedXmlDefinition.SelectNodes("//ALLOWEDVALUES"))
             {
                 SortChildNodes(allowedValuesList);
             }
 
             // Sort child nodes of suggested values.
-            foreach (XmlNode suggestedValuesList in root.SelectNodes("//SUGGESTEDVALUES"))
+            foreach (XmlNode suggestedValuesList in normalizedXmlDefinition.SelectNodes("//SUGGESTEDVALUES"))
             {
                 SortChildNodes(suggestedValuesList);
             }
 
             // Sort child nodes of transitions.
-            foreach (XmlNode transitionList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION"))
+            foreach (XmlNode transitionList in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION"))
             {
                 SortChildNodes(transitionList);
             }
 
             // Sort child nodes of transition reasons.
-            foreach (XmlNode transitionReasonList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/REASONS"))
+            foreach (XmlNode transitionReasonList in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/REASONS"))
             {
                 SortChildNodes(transitionReasonList);
             }
 
             // Sort child nodes of transition actions.
-            foreach (XmlNode transitionActionList in root.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/ACTIONS"))
+            foreach (XmlNode transitionActionList in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/ACTIONS"))
             {
                 SortChildNodes(transitionActionList);
             }
 
             // Sort child nodes of links control options.
-            foreach (XmlNode linksControlOptionList in root.SelectNodes("//LinksControlOptions"))
+            foreach (XmlNode linksControlOptionList in normalizedXmlDefinition.SelectNodes("//LinksControlOptions"))
             {
                 SortChildNodes(linksControlOptionList);
             }
+        }
 
-            // Sort all attributes.
-            foreach (XmlNode node in root.SelectNodes("//*"))
+        #endregion
+
+        #region NormalizeAgileConfiguration
+
+        private static void NormalizeAgileConfiguration(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort the child nodes of the iteration and product backlog nodes.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/AgileProjectConfiguration/IterationBacklog"));
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/AgileProjectConfiguration/ProductBacklog"));
+        }
+
+        #endregion
+
+        #region NormalizeCommonConfiguration
+
+        private static void NormalizeCommonConfiguration(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort all type fields by refname.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/TypeFields"), n => GetValue(n.Attributes["refname"]));
+
+            // Sort all type field values by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/TypeFields/TypeField/TypeFieldValues"), n => GetValue(n.Attributes["type"]));
+
+            // Sort the child nodes of the weekends node.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/Weekends"));
+
+            // Sort all states by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
+        }
+
+        #endregion
+
+        #region NormalizeCategories
+
+        private static void NormalizeCategories(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes by refname.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement, n => GetValue(n.Attributes["refname"]));
+
+            // Sort the child nodes of categories.
+            foreach (XmlNode categoryNode in normalizedXmlDefinition.SelectNodes("//CATEGORY"))
             {
-                SortAttributes(node);
+                SortChildNodes(categoryNode);
             }
         }
 
@@ -383,32 +447,9 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             }
         }
 
-        private static string GetValue(XmlNode node)
+        public static string GetValue(XmlNode node)
         {
             return (node == null ? null : node is XmlAttribute ? node.Value : node.OuterXml);
-        }
-
-        private static XmlElement GetPart(XmlDocument workItemType, WorkItemTypeDefinitionPart part)
-        {
-            string xpath;
-            switch (part)
-            {
-                case WorkItemTypeDefinitionPart.Description:
-                    xpath = "//WORKITEMTYPE/DESCRIPTION";
-                    break;
-                case WorkItemTypeDefinitionPart.Fields:
-                    xpath = "//WORKITEMTYPE/FIELDS";
-                    break;
-                case WorkItemTypeDefinitionPart.Workflow:
-                    xpath = "//WORKITEMTYPE/WORKFLOW";
-                    break;
-                case WorkItemTypeDefinitionPart.Form:
-                    xpath = "//WORKITEMTYPE/FORM";
-                    break;
-                default:
-                    throw new ArgumentException("The requested part is invalid: " + part.ToString());
-            }
-            return (XmlElement)workItemType.SelectSingleNode(xpath);
         }
 
         #endregion

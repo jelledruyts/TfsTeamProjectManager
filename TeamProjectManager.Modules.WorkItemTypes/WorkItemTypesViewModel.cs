@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -9,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using System.Xml;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.Win32;
@@ -34,13 +32,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
         public RelayCommand ValidateCommand { get; private set; }
         public RelayCommand ValidateAndImportCommand { get; private set; }
         public RelayCommand ImportCommand { get; private set; }
-
-        public RelayCommand AddComparisonSourceCommand { get; private set; }
-        public RelayCommand RemoveSelectedComparisonSourceCommand { get; private set; }
-        public RelayCommand LoadComparisonSourcesCommand { get; private set; }
-        public RelayCommand SaveComparisonSourcesCommand { get; private set; }
-        public RelayCommand CompareCommand { get; private set; }
-        public RelayCommand ViewSelectedComparisonDetailsCommand { get; private set; }
 
         public RelayCommand SearchCommand { get; private set; }
 
@@ -120,38 +111,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
 
         public static ObservableProperty<bool> SearchUsesExactMatchProperty = new ObservableProperty<bool, WorkItemTypesViewModel>(o => o.SearchUsesExactMatch);
 
-        public ObservableCollection<ComparisonSource> ComparisonSources
-        {
-            get { return this.GetValue(ComparisonSourcesProperty); }
-            set { this.SetValue(ComparisonSourcesProperty, value); }
-        }
-
-        public static ObservableProperty<ObservableCollection<ComparisonSource>> ComparisonSourcesProperty = new ObservableProperty<ObservableCollection<ComparisonSource>, WorkItemTypesViewModel>(o => o.ComparisonSources, new ObservableCollection<ComparisonSource>());
-
-        public ComparisonSource SelectedComparisonSource
-        {
-            get { return this.GetValue(SelectedComparisonSourceProperty); }
-            set { this.SetValue(SelectedComparisonSourceProperty, value); }
-        }
-
-        public static ObservableProperty<ComparisonSource> SelectedComparisonSourceProperty = new ObservableProperty<ComparisonSource, WorkItemTypesViewModel>(o => o.SelectedComparisonSource);
-
-        public ICollection<TeamProjectComparisonResult> ComparisonResults
-        {
-            get { return this.GetValue(ComparisonResultsProperty); }
-            set { this.SetValue(ComparisonResultsProperty, value); }
-        }
-
-        public static ObservableProperty<ICollection<TeamProjectComparisonResult>> ComparisonResultsProperty = new ObservableProperty<ICollection<TeamProjectComparisonResult>, WorkItemTypesViewModel>(o => o.ComparisonResults);
-
-        public TeamProjectComparisonResult SelectedComparisonResult
-        {
-            get { return this.GetValue(SelectedComparisonResultProperty); }
-            set { this.SetValue(SelectedComparisonResultProperty, value); }
-        }
-
-        public static ObservableProperty<TeamProjectComparisonResult> SelectedComparisonResultProperty = new ObservableProperty<TeamProjectComparisonResult, WorkItemTypesViewModel>(o => o.SelectedComparisonResult);
-
         #endregion
 
         #region Constructors
@@ -170,12 +129,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             this.ValidateAndImportCommand = new RelayCommand(ValidateAndImport, CanValidateAndImport);
             this.ImportCommand = new RelayCommand(Import, CanImport);
 
-            this.AddComparisonSourceCommand = new RelayCommand(AddComparisonSource, CanAddComparisonSource);
-            this.RemoveSelectedComparisonSourceCommand = new RelayCommand(RemoveSelectedComparisonSource, CanRemoveSelectedComparisonSource);
-            this.LoadComparisonSourcesCommand = new RelayCommand(LoadComparisonSources, CanLoadComparisonSources);
-            this.SaveComparisonSourcesCommand = new RelayCommand(SaveComparisonSources, CanSaveComparisonSources);
-            this.CompareCommand = new RelayCommand(Compare, CanCompare);
-            this.ViewSelectedComparisonDetailsCommand = new RelayCommand(ViewSelectedComparisonDetails, CanViewSelectedComparisonDetails);
             this.SearchCommand = new RelayCommand(Search, CanSearch);
         }
 
@@ -189,7 +142,18 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var path = viewModel.WorkItemTypesFilePath;
             if (Directory.Exists(path))
             {
-                viewModel.WorkItemTypeFiles = Directory.GetFiles(path, "*.xml").Select(f => new WorkItemTypeDefinition(f)).ToList();
+                var workItemTypeFiles = new List<WorkItemTypeDefinition>();
+                foreach (var workItemTypeFileName in Directory.GetFiles(path, "*.xml"))
+                {
+                    try
+                    {
+                        workItemTypeFiles.Add(WorkItemTypeDefinition.FromFile(workItemTypeFileName));
+                    }
+                    catch (ArgumentException)
+                    {
+                    }
+                }
+                viewModel.WorkItemTypeFiles = workItemTypeFiles;
             }
             else
             {
@@ -550,169 +514,6 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             PerformImport("Importing work item types", ImportOptions.Import);
         }
 
-        private bool CanAddComparisonSource(object argument)
-        {
-            return true;
-        }
-
-        private void AddComparisonSource(object argument)
-        {
-            var dialog = new ComparisonSourceEditorDialog();
-            dialog.Owner = Application.Current.MainWindow;
-            var result = dialog.ShowDialog();
-            if (result == true)
-            {
-                this.ComparisonSources.Add(dialog.ComparisonSource);
-            }
-        }
-
-        private bool CanRemoveSelectedComparisonSource(object argument)
-        {
-            return this.SelectedComparisonSource != null;
-        }
-
-        private void RemoveSelectedComparisonSource(object argument)
-        {
-            this.ComparisonSources.Remove(this.SelectedComparisonSource);
-        }
-
-        private bool CanLoadComparisonSources(object argument)
-        {
-            return true;
-        }
-
-        private void LoadComparisonSources(object argument)
-        {
-            var dialog = new OpenFileDialog();
-            dialog.Title = "Please select the comparison source list (*.xml) to load.";
-            dialog.Filter = "XML Files (*.xml)|*.xml";
-            var result = dialog.ShowDialog(Application.Current.MainWindow);
-            if (result == true)
-            {
-                try
-                {
-                    var persistedSources = SerializationProvider.Read<PersistedComparisonSource[]>(dialog.FileName);
-                    this.ComparisonSources.Clear();
-                    foreach (var persistedSource in persistedSources)
-                    {
-                        var workItemTypes = new List<WorkItemTypeDefinition>();
-                        foreach (var workItemType in persistedSource.WorkItemTypeDefinitions)
-                        {
-                            var doc = new XmlDocument();
-                            doc.LoadXml(workItemType);
-                            workItemTypes.Add(new WorkItemTypeDefinition(doc));
-                        }
-                        this.ComparisonSources.Add(new ComparisonSource(persistedSource.Name, workItemTypes));
-                    }
-                }
-                catch (Exception exc)
-                {
-                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the comparison source list from \"{0}\"", dialog.FileName), exc);
-                    MessageBox.Show("An error occurred while loading the comparison source list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-        }
-
-        private bool CanSaveComparisonSources(object argument)
-        {
-            return true;
-        }
-
-        private void SaveComparisonSources(object argument)
-        {
-            var dialog = new SaveFileDialog();
-            dialog.Title = "Please select the comparison source list (*.xml) to save.";
-            dialog.Filter = "XML Files (*.xml)|*.xml";
-            var result = dialog.ShowDialog(Application.Current.MainWindow);
-            if (result == true)
-            {
-                try
-                {
-                    SerializationProvider.Write<PersistedComparisonSource[]>(this.ComparisonSources.Select(c => new PersistedComparisonSource(c)).ToArray(), dialog.FileName);
-                }
-                catch (Exception exc)
-                {
-                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while saving the comparison source list to \"{0}\"", dialog.FileName), exc);
-                    MessageBox.Show("An error occurred while saving the comparison source list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-        }
-
-        private bool CanCompare(object argument)
-        {
-            return IsAnyTeamProjectSelected() && this.ComparisonSources.Count > 0;
-        }
-
-        private void Compare(object argument)
-        {
-            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var sources = this.ComparisonSources.ToList();
-            var task = new ApplicationTask("Comparing work item types", teamProjectNames.Count);
-            PublishStatus(new StatusEventArgs(task));
-            var step = 0;
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sender, e) =>
-            {
-                var tfs = GetSelectedTfsTeamProjectCollection();
-                var store = tfs.GetService<WorkItemStore>();
-
-                var results = new List<TeamProjectComparisonResult>();
-                foreach (var teamProjectName in teamProjectNames)
-                {
-                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    try
-                    {
-                        var project = store.Projects[teamProjectName];
-
-                        var targetWorkItemTypes = new List<WorkItemTypeDefinition>();
-                        foreach (WorkItemType workItemType in project.WorkItemTypes)
-                        {
-                            targetWorkItemTypes.Add(new WorkItemTypeDefinition(workItemType.Export(false)));
-                        }
-
-                        var sourceComparisonResults = new List<ComparisonSourceComparisonResult>();
-                        foreach (var source in sources)
-                        {
-                            sourceComparisonResults.Add(WorkItemTypeComparer.Compare(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, source, targetWorkItemTypes));
-                        }
-                        results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
-                    }
-                    catch (Exception exc)
-                    {
-                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
-                    }
-                }
-                e.Result = results;
-            };
-            worker.RunWorkerCompleted += (sender, e) =>
-            {
-                if (e.Error != null)
-                {
-                    Logger.Log("An unexpected exception occurred while comparing work item types", e.Error);
-                    task.SetError(e.Error);
-                    task.SetComplete("An unexpected exception occurred");
-                }
-                else
-                {
-                    this.ComparisonResults = (ICollection<TeamProjectComparisonResult>)e.Result;
-                    task.SetComplete("Done");
-                }
-            };
-            worker.RunWorkerAsync();
-        }
-
-        private bool CanViewSelectedComparisonDetails(object argument)
-        {
-            return this.SelectedComparisonResult != null;
-        }
-
-        private void ViewSelectedComparisonDetails(object argument)
-        {
-            var dialog = new ComparisonResultViewerDialog(this.SelectedComparisonResult);
-            dialog.Owner = Application.Current.MainWindow;
-            dialog.ShowDialog();
-        }
-
         #endregion
 
         #region Helper Methods
@@ -743,7 +544,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
                         {
                             var project = store.Projects[workItemTypeToExport.WorkItemType.TeamProject.Name];
                             var workItemType = project.WorkItemTypes[workItemTypeToExport.WorkItemType.Name];
-                            workItemTypeToExport.WorkItemTypeDefinition = new WorkItemTypeDefinition(workItemType.Export(false));
+                            workItemTypeToExport.WorkItemTypeDefinition = WorkItemTypeDefinition.FromXml(workItemType.Export(false));
                             if (!string.IsNullOrEmpty(workItemTypeToExport.SaveAsFileName))
                             {
                                 Directory.CreateDirectory(Path.GetDirectoryName(workItemTypeToExport.SaveAsFileName));
@@ -783,7 +584,7 @@ namespace TeamProjectManager.Modules.WorkItemTypes
             var teamProjectsWithWorkItemTypes = this.SelectedTeamProjects.ToDictionary(p => p, p => workItemTypes);
             PerformImport(description, options, teamProjectsWithWorkItemTypes);
         }
-        
+
         private void PerformImport(string description, ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
         {
             var numberOfSteps = GetTotalNumberOfSteps(options, teamProjectsWithWorkItemTypes);

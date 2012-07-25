@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TeamProjectManager.Modules.WorkItemConfiguration</RootNamespace>
+    <AssemblyName>TeamProjectManager.Modules.WorkItemConfiguration</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\TeamProjectManager.snk</AssemblyOriginatorKeyFile>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.Prism">
+      <HintPath>..\References\Microsoft.Practices.Prism.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
+      <HintPath>..\References\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\References\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\ReferenceAssemblies\v4.5\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AgileProjectConfigurationPart.cs" />
+    <Compile Include="CommonProjectConfigurationPart.cs" />
+    <Compile Include="WorkItemConfigurationItem.cs" />
+    <Compile Include="WorkItemConfigurationItemPart.cs" />
+    <Compile Include="WorkItemConfigurationItemType.cs" />
+    <Compile Include="WorkItemConfigurationItemTypeConverter.cs" />
+    <Compile Include="WorkItemConfigurationPersistenceData.cs" />
+    <Compile Include="ComparisonStatus.cs" />
+    <Compile Include="ComparisonResultViewerDialog.xaml.cs">
+      <DependentUpon>ComparisonResultViewerDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfiguration.cs" />
+    <Compile Include="WorkItemConfigurationComparisonResult.cs" />
+    <Compile Include="WorkItemConfigurationEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemConfigurationEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ComparisonStatusConverter.cs" />
+    <Compile Include="TeamProjectComparisonResult.cs" />
+    <Compile Include="WorkItemCategoriesView.xaml.cs">
+      <DependentUpon>WorkItemCategoriesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImportOptions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SearchResult.cs" />
+    <Compile Include="WorkItemCategoriesViewModel.cs" />
+    <Compile Include="WorkItemCategory.cs" />
+    <Compile Include="WorkItemCategoryInfo.cs" />
+    <Compile Include="WorkItemCategoryList.cs" />
+    <Compile Include="WorkItemConfigurationComparer.cs" />
+    <Compile Include="WorkItemConfigurationItemComparisonResult.cs" />
+    <Compile Include="ComparisonView.xaml.cs">
+      <DependentUpon>ComparisonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ComparisonViewModel.cs" />
+    <Compile Include="WorkItemProcessConfigurationView.xaml.cs">
+      <DependentUpon>WorkItemProcessConfigurationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemProcessConfigurationViewModel.cs" />
+    <Compile Include="WorkItemTypeDefinitionPart.cs" />
+    <Compile Include="WorkItemConfigurationItemEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemConfigurationItemEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfigurationItemExport.cs" />
+    <Compile Include="WorkItemConfigurationItemPartComparisonResult.cs" />
+    <Compile Include="WorkItemTypeReference.cs" />
+    <Compile Include="WorkItemConfigurationItemImportExport.cs" />
+    <Compile Include="WorkItemTypeDefinition.cs" />
+    <Compile Include="WorkItemTypeInfo.cs" />
+    <Compile Include="WorkItemConfigurationView.xaml.cs">
+      <DependentUpon>WorkItemConfigurationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfigurationViewModel.cs" />
+    <Compile Include="WorkItemTypesView.xaml.cs">
+      <DependentUpon>WorkItemTypesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemTypesViewModel.cs" />
+    <Compile Include="WorkItemConfigurationModule.cs" />
+    <AppDesigner Include="Properties\" />
+    <Compile Include="XmlNormalizer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="ComparisonResultViewerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemConfigurationEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemCategoriesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ComparisonView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemProcessConfigurationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemConfigurationItemEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemConfigurationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemTypesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj">
+      <Project>{6034E65E-4E00-46FA-B683-65AB8F3C47E7}</Project>
+      <Name>TeamProjectManager.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

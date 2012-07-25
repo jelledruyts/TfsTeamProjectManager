@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Common", "TeamProjectManager.Common\TeamProjectManager.Common.csproj", "{6034E65E-4E00-46FA-B683-65AB8F3C47E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.WorkItemTypes", "TeamProjectManager.Modules.WorkItemTypes\TeamProjectManager.Modules.WorkItemTypes.csproj", "{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.WorkItemConfiguration", "TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj", "{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{418CF9CB-5595-4268-B745-1F8A659D84D1}"
 	ProjectSection(SolutionItems) = preProject
@@ -31,11 +31,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
 		Resources\WorkItemCategories-UpdateImport.png = Resources\WorkItemCategories-UpdateImport.png
 		Resources\WorkItemCategories-ViewDelete.png = Resources\WorkItemCategories-ViewDelete.png
-		Resources\WorkItemTypes-Compare.png = Resources\WorkItemTypes-Compare.png
-		Resources\WorkItemTypes-CompareDetails.png = Resources\WorkItemTypes-CompareDetails.png
-		Resources\WorkItemTypes-Import.png = Resources\WorkItemTypes-Import.png
-		Resources\WorkItemTypes-Search.png = Resources\WorkItemTypes-Search.png
-		Resources\WorkItemTypes-ViewExportDelete.png = Resources\WorkItemTypes-ViewExportDelete.png
+		Resources\WorkItemConfiguration-Compare.png = Resources\WorkItemConfiguration-Compare.png
+		Resources\WorkItemConfiguration-CompareDetails.png = Resources\WorkItemConfiguration-CompareDetails.png
+		Resources\WorkItemConfiguration-Import.png = Resources\WorkItemConfiguration-Import.png
+		Resources\WorkItemConfiguration-Search.png = Resources\WorkItemConfiguration-Search.png
+		Resources\WorkItemConfiguration-ViewExportDelete.png = Resources\WorkItemConfiguration-ViewExportDelete.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Security", "TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj", "{412C41B9-CE97-47CA-9607-BBC22418B547}"
@@ -54,9 +54,9 @@ Global
 		SccProjectUniqueName2 = TeamProjectManager.Modules.BuildProcessTemplates\\TeamProjectManager.Modules.BuildProcessTemplates.csproj
 		SccProjectName2 = TeamProjectManager.Modules.BuildProcessTemplates
 		SccLocalPath2 = TeamProjectManager.Modules.BuildProcessTemplates
-		SccProjectUniqueName3 = TeamProjectManager.Modules.WorkItemTypes\\TeamProjectManager.Modules.WorkItemTypes.csproj
-		SccProjectName3 = TeamProjectManager.Modules.WorkItemTypes
-		SccLocalPath3 = TeamProjectManager.Modules.WorkItemTypes
+		SccProjectUniqueName3 = TeamProjectManager.Modules.WorkItemConfiguration\\TeamProjectManager.Modules.WorkItemConfiguration.csproj
+		SccProjectName3 = TeamProjectManager.Modules.WorkItemConfiguration
+		SccLocalPath3 = TeamProjectManager.Modules.WorkItemConfiguration
 		SccProjectUniqueName4 = TeamProjectManager.Shell\\TeamProjectManager.Shell.csproj
 		SccProjectName4 = TeamProjectManager.Shell
 		SccLocalPath4 = TeamProjectManager.Shell

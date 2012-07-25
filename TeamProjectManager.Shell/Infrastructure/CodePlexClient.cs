@@ -30,9 +30,8 @@ namespace TeamProjectManager.Shell.Infrastructure
 
         #region GetLatestReleasedVersion
 
-        public static Version GetLatestReleasedVersion(string projectName, ILogger logger, out Uri downloadUrl)
+        public static ApplicationVersion GetLatestReleasedVersion(string projectName, string editionName, ILogger logger)
         {
-            downloadUrl = null;
             try
             {
                 // Load the latest releases RSS feed.
@@ -41,29 +40,33 @@ namespace TeamProjectManager.Shell.Infrastructure
                 {
                     var feed = SyndicationFeed.Load(reader);
                     Version highestVersion = null;
+                    Uri downloadUrl = null;
                     foreach (var item in feed.Items)
                     {
-                        // For each release item in the feed, check if the title contains one or more version numbers.
+                        // For each release item in the feed, check if the title contains the edition name (if given) and one or more version numbers.
                         var title = item.Title.Text;
-                        var versionMatches = VersionExpression.Matches(title);
-                        foreach (Match versionMatch in versionMatches)
+                        if (!string.IsNullOrEmpty(title) && (string.IsNullOrEmpty(editionName) || title.IndexOf(editionName, StringComparison.OrdinalIgnoreCase) >= 0))
                         {
-                            if (versionMatch.Success)
+                            var versionMatches = VersionExpression.Matches(title);
+                            foreach (Match versionMatch in versionMatches)
                             {
-                                Version parsedVersion;
-                                if (Version.TryParse(versionMatch.Value, out parsedVersion))
+                                if (versionMatch.Success)
                                 {
-                                    // Find the highest version number that actually has at least 3 parts: major.minor.build.
-                                    // This makes sure to exclude versions that are planned but not yet released (so the build number isn't known yet).
-                                    if (parsedVersion.Build >= 0)
+                                    Version parsedVersion;
+                                    if (Version.TryParse(versionMatch.Value, out parsedVersion))
                                     {
-                                        if (highestVersion == null || parsedVersion > highestVersion)
+                                        // Find the highest version number that actually has at least 3 parts: major.minor.build.
+                                        // This makes sure to exclude versions that are planned but not yet released (so the build number isn't known yet).
+                                        if (parsedVersion.Build >= 0)
                                         {
-                                            highestVersion = parsedVersion;
-                                            if (item.Links.Count > 0)
+                                            if (highestVersion == null || parsedVersion > highestVersion)
                                             {
-                                                // The link points to the download web page.
-                                                downloadUrl = item.Links[0].Uri;
+                                                highestVersion = parsedVersion;
+                                                if (item.Links.Count > 0)
+                                                {
+                                                    // The link points to the download web page.
+                                                    downloadUrl = item.Links[0].Uri;
+                                                }
                                             }
                                         }
                                     }
@@ -71,7 +74,10 @@ namespace TeamProjectManager.Shell.Infrastructure
                             }
                         }
                     }
-                    return highestVersion;
+                    if (highestVersion != null)
+                    {
+                        return new ApplicationVersion(highestVersion, downloadUrl);
+                    }
                 }
             }
             catch (Exception exc)

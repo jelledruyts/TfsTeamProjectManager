@@ -55,11 +55,11 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\References\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -88,12 +88,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Infrastructure\ApplicationVersion.cs" />
     <Compile Include="Infrastructure\CodePlexClient.cs" />
     <Compile Include="Infrastructure\HelpContentConverter.cs" />
     <Compile Include="Infrastructure\IStatusService.cs" />
     <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Infrastructure\LoggerAdapter.cs" />
     <Compile Include="InternalConstants.cs" />
+    <Compile Include="InternalConstants.Edition.cs" />
     <Compile Include="Modules\Logo\LogoModule.cs" />
     <Compile Include="Modules\Logo\LogoView.xaml.cs">
       <DependentUpon>LogoView.xaml</DependentUpon>
@@ -170,9 +172,9 @@
       <Project>{FA594433-69DA-461E-9C57-6483529214EA}</Project>
       <Name>TeamProjectManager.Modules.SourceControl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemTypes\TeamProjectManager.Modules.WorkItemTypes.csproj">
-      <Project>{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}</Project>
-      <Name>TeamProjectManager.Modules.WorkItemTypes</Name>
+    <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj">
+      <Project>{9a98f323-3b0d-41c3-9a6c-383da3869fe7}</Project>
+      <Name>TeamProjectManager.Modules.WorkItemConfiguration</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

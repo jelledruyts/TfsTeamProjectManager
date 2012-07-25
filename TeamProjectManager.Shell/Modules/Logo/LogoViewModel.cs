@@ -134,13 +134,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
-                    Uri downloadUrl;
-                    var latestVersion = CodePlexClient.GetLatestReleasedVersion(InternalConstants.CodePlexProjectName, this.Logger, out downloadUrl);
-                    if (latestVersion != null && latestVersion > App.ApplicationVersion)
-                    {
-                        // If the latest released version is newer than the current, return the version and URL.
-                        e.Result = new Tuple<Version, Uri>(latestVersion, downloadUrl);
-                    }
+                    e.Result = CodePlexClient.GetLatestReleasedVersion(InternalConstants.CodePlexProjectName, InternalConstants.CodePlexEditionName, this.Logger);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
                 {
@@ -150,13 +144,12 @@ namespace TeamProjectManager.Shell.Modules.Logo
                     }
                     else
                     {
-                        if (e.Result != null)
+                        var latestVersion = (ApplicationVersion)e.Result;
+                        if (latestVersion != null && latestVersion.VersionNumber > App.ApplicationVersion)
                         {
-                            var result = (Tuple<Version, Uri>)e.Result;
-                            var version = result.Item1;
-                            var downloadUrl = result.Item2;
-                            this.NewVersionMessage = string.Format(CultureInfo.CurrentCulture, "A new version is available: v{0}!", version.ToString());
-                            this.NewVersionUrl = downloadUrl.ToString();
+                            // If the latest released version is newer than the current, return the version and URL.
+                            this.NewVersionMessage = string.Format(CultureInfo.CurrentCulture, "A new version is available: v{0}!", latestVersion.VersionNumber.ToString());
+                            this.NewVersionUrl = latestVersion.DownloadUrl.ToString();
                             this.NewVersionVisibility = Visibility.Visible;
                         }
                     }

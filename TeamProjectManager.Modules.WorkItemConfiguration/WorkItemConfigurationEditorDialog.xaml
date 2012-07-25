@@ -1,0 +1,61 @@
+﻿<Window x:Class="TeamProjectManager.Modules.WorkItemConfiguration.WorkItemConfigurationEditorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemConfiguration"
+        Title="Edit Work Item Configuration"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Height="480" Width="640">
+    <Window.Resources>
+        <w:WorkItemConfigurationItemTypeConverter x:Key="workItemConfigurationItemTypeConverter" />
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="Import">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Content="Import From Team Project" Click="importFromTeamProjectButton_Click" />
+                <Button Content="Import From Process Template XML" Click="importFromProcessTemplateButton_Click" Margin="5,0,0,0" />
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Work Item Configuration">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Name" Margin="0,5,0,0" />
+                <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" x:Name="nameTextBox" TextChanged="nameTextBox_TextChanged" Margin="5,5,0,0" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Items" Margin="0,5,0,0" />
+                <DataGrid Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" ItemsSource="{Binding Path=Items}" x:Name="itemsDataGrid" SelectionMode="Extended" SelectionChanged="itemsDataGrid_SelectionChanged" IsReadOnly="True" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Path=Type, Converter={StaticResource workItemConfigurationItemTypeConverter}}" Width="Auto" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" Margin="5,5,0,0">
+                    <TextBlock><Hyperlink x:Name="addItemsFromFilesHyperlink" Click="addItemsFromFilesHyperlink_Click" ToolTip="Add XML files that contain work item type definitions, categories or process configurations">add...</Hyperlink></TextBlock>
+                    <TextBlock><Hyperlink x:Name="removeHyperlink" Click="removeHyperlink_Click" IsEnabled="False" ToolTip="Remove the currently selected items">remove</Hyperlink></TextBlock>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" IsEnabled="False" />
+            <Button Content="Cancel" IsCancel="True" Width="75" x:Name="cancelButton" Margin="5,0,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>

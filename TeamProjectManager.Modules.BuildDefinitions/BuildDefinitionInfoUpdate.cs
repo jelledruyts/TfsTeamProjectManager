@@ -14,8 +14,8 @@ namespace TeamProjectManager.Modules.BuildDefinitions
 
         public bool UpdateBuildControllerName { get; set; }
         public bool UpdateDefaultDropLocation { get; set; }
-        public bool UpdateContinuousIntegrationType { get; set; }
-        public bool UpdateEnabled { get; set; }
+        public bool UpdateTriggerType { get; set; }
+        public bool UpdateQueueStatus { get; set; }
         public bool UpdateProcessTemplate { get; set; }
         public bool UpdateBuildNumberFormat { get; set; }
         public bool UpdateCleanWorkspace { get; set; }
@@ -26,6 +26,10 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         public bool UpdateMSBuildArguments { get; set; }
         public bool UpdateMSBuildPlatform { get; set; }
         public bool UpdatePrivateDropLocation { get; set; }
+        public bool UpdateSolutionSpecificBuildOutputs { get; set; }
+        public bool UpdateMSBuildMultiProc { get; set; }
+        public bool UpdateContinuousIntegrationQuietPeriod { get; set; }
+        public bool UpdateBatchSize { get; set; }
 
         #endregion
 
@@ -36,8 +40,8 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             buildDefinitions = buildDefinitions ?? new BuildDefinitionInfo[0];
             this.BuildControllerName = (buildDefinitions.Any() ? buildDefinitions.First().BuildControllerName : DefaultBuildControllerName);
             this.DefaultDropLocation = (buildDefinitions.Any() ? buildDefinitions.First().DefaultDropLocation : DefaultDefaultDropLocation);
-            this.ContinuousIntegrationType = (buildDefinitions.Any() ? buildDefinitions.First().ContinuousIntegrationType : DefaultContinuousIntegrationType);
-            this.Enabled = (buildDefinitions.Any() ? buildDefinitions.First().Enabled : DefaultEnabled);
+            this.TriggerType = (buildDefinitions.Any() ? buildDefinitions.First().TriggerType : DefaultTriggerType);
+            this.QueueStatus = (buildDefinitions.Any() ? buildDefinitions.First().QueueStatus : DefaultQueueStatus);
             this.ProcessTemplate = (buildDefinitions.Any() ? buildDefinitions.First().ProcessTemplate : DefaultProcessTemplate);
             this.BuildNumberFormat = (buildDefinitions.Any() ? buildDefinitions.First().BuildNumberFormat : DefaultBuildNumberFormat);
             this.CleanWorkspace = (buildDefinitions.Any() ? buildDefinitions.First().CleanWorkspace : DefaultCleanWorkspace);
@@ -48,6 +52,10 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             this.MSBuildArguments = (buildDefinitions.Any() ? buildDefinitions.First().MSBuildArguments : DefaultMSBuildArguments);
             this.MSBuildPlatform = (buildDefinitions.Any() ? buildDefinitions.First().MSBuildPlatform : DefaultMSBuildPlatform);
             this.PrivateDropLocation = (buildDefinitions.Any() ? buildDefinitions.First().PrivateDropLocation : DefaultPrivateDropLocation);
+            this.SolutionSpecificBuildOutputs = (buildDefinitions.Any() ? buildDefinitions.First().SolutionSpecificBuildOutputs : DefaultSolutionSpecificBuildOutputs);
+            this.MSBuildMultiProc = (buildDefinitions.Any() ? buildDefinitions.First().MSBuildMultiProc : DefaultMSBuildMultiProc);
+            this.ContinuousIntegrationQuietPeriod = (buildDefinitions.Any() ? buildDefinitions.First().ContinuousIntegrationQuietPeriod : DefaultContinuousIntegrationQuietPeriod);
+            this.BatchSize = (buildDefinitions.Any() ? buildDefinitions.First().BatchSize : DefaultBatchSize);
         }
 
         #endregion
@@ -79,13 +87,13 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                 // To disable the drop location, do not set to null but always use an empty string (null only works for TFS 2010 and before, an empty string always works).
                 buildDefinition.DefaultDropLocation = this.DefaultDropLocation ?? string.Empty;
             }
-            if (UpdateContinuousIntegrationType)
+            if (UpdateTriggerType)
             {
-                buildDefinition.ContinuousIntegrationType = this.ContinuousIntegrationType;
+                buildDefinition.TriggerType = this.TriggerType;
             }
-            if (UpdateEnabled)
+            if (UpdateQueueStatus)
             {
-                buildDefinition.Enabled = this.Enabled;
+                buildDefinition.QueueStatus = this.QueueStatus;
             }
             if (UpdateProcessTemplate)
             {
@@ -98,6 +106,14 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                 {
                     buildDefinition.Process = selectedProcessTemplate;
                 }
+            }
+            if (UpdateContinuousIntegrationQuietPeriod)
+            {
+                buildDefinition.ContinuousIntegrationQuietPeriod = this.ContinuousIntegrationQuietPeriod;
+            }
+            if (UpdateBatchSize)
+            {
+                buildDefinition.BatchSize = this.BatchSize;
             }
 
             XmlNamespaceManager nsmgr;
@@ -144,6 +160,14 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             if (UpdatePrivateDropLocation)
             {
                 SetBuildProcessParameterNode(rootNode, nsmgr, "x:String", "PrivateDropLocation", this.PrivateDropLocation);
+            }
+            if (UpdateSolutionSpecificBuildOutputs)
+            {
+                SetBuildProcessParameterNode(rootNode, nsmgr, "x:Boolean", "SolutionSpecificBuildOutputs", this.SolutionSpecificBuildOutputs.ToString());
+            }
+            if (UpdateMSBuildMultiProc)
+            {
+                SetBuildProcessParameterNode(rootNode, nsmgr, "x:Boolean", "MSBuildMultiProc", this.MSBuildMultiProc.ToString());
             }
             buildDefinition.ProcessParameters = processParameters.OuterXml;
         }

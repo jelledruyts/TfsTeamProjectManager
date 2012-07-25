@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -26,13 +28,13 @@ namespace TeamProjectManager.Modules.Security
 
         #region Observable Properties
 
-        public QueryMembership MembershipMode
+        public MembershipQuery MembershipMode
         {
             get { return this.GetValue(MembershipModeProperty); }
             set { this.SetValue(MembershipModeProperty, value); }
         }
 
-        public static ObservableProperty<QueryMembership> MembershipModeProperty = new ObservableProperty<QueryMembership, SecurityViewModel>(o => o.MembershipMode);
+        public static ObservableProperty<MembershipQuery> MembershipModeProperty = new ObservableProperty<MembershipQuery, SecurityViewModel>(o => o.MembershipMode);
 
         public ICollection<SecurityGroupInfo> SecurityGroups
         {
@@ -98,7 +100,7 @@ namespace TeamProjectManager.Modules.Security
             worker.DoWork += (sender, e) =>
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
-                var securityService = tfs.GetService<IGroupSecurityService>();
+                var securityService = tfs.GetService<IIdentityManagementService>();
 
                 var step = 0;
                 var securityGroups = new List<SecurityGroupInfo>();
@@ -107,18 +109,24 @@ namespace TeamProjectManager.Modules.Security
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
                     try
                     {
-                        foreach (var applicationGroup in securityService.ListApplicationGroups(teamProject.Uri.ToString()).Where(g => !g.Deleted).OrderBy(g => g.DisplayName))
+                        foreach (var applicationGroup in securityService.ListApplicationGroups(teamProject.Uri.ToString(), ReadIdentityOptions.None).Where(g => g.IsActive).OrderBy(g => g.DisplayName))
                         {
                             var members = new List<string>();
-                            if (membershipMode != QueryMembership.None)
+                            if (membershipMode != MembershipQuery.None)
                             {
-                                var applicationGroupWithMembers = securityService.ReadIdentity(SearchFactor.Sid, applicationGroup.Sid, membershipMode);
+                                var applicationGroupWithMembers = securityService.ReadIdentity(applicationGroup.Descriptor, membershipMode, ReadIdentityOptions.None);
                                 if (applicationGroupWithMembers.Members != null && applicationGroupWithMembers.Members.Any())
                                 {
-                                    members.AddRange(securityService.ReadIdentities(SearchFactor.Sid, applicationGroupWithMembers.Members, QueryMembership.None).Where(m => m != null).Select(m => m.DisplayName));
+                                    members.AddRange(securityService.ReadIdentities(applicationGroupWithMembers.Members, membershipMode, ReadIdentityOptions.None).Where(m => m != null).Select(m => m.DisplayName));
                                 }
                             }
-                            var securityGroup = new SecurityGroupInfo(teamProject, applicationGroup.Sid, applicationGroup.DisplayName, applicationGroup.Description, members);
+                            object descriptionObject = null;
+                            string description = null;
+                            if (applicationGroup.TryGetProperty("Description", out descriptionObject))
+                            {
+                                description = descriptionObject.ToString();
+                            }
+                            var securityGroup = new SecurityGroupInfo(teamProject, applicationGroup.Descriptor.Identifier, applicationGroup.DisplayName, description, members);
                             securityGroups.Add(securityGroup);
                         }
                     }
@@ -164,7 +172,7 @@ namespace TeamProjectManager.Modules.Security
                 worker.DoWork += (sender, e) =>
                 {
                     var tfs = GetSelectedTfsTeamProjectCollection();
-                    var securityService = tfs.GetService<IGroupSecurityService>();
+                    var securityService = tfs.GetService<IIdentityManagementService>();
 
                     var step = 0;
                     var count = 0;
@@ -173,7 +181,7 @@ namespace TeamProjectManager.Modules.Security
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting security group \"{0}\" in Team Project \"{1}\"", securityGroup.Name, securityGroup.TeamProject.Name));
                         try
                         {
-                            securityService.DeleteApplicationGroup(securityGroup.Sid);
+                            securityService.DeleteApplicationGroup(IdentityHelper.CreateTeamFoundationDescriptor(securityGroup.Sid));
                             count++;
                         }
                         catch (Exception exc)
@@ -224,7 +232,7 @@ namespace TeamProjectManager.Modules.Security
                 worker.DoWork += (sender, e) =>
                 {
                     var tfs = GetSelectedTfsTeamProjectCollection();
-                    var securityService = tfs.GetService<IGroupSecurityService>();
+                    var securityService = tfs.GetService<IIdentityManagementService>();
 
                     var step = 0;
                     var count = 0;

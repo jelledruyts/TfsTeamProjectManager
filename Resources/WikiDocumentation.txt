@@ -68,30 +68,30 @@ This can be useful if you want to see which projects are still actively being wo
 Allows you to get an overview of the work item type definitions across multiple Team Projects, how many work items have been created from them, and in which work item categories they are used.
 You can also export their definitions to XML files, and delete the work item types from the Team Projects.
 
-[image:View / Export / Delete Work Item Types|WorkItemTypes-ViewExportDelete.png]
+[image:View / Export / Delete Work Item Types|WorkItemConfiguration-ViewExportDelete.png]
 
 !!! Import
 
 Allows you to validate and import new work item type definitions in existing Team Projects.
 This can be useful if you want to change the work item types being used, e.g. to upgrade them from a previous version.
 
-[image:Import Work Item Types|WorkItemTypes-Import.png]
+[image:Import Work Item Types|WorkItemConfiguration-Import.png]
 
 !!! Compare
 
 Allows you to compare the work item types used by Team Projects with work item type definition files on disk (e.g. from a Process Template) or from other Team Projects.
 This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item type definitions from a standard set.
 
-[image:Compare Work Item Types|WorkItemTypes-Compare.png]
+[image:Compare Work Item Types|WorkItemConfiguration-Compare.png]
 
-[image:Comparison Details|WorkItemTypes-CompareDetails.png]
+[image:Comparison Details|WorkItemConfiguration-CompareDetails.png]
 
 !!! Search
 
 Allows you to search for work item types and/or fields within them.
 This can be useful if you want to know if certain work items or fields are present in selected Team Projects.
 
-[image:Search Work Item Types|WorkItemTypes-Search.png]
+[image:Search Work Item Types|WorkItemConfiguration-Search.png]
 
 !! Work Item Categories
 

@@ -18,7 +18,7 @@ If you can think of other great features, please let us know through the discuss
 
 In the meantime, here's a gratuitous teaser screenshot:
 
-[image:Compare Work Item Types|WorkItemTypes-Compare.png]
+[image:Compare Work Item Types|WorkItemConfiguration-Compare.png]
 
 !! Free Software
 

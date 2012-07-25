@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <b:ContinuousIntegrationTypeConverter x:Key="continuousIntegrationTypeConverter" />
+        <b:TriggerTypeConverter x:Key="triggerTypeConverter" />
     </UserControl.Resources>
     <Grid>
         <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
@@ -27,11 +27,13 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                             <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
-                            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Path=Enabled, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Path=QueueStatus, Mode=OneWay}" />
                             <DataGridTextColumn Header="Build Controller" Binding="{Binding Path=BuildControllerName}" />
                             <DataGridTextColumn Header="Default Drop Location" Binding="{Binding Path=DefaultDropLocation}" />
-                            <DataGridTextColumn Header="Trigger" Binding="{Binding Path=ContinuousIntegrationType, Converter={StaticResource continuousIntegrationTypeConverter}}" />
+                            <DataGridTextColumn Header="Trigger" Binding="{Binding Path=TriggerType, Converter={StaticResource triggerTypeConverter}}" />
                             <DataGridTextColumn Header="Schedule" Binding="{Binding Path=ScheduleDescription}" />
+                            <DataGridTextColumn Header="CI Quiet Period" Binding="{Binding Path=ContinuousIntegrationQuietPeriod}" />
+                            <DataGridTextColumn Header="Gated Batch Size" Binding="{Binding Path=BatchSize}" />
                             <DataGridTextColumn Header="Process Template" Binding="{Binding Path=ProcessTemplate}" />
                             <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
                             <DataGridTextColumn Header="Clean Workspace" Binding="{Binding Path=CleanWorkspace}" />
@@ -40,8 +42,10 @@
                             <DataGridCheckBoxColumn Header="Source Server" Binding="{Binding Path=SourceServerEnabled, Mode=OneWay}" />
                             <DataGridTextColumn Header="Symbol Server" Binding="{Binding Path=SymbolServerPath}" />
                             <DataGridTextColumn Header="MSBuild Arguments" Binding="{Binding Path=MSBuildArguments}" />
+                            <DataGridTextColumn Header="MSBuild Multi-Proc" Binding="{Binding Path=MSBuildMultiProc}" />
                             <DataGridTextColumn Header="MSBuild Platform" Binding="{Binding Path=MSBuildPlatform}" />
                             <DataGridTextColumn Header="Private Drop Location" Binding="{Binding Path=PrivateDropLocation}" />
+                            <DataGridTextColumn Header="Solution Specific Build Outputs" Binding="{Binding Path=SolutionSpecificBuildOutputs}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <WrapPanel Grid.Row="2" Margin="0,5,0,0">

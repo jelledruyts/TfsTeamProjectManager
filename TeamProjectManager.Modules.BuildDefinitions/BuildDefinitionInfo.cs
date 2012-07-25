@@ -15,9 +15,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         // General Properties
         protected const string DefaultBuildControllerName = null;
         protected const string DefaultDefaultDropLocation = null;
-        protected const ContinuousIntegrationType DefaultContinuousIntegrationType = ContinuousIntegrationType.None;
-        protected const bool DefaultEnabled = true;
+        protected const DefinitionTriggerType DefaultTriggerType = DefinitionTriggerType.None;
+        protected const DefinitionQueueStatus DefaultQueueStatus = DefinitionQueueStatus.Enabled;
         protected const string DefaultProcessTemplate = null;
+        protected const int DefaultContinuousIntegrationQuietPeriod = 0;
+        protected const int DefaultBatchSize = 1;
 
         // Process Template-Specific Basic Properties
         protected const string ProcessParametersRootNodeXpath = "/scg:Dictionary";
@@ -40,6 +42,10 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         protected const ToolPlatform DefaultMSBuildPlatform = ToolPlatform.Auto;
         protected const string PrivateDropLocationNodeXpath = ProcessParametersRootNodeXpath + "/x:String[@x:Key='PrivateDropLocation']";
         protected const string DefaultPrivateDropLocation = null;
+        protected const string SolutionSpecificBuildOutputsNodeXpath = ProcessParametersRootNodeXpath + "/x:Boolean[@x:Key='SolutionSpecificBuildOutputs']";
+        protected const bool DefaultSolutionSpecificBuildOutputs = false;
+        protected const string MSBuildMultiProcNodeXpath = ProcessParametersRootNodeXpath + "/x:Boolean[@x:Key='MSBuildMultiProc']";
+        protected const bool DefaultMSBuildMultiProc = true;
 
         #endregion
 
@@ -52,10 +58,12 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         // General Properties
         public string BuildControllerName { get; set; }
         public string DefaultDropLocation { get; set; }
-        public ContinuousIntegrationType ContinuousIntegrationType { get; set; }
-        public bool Enabled { get; set; }
+        public DefinitionTriggerType TriggerType { get; set; }
+        public DefinitionQueueStatus QueueStatus { get; set; }
         public string ProcessTemplate { get; set; }
         public string ScheduleDescription { get; set; }
+        public int ContinuousIntegrationQuietPeriod { get; set; }
+        public int BatchSize { get; set; }
 
         // Process Template-Specific Basic Properties
         public string BuildNumberFormat { get; set; }
@@ -64,6 +72,8 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         public CodeAnalysisOption RunCodeAnalysis { get; set; }
         public bool SourceServerEnabled { get; set; }
         public string SymbolServerPath { get; set; }
+        public bool SolutionSpecificBuildOutputs { get; set; }
+        public bool MSBuildMultiProc { get; set; }
 
         // Process Template-Specific Advanced Properties
         public string MSBuildArguments { get; set; }
@@ -86,9 +96,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             this.Name = buildDefinition.Name;
             this.BuildControllerName = (buildDefinition.BuildController == null ? null : buildDefinition.BuildController.Name);
             this.DefaultDropLocation = buildDefinition.DefaultDropLocation;
-            this.ContinuousIntegrationType = buildDefinition.ContinuousIntegrationType;
-            this.Enabled = buildDefinition.Enabled;
+            this.TriggerType = buildDefinition.TriggerType;
+            this.QueueStatus = buildDefinition.QueueStatus;
             this.ProcessTemplate = buildDefinition.Process == null ? null : buildDefinition.Process.ServerPath;
+            this.ContinuousIntegrationQuietPeriod = buildDefinition.ContinuousIntegrationQuietPeriod;
+            this.BatchSize = buildDefinition.BatchSize;
 
             var scheduleDescription = new StringBuilder();
             foreach (var schedule in buildDefinition.Schedules)
@@ -118,6 +130,8 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                     this.MSBuildArguments = GetBuildProcessParameterAsString(processParameters, nsmgr, MSBuildArgumentsNodeXpath, DefaultMSBuildArguments);
                     this.MSBuildPlatform = GetBuildProcessParameterAsEnum<ToolPlatform>(processParameters, nsmgr, MSBuildPlatformNodeXpath, DefaultMSBuildPlatform);
                     this.PrivateDropLocation = GetBuildProcessParameterAsString(processParameters, nsmgr, PrivateDropLocationNodeXpath, DefaultPrivateDropLocation);
+                    this.SolutionSpecificBuildOutputs = GetBuildProcessParameterAsBoolean(processParameters, nsmgr, SolutionSpecificBuildOutputsNodeXpath, DefaultSolutionSpecificBuildOutputs);
+                    this.MSBuildMultiProc = GetBuildProcessParameterAsBoolean(processParameters, nsmgr, MSBuildMultiProcNodeXpath, DefaultMSBuildMultiProc);
                 }
                 catch (Exception)
                 {

@@ -22,7 +22,7 @@ namespace TeamProjectManager.Common
             {
                 if (!tfsTeamProjectCollectionCache.ContainsKey(uri))
                 {
-                    tfsTeamProjectCollectionCache[uri] = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(uri, new UICredentialsProvider());
+                    tfsTeamProjectCollectionCache[uri] = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(uri);
                 }
                 return tfsTeamProjectCollectionCache[uri];
             }

@@ -198,7 +198,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var sources = this.ComparisonSources.ToList();
-            var task = new ApplicationTask("Comparing work item types", teamProjectNames.Count);
+            var task = new ApplicationTask("Comparing work item configurations", teamProjectNames.Count);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -235,7 +235,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 if (e.Error != null)
                 {
-                    Logger.Log("An unexpected exception occurred while comparing work item types", e.Error);
+                    Logger.Log("An unexpected exception occurred while comparing work item configurations", e.Error);
                     task.SetError(e.Error);
                     task.SetComplete("An unexpected exception occurred");
                 }

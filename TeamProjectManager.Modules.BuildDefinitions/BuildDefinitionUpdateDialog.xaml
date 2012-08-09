@@ -112,7 +112,7 @@
                         </ComboBox>
 
                         <CheckBox Grid.Row="4" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateSourceServerEnabled}" Content="Source Server Enabled" />
-                        <CheckBox Grid.Row="4" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSourceServerEnabled}" IsChecked="{Binding SourceServerEnabled}" Content="Index Sources" />
+                        <CheckBox Grid.Row="4" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSourceServerEnabled}" IsChecked="{Binding SourceServerEnabled}" />
 
                         <CheckBox Grid.Row="5" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateSymbolServerPath}" Content="Symbol Server" />
                         <TextBox Grid.Row="5" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSymbolServerPath}" Text="{Binding SymbolServerPath}" />

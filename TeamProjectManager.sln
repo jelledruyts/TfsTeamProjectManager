@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildProcessTemplates", "TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj", "{BDCA8650-C32C-4131-A622-DDA98C43656C}"
@@ -29,13 +29,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Resources\SourceControl-ViewSettings.png = Resources\SourceControl-ViewSettings.png
 		Resources\WikiDocumentation.txt = Resources\WikiDocumentation.txt
 		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
-		Resources\WorkItemCategories-UpdateImport.png = Resources\WorkItemCategories-UpdateImport.png
-		Resources\WorkItemCategories-ViewDelete.png = Resources\WorkItemCategories-ViewDelete.png
+		Resources\WorkItemConfiguration-Categories-UpdateImport.png = Resources\WorkItemConfiguration-Categories-UpdateImport.png
+		Resources\WorkItemConfiguration-Categories-ViewDelete.png = Resources\WorkItemConfiguration-Categories-ViewDelete.png
 		Resources\WorkItemConfiguration-Compare.png = Resources\WorkItemConfiguration-Compare.png
 		Resources\WorkItemConfiguration-CompareDetails.png = Resources\WorkItemConfiguration-CompareDetails.png
-		Resources\WorkItemConfiguration-Import.png = Resources\WorkItemConfiguration-Import.png
-		Resources\WorkItemConfiguration-Search.png = Resources\WorkItemConfiguration-Search.png
-		Resources\WorkItemConfiguration-ViewExportDelete.png = Resources\WorkItemConfiguration-ViewExportDelete.png
+		Resources\WorkItemConfiguration-ProcessConfiguration-Import.png = Resources\WorkItemConfiguration-ProcessConfiguration-Import.png
+		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png
+		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png
+		Resources\WorkItemConfiguration-WorkItemTypes-Import.png = Resources\WorkItemConfiguration-WorkItemTypes-Import.png
+		Resources\WorkItemConfiguration-WorkItemTypes-Search.png = Resources\WorkItemConfiguration-WorkItemTypes-Search.png
+		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png
+		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Security", "TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj", "{412C41B9-CE97-47CA-9607-BBC22418B547}"

@@ -2,23 +2,42 @@
 
 TFS Team Project Manager automates various tasks across Team Projects in Team Foundation Server. If you find yourself managing multiple Team Projects for an organization and have recurring tasks and questions that repeat themselves over and over again, Team Project Manager probably has some answers for you.
 
+[image:Compare Work Item Types|WorkItemConfiguration-Compare.png]
+
+!! Features
+
 Team Project Manager can help you...
 
-* Manage build definitions (viewing and deleting build definitions, as well as bulk updating common properties within the build definition)
-* Manage build process templates (understanding which build templates are used by which build definitions, uploading new build process templates, unregistering existing ones, ...)
-* Manage security groups (understanding which groups have which members, adding groups, ...)
-* Manage source control settings (e.g. to standardize settings for multiple check-out, get latest on check-out, check-in notes, ...)
-* Retrieve the latest changesets (e.g. to see which projects are still active)
-* Manage work item type definitions (understanding with projects use which work item types and how many work items there are of each, importing work item types to various projects, comparing them with various sources e.g. to determine which Process Template was likely used to create Team Projects, ...)
-* Manage work item categories (adding and removing categories and managing the work item types they contain)
-
-For more details on how all this works, see the [Documentation] page. It works against TFS 2005, 2008 and 2010.
+* *Manage build definitions*
+** View and delete build definitions
+** Update common properties within build definitions
+* *Manage build process templates*
+** Understand which build templates are used by which build definitions
+** Unregister existing build process templates
+** Register new or update existing build process templates
+* *Manage security*
+** Understand which security groups have which members
+** Delete security groups
+** Add security groups
+* *Manage source control*
+** Understand which projects have which source control settings (multiple check-out, get latest on check-out, check-in notes)
+** Update source control settings
+** Retrieve the latest changesets (e.g. to see which projects are still active)
+* *Manage work item configuration*
+** Compare work item configurations (i.e. work item type definitions, categories, process configuration) with various sources, e.g. to determine which Process Template was likely used to create which project
+** Understand which projects use which work item types and how many work items there are of each
+** Import new or update existing work item types
+** Manage work item categories
+** Manage process configuration (i.e. common and agile configuration)
+For more details on how all this works, see the [Documentation] page.
 
 If you can think of other great features, please let us know through the discussion forums or the issue tracker! Or (even better) because it's built with a very modular framework ([url:Microsoft Prism|http://compositewpf.codeplex.com/]) you can also contribute by building your own modules!
 
-In the meantime, here's a gratuitous teaser screenshot:
+!! Compatibility
 
-[image:Compare Work Item Types|WorkItemConfiguration-Compare.png]
+TFS Team Project Manager works against TFS 2005, 2008, 2010 and 2012.
+
+On the machine where you run the tool, you need to have Team Explorer installed; use the edition of TFS Team Project Manager that matches your version of Team Explorer.
 
 !! Free Software
 
@@ -28,7 +47,13 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v1.2.4450 (March 8th, 2012)
+* v1.3.4601 (August 6, 2012)
+** Split up in two editions depending on the version of Team Explorer you have installed locally (although all editions still work against all versions of TFS)
+** Added support for TFS 2012
+** Added support for editing Work Item Type Definitions directly
+** Added support for managing work item process configuration (Agile and Common configuration)
+** Added support for comparing work item categories and process configuration (Agile and Common configuration); improved comparison of work item type definitions
+* v1.2.4450 (March 8, 2012)
 ** When Visual Studio 2012 is detected, its built-in Diff Tool is now used by default.
 ** Added support for customization of the Diff Tool in the work item type comparer (see the TeamProjectManager.exe.config file).
 * v1.2.4406 (January 24, 2012)

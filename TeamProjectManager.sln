@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Resources\SourceControl-ViewLatestChangesets.png = Resources\SourceControl-ViewLatestChangesets.png
 		Resources\SourceControl-ViewSettings.png = Resources\SourceControl-ViewSettings.png
 		Resources\WikiDocumentation.txt = Resources\WikiDocumentation.txt
+		Resources\WikiDocumentationHowToContribute.txt = Resources\WikiDocumentationHowToContribute.txt
 		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
 		Resources\WorkItemConfiguration-Categories-UpdateImport.png = Resources\WorkItemConfiguration-Categories-UpdateImport.png
 		Resources\WorkItemConfiguration-Categories-ViewDelete.png = Resources\WorkItemConfiguration-Categories-ViewDelete.png

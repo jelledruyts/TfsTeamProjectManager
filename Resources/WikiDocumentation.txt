@@ -1,3 +1,20 @@
+! Contents
+
+*Features*
+* [Build Definitions|#Build Definitions]
+* [Build Process Templates|#Build Process Templates]
+* [Security|#Security]
+* [Source Control|#Source Control]
+* [Work Item Configuration - Compare|#Work Item Configuration - Compare]
+* [Work Item Configuration - Work Item Types|#Work Item Configuration - Work Item Types]
+* [Work Item Configuration - Categories|#Work Item Configuration - Categories]
+* [Work Item Configuration - Process Configuration|#Work Item Configuration - Process Configuration]
+*Contributing to the project*
+* [How To Contribute|How To Contribute]
+
+! Features
+
+{anchor:Build Definitions}
 !! Build Definitions
 
 Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions.
@@ -7,6 +24,7 @@ This can be useful when you want to get an overview of all the builds or want to
 
 [image:Update Build Definitions|BuildDefinitions-Update.png]
 
+{anchor:Build Process Templates}
 !! Build Process Templates
 
 !!! View / Unregister
@@ -23,6 +41,7 @@ This can be useful when you want to standardize on a single build process templa
 
 [image:Register / Update Build Process Templates|BuildProcessTemplates-RegisterUpdate.png]
 
+{anchor:Security}
 !! Security
 
 !!! View / Delete Groups
@@ -39,6 +58,7 @@ This can be useful when you want to have consistent security groups or when you 
 
 [image:Add Group|Security-AddGroup.png]
 
+{anchor:Source Control}
 !! Source Control
 
 !!! View Settings
@@ -61,6 +81,7 @@ This can be useful if you want to see which projects are still actively being wo
 
 [image:View Latest Changesets|SourceControl-ViewLatestChangesets.png]
 
+{anchor:Work Item Configuration - Compare}
 !! Work Item Configuration - Compare
 
 Allows you to compare the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects.
@@ -70,6 +91,7 @@ This can be useful to determine which Team Projects have been created with which
 
 [image:Comparison Details|WorkItemConfiguration-CompareDetails.png]
 
+{anchor:Work Item Configuration - Work Item Types}
 !! Work Item Configuration - Work Item Types
 
 !!! View / Export / Delete / Edit
@@ -95,6 +117,7 @@ This can be useful if you want to know if certain work items or fields are prese
 
 [image:Search Work Item Types|WorkItemConfiguration-WorkItemTypes-Search.png]
 
+{anchor:Work Item Configuration - Categories}
 !! Work Item Configuration - Categories
 
 !!! View / Delete
@@ -111,6 +134,7 @@ This can be useful if you want to change work item categories or if you want to 
 
 [image:Update / Import Work Item Categories|WorkItemConfiguration-Categories-UpdateImport.png]
 
+{anchor:workitemconfigurationprocessconfiguration}
 !! Work Item Configuration - Process Configuration
 
 !!! View / Export / Edit

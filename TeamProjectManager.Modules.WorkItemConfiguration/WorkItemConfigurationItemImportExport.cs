@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Xml;
 using System.Xml.Schema;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
@@ -90,42 +85,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
-        #region ImportProcessConfigurations
-
-        public static void ImportProcessConfigurations(ApplicationTask task, TfsTeamProjectCollection tfs, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
-        {
-            var step = 0;
-            foreach (var teamProjectWithProcessConfigurations in teamProjectsWithProcessConfigurations)
-            {
-                var project = store.Projects[teamProjectWithProcessConfigurations.Key.Name];
-                foreach (var processConfiguration in teamProjectWithProcessConfigurations.Value)
-                {
-                    task.SetProgress(step++, string.Format("Importing {0} in project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name));
-                    try
-                    {
-                        if (processConfiguration.Type == WorkItemConfigurationItemType.CommonConfiguration)
-                        {
-                            SetCommonConfiguration(tfs, project, processConfiguration);
-                        }
-                        else if (processConfiguration.Type == WorkItemConfigurationItemType.AgileConfiguration)
-                        {
-                            SetAgileConfiguration(tfs, project, processConfiguration);
-                        }
-                        else
-                        {
-                            throw new ArgumentException("The process configuration item must be either a CommonConfiguration or AgileConfiguration.");
-                        }
-                    }
-                    catch (Exception exc)
-                    {
-                        task.SetError("ERROR - " + exc.Message);
-                    }
-                }
-            }
-        }
-
-        #endregion
-
         #region ExportWorkItemConfigurationItems
 
         public static void ExportWorkItemConfigurationItems(ApplicationTask task, string itemType, IList<WorkItemConfigurationItemExport> workItemConfigurationItems)
@@ -149,118 +108,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0} \"{1}\"", itemType, workItemConfigurationItem.Item.Name), exc);
                     }
                 }
-            }
-        }
-
-        #endregion
-
-        #region Get & Set CommonConfiguration
-
-        public static WorkItemConfigurationItem GetCommonConfiguration(TfsTeamProjectCollection tfs, Project project)
-        {
-            return GetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.CommonConfiguration);
-        }
-
-        public static void SetCommonConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItem commonConfiguration)
-        {
-            SetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.CommonConfiguration, commonConfiguration);
-        }
-
-        public static WorkItemConfigurationItem GetAgileConfiguration(TfsTeamProjectCollection tfs, Project project)
-        {
-            return GetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.AgileConfiguration);
-        }
-
-        public static void SetAgileConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItem agileConfiguration)
-        {
-            SetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.AgileConfiguration, agileConfiguration);
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        private static WorkItemConfigurationItem GetProcessConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItemType type)
-        {
-            var configService = tfs.GetService<ProjectProcessConfigurationService>();
-            string processConfigXml;
-            try
-            {
-                if (type == WorkItemConfigurationItemType.CommonConfiguration)
-                {
-                    var commonConfig = configService.GetCommonConfiguration(project.Uri.ToString());
-                    var configXml = new StringBuilder();
-                    using (var writer = XmlWriter.Create(configXml, new XmlWriterSettings { Indent = true }))
-                    {
-                        commonConfig.ToXml(writer, "CommonProjectConfiguration");
-                    }
-                    processConfigXml = configXml.ToString();
-                }
-                else if (type == WorkItemConfigurationItemType.AgileConfiguration)
-                {
-                    var agileConfig = configService.GetAgileConfiguration(project.Uri.ToString());
-                    var configXml = new StringBuilder();
-                    using (var writer = XmlWriter.Create(configXml, new XmlWriterSettings { Indent = true }))
-                    {
-                        agileConfig.ToXml(writer, "AgileProjectConfiguration");
-                    }
-                    processConfigXml = configXml.ToString();
-                }
-                else
-                {
-                    throw new ArgumentException("The type argument must be either a CommonConfiguration or AgileConfiguration.");
-                }
-            }
-            catch (NullReferenceException)
-            {
-                // Working with the ProjectProcessConfigurationService throws NullReferenceException on TFS 2010 or earlier.
-                return null;
-            }
-            return WorkItemConfigurationItem.FromXml(processConfigXml);
-        }
-
-        private static void SetProcessConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItemType type, WorkItemConfigurationItem item)
-        {
-            var configService = tfs.GetService<ProjectProcessConfigurationService>();
-            try
-            {
-                if (type == WorkItemConfigurationItemType.CommonConfiguration)
-                {
-                    CommonProjectConfiguration commonConfig;
-                    using (var xmlStringReader = new StringReader(item.XmlDefinition.DocumentElement.OuterXml))
-                    using (var xmlReader = XmlReader.Create(xmlStringReader))
-                    {
-                        while (xmlReader.NodeType != XmlNodeType.Element)
-                        {
-                            xmlReader.Read();
-                        }
-                        commonConfig = CommonProjectConfiguration.FromXml(tfs, xmlReader);
-                    }
-                    configService.SetCommonConfiguration(project.Uri.ToString(), commonConfig);
-                }
-                else if (type == WorkItemConfigurationItemType.AgileConfiguration)
-                {
-                    AgileProjectConfiguration agileConfig;
-                    using (var xmlStringReader = new StringReader(item.XmlDefinition.DocumentElement.OuterXml))
-                    using (var xmlReader = XmlReader.Create(xmlStringReader))
-                    {
-                        while (xmlReader.NodeType != XmlNodeType.Element)
-                        {
-                            xmlReader.Read();
-                        }
-                        agileConfig = AgileProjectConfiguration.FromXml(tfs, xmlReader);
-                    }
-                    configService.SetAgileConfiguration(project.Uri.ToString(), agileConfig);
-                }
-                else
-                {
-                    throw new ArgumentException("The type argument must be either a CommonConfiguration or AgileConfiguration.");
-                }
-            }
-            catch (NullReferenceException exc)
-            {
-                // Working with the ProjectProcessConfigurationService throws NullReferenceException on TFS 2010 or earlier.
-                throw new InvalidOperationException("The process configuration could not be saved.", exc);
             }
         }
 

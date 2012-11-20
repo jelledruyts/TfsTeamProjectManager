@@ -11,10 +11,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var type = (WorkItemConfigurationItemType)value;
             switch (type)
             {
-                case WorkItemConfigurationItemType.AgileConfiguration:
-                    return WorkItemConfigurationItem.AgileConfigurationName;
-                case WorkItemConfigurationItemType.CommonConfiguration:
-                    return WorkItemConfigurationItem.CommonConfigurationName;
                 case WorkItemConfigurationItemType.WorkItemType:
                     return WorkItemConfigurationItem.WorkItemTypeDefinitionName;
                 case WorkItemConfigurationItemType.Categories:

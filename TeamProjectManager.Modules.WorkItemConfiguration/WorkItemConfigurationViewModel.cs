@@ -18,9 +18,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         [Import]
         public ComparisonView ComparisonView { get; set; }
 
-        [Import]
-        public WorkItemProcessConfigurationView WorkItemProcessConfigurationView { get; set; }
-
         #endregion
 
         #region Constructors

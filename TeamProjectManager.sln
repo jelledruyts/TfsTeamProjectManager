@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildProcessTemplates", "TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj", "{BDCA8650-C32C-4131-A622-DDA98C43656C}"

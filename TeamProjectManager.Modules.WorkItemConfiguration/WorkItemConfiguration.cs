@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
@@ -53,7 +53,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Static Factory Methods
 
-        public static WorkItemConfiguration FromTeamProject(TfsTeamProjectCollection tfs, Project project, bool includeAgileAndCommonConfiguration)
+        public static WorkItemConfiguration FromTeamProject(TfsTeamProjectCollection tfs, Project project)
         {
             // Export work item type definitions.
             var projectWorkItemTypes = new List<WorkItemConfigurationItem>();
@@ -64,21 +64,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
             // Export categories.
             projectWorkItemTypes.Add(WorkItemConfigurationItem.FromXml(project.Categories.Export()));
-
-            // Export process configuration.
-            if (includeAgileAndCommonConfiguration)
-            {
-                var commonConfig = WorkItemConfigurationItemImportExport.GetCommonConfiguration(tfs, project);
-                if (commonConfig != null)
-                {
-                    projectWorkItemTypes.Add(commonConfig);
-                }
-                var agileConfig = WorkItemConfigurationItemImportExport.GetAgileConfiguration(tfs, project);
-                if (agileConfig != null)
-                {
-                    projectWorkItemTypes.Add(agileConfig);
-                }
-            }
 
             return new WorkItemConfiguration(project.Name, projectWorkItemTypes);
         }
@@ -128,21 +113,13 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var categoriesFileName = Path.Combine(baseDir, categoriesFileNameAttribute.InnerText);
                     items.Add(WorkItemConfigurationItem.FromFile(categoriesFileName));
                 }
-
-                // Find the common configuration XML file.
-                var commonConfigurationFileNameAttribute = workItemConfigurationTemplate.SelectSingleNode("/tasks/task[@id='ProcessConfiguration']/taskXml/PROCESSCONFIGURATION/CommonConfiguration/@fileName");
-                if (commonConfigurationFileNameAttribute != null)
+                else
                 {
-                    var commonConfigurationFileName = Path.Combine(baseDir, commonConfigurationFileNameAttribute.InnerText);
-                    items.Add(WorkItemConfigurationItem.FromFile(commonConfigurationFileName));
-                }
-
-                // Find the agile configuration XML file.
-                var agileConfigurationFileNameAttribute = workItemConfigurationTemplate.SelectSingleNode("/tasks/task[@id='ProcessConfiguration']/taskXml/PROCESSCONFIGURATION/AgileConfiguration/@fileName");
-                if (agileConfigurationFileNameAttribute != null)
-                {
-                    var agileConfigurationFileName = Path.Combine(baseDir, agileConfigurationFileNameAttribute.InnerText);
-                    items.Add(WorkItemConfigurationItem.FromFile(agileConfigurationFileName));
+                    // If the process template doesn't specify any categories (typically because it's an old
+                    // process template from before Work Item Categories existed), load an empty list anyway.
+                    // This will improve comparisons because a Team Project will always have a Work Item
+                    // Categories configuration item (even if it's empty).
+                    items.Add(WorkItemConfigurationItem.FromXml("<cat:CATEGORIES xmlns:cat=\"http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/categories\"/>"));
                 }
             }
 

@@ -63,7 +63,7 @@ namespace TeamProjectManager.Modules.SourceControl
             set { this.SetValue(ExclusionsProperty, value); }
         }
 
-        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update");
+        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update;Checked in by server upgrade");
 
         public ObservableCollection<SourceControlSettings> SourceControlSettings
         {

@@ -9,8 +9,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         #region Constants
 
-        public const string AgileConfigurationName = "Agile Configuration";
-        public const string CommonConfigurationName = "Common Configuration";
         public const string WorkItemTypeDefinitionName = "Work Item Type Definition";
         public const string CategoriesName = "Work Item Categories";
 
@@ -77,16 +75,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var nameNode = xmlDefinition.SelectSingleNode("//WORKITEMTYPE/@name");
                 name = nameNode == null ? null : nameNode.Value;
             }
-            else if (typeName.Equals("AgileProjectConfiguration", StringComparison.OrdinalIgnoreCase))
-            {
-                type = WorkItemConfigurationItemType.AgileConfiguration;
-                name = AgileConfigurationName;
-            }
-            else if (typeName.Equals("CommonProjectConfiguration", StringComparison.OrdinalIgnoreCase))
-            {
-                type = WorkItemConfigurationItemType.CommonConfiguration;
-                name = CommonConfigurationName;
-            }
             else if (typeName.Equals("CATEGORIES", StringComparison.OrdinalIgnoreCase))
             {
                 type = WorkItemConfigurationItemType.Categories;
@@ -135,10 +123,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 case WorkItemConfigurationItemType.WorkItemType:
                     return Enum.GetValues(typeof(WorkItemTypeDefinitionPart)).Cast<WorkItemTypeDefinitionPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
-                case WorkItemConfigurationItemType.CommonConfiguration:
-                    return Enum.GetValues(typeof(CommonProjectConfigurationPart)).Cast<CommonProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
-                case WorkItemConfigurationItemType.AgileConfiguration:
-                    return Enum.GetValues(typeof(AgileProjectConfigurationPart)).Cast<AgileProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
                 case WorkItemConfigurationItemType.Categories:
                     return new WorkItemConfigurationItemPart[] { new WorkItemConfigurationItemPart(CategoriesName, normalizedXmlDefinition.DocumentElement) };
                 default:
@@ -149,18 +133,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, WorkItemTypeDefinitionPart part)
         {
             var xpath = "//WORKITEMTYPE/" + part.ToString().ToUpperInvariant();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
-        }
-
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, AgileProjectConfigurationPart part)
-        {
-            var xpath = "/AgileProjectConfiguration/" + part.ToString();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
-        }
-
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, CommonProjectConfigurationPart part)
-        {
-            var xpath = "/CommonProjectConfiguration/" + part.ToString();
             return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
         }
 

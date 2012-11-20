@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using Microsoft.TeamFoundation.Build.Client;
@@ -64,6 +65,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         public string ScheduleDescription { get; set; }
         public int ContinuousIntegrationQuietPeriod { get; set; }
         public int BatchSize { get; set; }
+        public DateTime? LastBuildStartTime { get; set; }
 
         // Process Template-Specific Basic Properties
         public string BuildNumberFormat { get; set; }
@@ -101,6 +103,16 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             this.ProcessTemplate = buildDefinition.Process == null ? null : buildDefinition.Process.ServerPath;
             this.ContinuousIntegrationQuietPeriod = buildDefinition.ContinuousIntegrationQuietPeriod;
             this.BatchSize = buildDefinition.BatchSize;
+
+            var buildSpec = buildDefinition.BuildServer.CreateBuildDetailSpec(buildDefinition);
+            buildSpec.InformationTypes = null;
+            buildSpec.MaxBuildsPerDefinition = 1;
+            buildSpec.QueryOrder = BuildQueryOrder.StartTimeDescending;
+            var builds = buildDefinition.BuildServer.QueryBuilds(buildSpec).Builds;
+            if (builds.Any())
+            {
+                this.LastBuildStartTime = builds.First().StartTime;
+            }
 
             var scheduleDescription = new StringBuilder();
             foreach (var schedule in buildDefinition.Schedules)

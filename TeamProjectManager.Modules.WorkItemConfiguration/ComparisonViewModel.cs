@@ -214,7 +214,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProjectName];
-                        var target = WorkItemConfiguration.FromTeamProject(tfs, project);
+                        var shouldIncludeAgileAndCommonConfiguration = sources.Any(s => s.Items.Any(i => i.Type == WorkItemConfigurationItemType.AgileConfiguration || i.Type == WorkItemConfigurationItemType.CommonConfiguration));
+                        var target = WorkItemConfiguration.FromTeamProject(tfs, project, shouldIncludeAgileAndCommonConfiguration);
 
                         var sourceComparisonResults = new List<WorkItemConfigurationComparisonResult>();
                         foreach (var source in sources)

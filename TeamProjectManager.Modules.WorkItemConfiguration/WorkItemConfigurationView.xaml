@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <TabControl>
 
-        <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item configuration (i.e. work item type definitions and work item categories) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item configuration from a standard configuration.">
+        <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item configuration from a standard configuration.">
             <ContentPresenter Content="{Binding Path=ComparisonView, Mode=OneTime}" />
         </TabItem>
 
@@ -19,6 +19,10 @@
 
         <TabItem Header="Categories">
             <ContentPresenter Content="{Binding Path=WorkItemCategoriesView, Mode=OneTime}" />
+        </TabItem>
+
+        <TabItem Header="Process Configuration">
+            <ContentPresenter Content="{Binding Path=WorkItemProcessConfigurationView, Mode=OneTime}" />
         </TabItem>
     </TabControl>
 </UserControl>

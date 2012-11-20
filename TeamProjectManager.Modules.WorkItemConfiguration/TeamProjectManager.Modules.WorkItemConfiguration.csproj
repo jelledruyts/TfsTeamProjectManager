@@ -87,6 +87,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgileProjectConfigurationPart.cs" />
+    <Compile Include="CommonProjectConfigurationPart.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
     <Compile Include="WorkItemConfigurationItemType.cs" />
@@ -121,6 +123,10 @@
       <DependentUpon>ComparisonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ComparisonViewModel.cs" />
+    <Compile Include="WorkItemProcessConfigurationView.xaml.cs">
+      <DependentUpon>WorkItemProcessConfigurationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemProcessConfigurationViewModel.cs" />
     <Compile Include="WorkItemTypeDefinitionPart.cs" />
     <Compile Include="WorkItemConfigurationItemEditorDialog.xaml.cs">
       <DependentUpon>WorkItemConfigurationItemEditorDialog.xaml</DependentUpon>
@@ -157,6 +163,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="ComparisonView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemProcessConfigurationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

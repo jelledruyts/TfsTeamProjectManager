@@ -93,6 +93,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 NormalizeWorkItemTypeDefinition(normalizedXmlDefinition, tfsMajorVersion);
             }
+            else if (item.Type == WorkItemConfigurationItemType.AgileConfiguration)
+            {
+                NormalizeAgileConfiguration(normalizedXmlDefinition);
+            }
+            else if (item.Type == WorkItemConfigurationItemType.CommonConfiguration)
+            {
+                NormalizeCommonConfiguration(normalizedXmlDefinition);
+            }
             else if (item.Type == WorkItemConfigurationItemType.Categories)
             {
                 NormalizeCategories(normalizedXmlDefinition);
@@ -330,6 +338,42 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 SortChildNodes(linksControlOptionList);
             }
+        }
+
+        #endregion
+
+        #region NormalizeAgileConfiguration
+
+        private static void NormalizeAgileConfiguration(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort the child nodes of the iteration and product backlog nodes.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/AgileProjectConfiguration/IterationBacklog"));
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/AgileProjectConfiguration/ProductBacklog"));
+        }
+
+        #endregion
+
+        #region NormalizeCommonConfiguration
+
+        private static void NormalizeCommonConfiguration(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort all type fields by refname.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/TypeFields"), n => GetValue(n.Attributes["refname"]));
+
+            // Sort all type field values by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/TypeFields/TypeField/TypeFieldValues"), n => GetValue(n.Attributes["type"]));
+
+            // Sort the child nodes of the weekends node.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/Weekends"));
+
+            // Sort all states by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
         }
 
         #endregion

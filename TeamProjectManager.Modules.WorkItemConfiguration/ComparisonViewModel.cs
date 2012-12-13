@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,9 +9,6 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.Win32;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -23,6 +23,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand AddComparisonSourceCommand { get; private set; }
         public RelayCommand EditSelectedComparisonSourceCommand { get; private set; }
         public RelayCommand RemoveSelectedComparisonSourceCommand { get; private set; }
+        public RelayCommand MoveSelectedComparisonSourceUpCommand { get; private set; }
+        public RelayCommand MoveSelectedComparisonSourceDownCommand { get; private set; }
         public RelayCommand LoadComparisonSourcesCommand { get; private set; }
         public RelayCommand SaveComparisonSourcesCommand { get; private set; }
         public RelayCommand CompareCommand { get; private set; }
@@ -75,6 +77,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.AddComparisonSourceCommand = new RelayCommand(AddComparisonSource, CanAddComparisonSource);
             this.EditSelectedComparisonSourceCommand = new RelayCommand(EditSelectedComparisonSource, CanEditSelectedComparisonSource);
             this.RemoveSelectedComparisonSourceCommand = new RelayCommand(RemoveSelectedComparisonSource, CanRemoveSelectedComparisonSource);
+            this.MoveSelectedComparisonSourceUpCommand = new RelayCommand(MoveSelectedComparisonSourceUp, CanMoveSelectedComparisonSourceUp);
+            this.MoveSelectedComparisonSourceDownCommand = new RelayCommand(MoveSelectedComparisonSourceDown, CanMoveSelectedComparisonSourceDown);
             this.LoadComparisonSourcesCommand = new RelayCommand(LoadComparisonSources, CanLoadComparisonSources);
             this.SaveComparisonSourcesCommand = new RelayCommand(SaveComparisonSources, CanSaveComparisonSources);
             this.CompareCommand = new RelayCommand(Compare, CanCompare);
@@ -121,6 +125,28 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void RemoveSelectedComparisonSource(object argument)
         {
             this.ComparisonSources.Remove(this.SelectedComparisonSource);
+        }
+
+        private bool CanMoveSelectedComparisonSourceUp(object argument)
+        {
+            return this.SelectedComparisonSource != null && this.ComparisonSources.IndexOf(this.SelectedComparisonSource) > 0;
+        }
+
+        private void MoveSelectedComparisonSourceUp(object argument)
+        {
+            var currentIndex = this.ComparisonSources.IndexOf(this.SelectedComparisonSource);
+            this.ComparisonSources.Move(currentIndex, currentIndex - 1);
+        }
+
+        private bool CanMoveSelectedComparisonSourceDown(object argument)
+        {
+            return this.SelectedComparisonSource != null && this.ComparisonSources.IndexOf(this.SelectedComparisonSource) < this.ComparisonSources.Count - 1;
+        }
+
+        private void MoveSelectedComparisonSourceDown(object argument)
+        {
+            var currentIndex = this.ComparisonSources.IndexOf(this.SelectedComparisonSource);
+            this.ComparisonSources.Move(currentIndex, currentIndex + 1);
         }
 
         private bool CanLoadComparisonSources(object argument)

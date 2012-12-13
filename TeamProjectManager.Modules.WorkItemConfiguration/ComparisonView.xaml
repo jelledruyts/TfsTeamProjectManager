@@ -30,6 +30,10 @@
                 <TextBlock><Hyperlink Command="{Binding Path=AddComparisonSourceCommand}" ToolTip="Add a work item configuration to compare with">add...</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=EditSelectedComparisonSourceCommand}" ToolTip="Edit the selected work item configuration">edit...</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedComparisonSourceCommand}" ToolTip="Remove the selected work item configuration">remove</Hyperlink></TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock><Hyperlink Command="{Binding Path=MoveSelectedComparisonSourceUpCommand}" ToolTip="Moves the selected work item configuration up">up</Hyperlink></TextBlock>
+                    <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=MoveSelectedComparisonSourceDownCommand}" ToolTip="Moves the selected work item configuration up">down</Hyperlink></TextBlock>
+                </StackPanel>
                 <TextBlock><Hyperlink Command="{Binding Path=LoadComparisonSourcesCommand}" ToolTip="Load a list of sources from a saved file">load...</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=SaveComparisonSourcesCommand}" ToolTip="Save the current list of sources to a file">save...</Hyperlink></TextBlock>
             </StackPanel>

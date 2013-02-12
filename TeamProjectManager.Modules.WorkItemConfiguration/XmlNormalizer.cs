@@ -22,7 +22,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         static XmlNormalizer()
         {
-            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName" };
+            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName", "Microsoft.VSTS.CMMI.RootCause" };
             KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
             KnownFieldsWithReportableMeasure = new string[] { "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
             KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy" };
@@ -56,6 +56,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 { "System.Rev", new Dictionary<string, string> { { "refname", "System.Rev" }, { "name", "Rev" }, { "type", "Integer" }, { "reportable", "dimension" } } },
                 { "System.RevisedDate", new Dictionary<string, string> { { "refname", "System.RevisedDate" }, { "name", "Revised Date" }, { "type", "DateTime" }, { "reportable", "detail" } } },
                 { "System.State", new Dictionary<string, string> { { "refname", "System.State" }, { "name", "State" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.Tags", new Dictionary<string, string> { { "refname", "System.Tags" }, { "name", "Tags" }, { "type", "PlainText" } } },
                 { "System.TeamProject", new Dictionary<string, string> { { "refname", "System.TeamProject" }, { "name", "Team Project" }, { "type", "String" }, { "reportable", "dimension" } } },
                 { "System.Title", new Dictionary<string, string> { { "refname", "System.Title" }, { "name", "Title" }, { "type", "String" }, { "reportable", "dimension" } } },
                 { "System.Watermark", new Dictionary<string, string> { { "refname", "System.Watermark" }, { "name", "Watermark" }, { "type", "Integer" } } },
@@ -183,6 +184,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 overtakenByEventsAttribute.Value = "Overtaken by Events";
             }
+            foreach (XmlAttribute notFixedAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Not fixed']/@value | //REASON[@value='Not fixed']/@value"))
+            {
+                notFixedAttribute.Value = "Not Fixed";
+            }
             foreach (XmlAttribute fieldIdAttribute in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD[@refname='System.Id']/@name"))
             {
                 fieldIdAttribute.Value = "ID";
@@ -217,14 +222,17 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var allowExistingValueNode = field.SelectSingleNode("ALLOWEXISTINGVALUE");
                 if (allowExistingValueNode != null)
                 {
+                    // The ALLOWEXISTINGVALUE doesn't make sense if there are only DEFAULT or COPY rules in the list,
+                    // in which case the ALLOWEXISTINGVALUE rule isn't present in an exported WITD.
+                    Predicate<XmlNode> predicate = parentNode => parentNode.ChildNodes.Cast<XmlNode>().Any(childNode => !(string.Equals(childNode.LocalName, "DEFAULT", StringComparison.OrdinalIgnoreCase) || string.Equals(childNode.LocalName, "COPY", StringComparison.OrdinalIgnoreCase)));
                     foreach (var ruleElementName in FieldRuleElementNames)
                     {
-                        AddElementIfNeeded(field.SelectSingleNode(ruleElementName), "ALLOWEXISTINGVALUE");
+                        AddElementIfNeeded(field.SelectSingleNode(ruleElementName), "ALLOWEXISTINGVALUE", predicate);
                     }
 
                     foreach (XmlNode fieldReference in normalizedXmlDefinition.SelectNodes(string.Format(CultureInfo.InvariantCulture, "//WORKITEMTYPE/WORKFLOW/STATES/STATE/FIELDS/FIELD[@refname='{0}'] | //WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION/FIELDS/FIELD[@refname='{0}']", refname)))
                     {
-                        AddElementIfNeeded(fieldReference, "ALLOWEXISTINGVALUE");
+                        AddElementIfNeeded(fieldReference, "ALLOWEXISTINGVALUE", predicate);
                     }
 
                     field.RemoveChild(allowExistingValueNode);
@@ -410,15 +418,15 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
         }
 
-        private static void AddElementIfNeeded(XmlNode node, string elementName)
+        private static void AddElementIfNeeded(XmlNode node, string elementName, Predicate<XmlNode> predicateOnParentNode)
         {
-            if (node != null)
+            if (node != null && predicateOnParentNode(node))
             {
                 var existingElement = node.SelectSingleNode(elementName);
                 if (existingElement == null)
                 {
-                    var n = node.OwnerDocument.CreateElement(elementName);
-                    node.AppendChild(n);
+                    var childNode = node.OwnerDocument.CreateElement(elementName);
+                    node.AppendChild(childNode);
                 }
                 SortChildNodes(node);
             }

@@ -87,6 +87,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildProcessHierarchyNode.cs" />
+    <Compile Include="BuildProcessHierarchyNodeColorConverter.cs" />
+    <Compile Include="BuildProcessHierarchyNodeType.cs" />
     <Compile Include="BuildProcessTemplateInfo.cs" />
     <Compile Include="BuildProcessTemplatesModule.cs" />
     <Compile Include="Tasks.cs" />

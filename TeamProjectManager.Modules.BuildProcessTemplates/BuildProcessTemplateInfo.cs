@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Build.Client;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using Microsoft.TeamFoundation.Build.Client;
 
 namespace TeamProjectManager.Modules.BuildProcessTemplates
 {
@@ -16,7 +17,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             this.ProcessTemplate = processTemplate;
             this.BuildDefinitions = buildDefinitions ?? new IBuildDefinition[0];
             var buildDefinitionsDescription = new StringBuilder();
-            foreach (var buildDefinition in this.BuildDefinitions)
+            foreach (var buildDefinition in this.BuildDefinitions.OrderBy(b => b.Name))
             {
                 if (buildDefinitionsDescription.Length > 0)
                 {

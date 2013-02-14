@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Build.Client;
+using Microsoft.TeamFoundation.VersionControl.Client;
+using Microsoft.TeamFoundation.VersionControl.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -7,10 +11,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.Build.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.TeamFoundation.VersionControl.Controls;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -87,6 +87,14 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
         }
 
         public static ObservableProperty<ICollection<BuildProcessTemplateInfo>> SelectedBuildProcessTemplatesProperty = new ObservableProperty<ICollection<BuildProcessTemplateInfo>, BuildProcessTemplatesViewModel>(o => o.SelectedBuildProcessTemplates);
+
+        public IEnumerable<BuildProcessHierarchyNode> BuildProcessHierarchy
+        {
+            get { return this.GetValue(BuildProcessHierarchyProperty); }
+            set { this.SetValue(BuildProcessHierarchyProperty, value); }
+        }
+
+        public static readonly ObservableProperty<IEnumerable<BuildProcessHierarchyNode>> BuildProcessHierarchyProperty = new ObservableProperty<IEnumerable<BuildProcessHierarchyNode>, BuildProcessTemplatesViewModel>(o => o.BuildProcessHierarchy);
 
         #endregion
 
@@ -169,8 +177,25 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 }
                 else
                 {
-                    this.BuildProcessTemplates = (IEnumerable<BuildProcessTemplateInfo>)e.Result;
-                    task.SetComplete("Retrieved " + this.BuildProcessTemplates.Count().ToCountString("build process template"));
+                    var buildProcessTemplates = (IList<BuildProcessTemplateInfo>)e.Result;
+                    this.BuildProcessTemplates = buildProcessTemplates;
+                    var serverPathNodes = new List<BuildProcessHierarchyNode>();
+                    foreach (var buildProcessTemplatesByServerPath in buildProcessTemplates.GroupBy(b => b.ProcessTemplate.ServerPath).OrderBy(g => g.Key))
+                    {
+                        var buildProcessTemplatesForServerPath = buildProcessTemplatesByServerPath.ToList();
+                        var teamProjectNodes = new List<BuildProcessHierarchyNode>();
+                        foreach (var buildProcessTemplatesByTeamProject in buildProcessTemplatesForServerPath.GroupBy(b => b.ProcessTemplate.TeamProject).OrderBy(g => g.Key))
+                        {
+                            var buildProcessTemplatesForTeamProject = buildProcessTemplatesByTeamProject.ToList();
+                            var buildDefinitionNodes = buildProcessTemplatesForTeamProject.SelectMany(b => b.BuildDefinitions).OrderBy(d => d.Name).Select(d => new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildDefinition, d.Name, null, null)).ToList();
+                            var teamProjectNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.TeamProject, buildProcessTemplatesByTeamProject.Key, buildProcessTemplatesForTeamProject, buildDefinitionNodes);
+                            teamProjectNodes.Add(teamProjectNode);
+                        }
+                        var serverPathNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildProcessTemplateServerPath, buildProcessTemplatesByServerPath.Key, buildProcessTemplatesForServerPath, teamProjectNodes);
+                        serverPathNodes.Add(serverPathNode);
+                    }
+                    this.BuildProcessHierarchy = serverPathNodes;
+                    task.SetComplete("Retrieved " + buildProcessTemplates.Count().ToCountString("build process template"));
                 }
             };
             worker.RunWorkerAsync();

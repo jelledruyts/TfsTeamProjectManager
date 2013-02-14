@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:l="clr-namespace:TeamProjectManager.Modules.BuildProcessTemplates"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <l:BuildProcessHierarchyNodeColorConverter x:Key="BuildProcessHierarchyNodeColorConverter" />
+    </UserControl.Resources>
     <Grid>
         <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
 
@@ -16,18 +20,41 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Button Grid.Row="0" Content="Get Registered Build Process Templates" Margin="0,5,0,5" Command="{Binding Path=GetBuildProcessTemplatesCommand}" />
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildProcessTemplates}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildProcessTemplatesDataGrid" SelectionChanged="buildProcessTemplatesDataGrid_SelectionChanged">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
-                            <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
-                            <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
-                            <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <Button Grid.Row="2" Content="Unregister Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
+                    <TabControl Grid.Row="1">
+                        <TabItem Header="By Team Project">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <DataGrid Grid.Row="0" ItemsSource="{Binding Path=BuildProcessTemplates}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildProcessTemplatesDataGrid" SelectionChanged="buildProcessTemplatesDataGrid_SelectionChanged">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
+                                        <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
+                                        <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
+                                        <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button Grid.Row="1" Content="Unregister Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="By Server Path">
+                            <TreeView ItemsSource="{Binding Path=BuildProcessHierarchy}">
+                                <TreeView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type TreeViewItem}">
+                                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                        <TextBlock Text="{Binding Path=DisplayName}" ToolTip="{Binding Path=Description}" Foreground="{Binding Path=., Converter={StaticResource BuildProcessHierarchyNodeColorConverter}}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
+                        </TabItem>
+                    </TabControl>
                 </Grid>
             </TabItem>
 

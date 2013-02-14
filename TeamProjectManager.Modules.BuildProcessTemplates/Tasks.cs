@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Build.Client;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.TeamFoundation.Build.Client;
 using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.BuildProcessTemplates
 {
     internal static class Tasks
     {
-        public static IEnumerable<BuildProcessTemplateInfo> GetBuildProcessTemplates(ApplicationTask task, IBuildServer buildServer, IEnumerable<string> teamProjectNames)
+        public static IList<BuildProcessTemplateInfo> GetBuildProcessTemplates(ApplicationTask task, IBuildServer buildServer, IEnumerable<string> teamProjectNames)
         {
             var processTemplates = new List<BuildProcessTemplateInfo>();
             var step = 0;

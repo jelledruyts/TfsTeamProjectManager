@@ -47,6 +47,11 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.4.4793 (February 14, 2013)
+** Added support for moving work item comparison sources up and down
+** Improved work item comparison to better support TFS 2012 Update 1
+** Added the last build time in the Build Definitions screen
+** Added a view by server path for the Build Process Templates
 * v1.3.4601 (August 6, 2012)
 ** Split up in two editions depending on the version of Team Explorer you have installed locally (although all editions still work against all versions of TFS)
 ** Added support for TFS 2012

@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.Activity.ActivityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
+
+        <Grid Visibility="{Binding Path=TfsSupportedVisibility}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Content="Get Activity" Margin="0,5,0,5" Command="{Binding Path=GetActivityCommand}" />
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Activity}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                    <DataGridTextColumn Header="Last Activity" Binding="{Binding Path=LastActivityTime}" />
+                    <DataGridTextColumn Header="Last Activity - Version Control" Binding="{Binding Path=LastActivityInVersionControlTime}" />
+                    <DataGridTextColumn Header="Last Activity - Work Item Tracking" Binding="{Binding Path=LastActivityInWorkItemTrackingTime}" />
+                    <DataGridTextColumn Header="Last Activity - Team Build" Binding="{Binding Path=LastActivityInTeamBuildTime}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+    </Grid>
+</UserControl>

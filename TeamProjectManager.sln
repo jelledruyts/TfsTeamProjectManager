@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildProcessTemplates", "TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj", "{BDCA8650-C32C-4131-A622-DDA98C43656C}"
@@ -47,9 +47,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildDefinitions", "TeamProjectManager.Modules.BuildDefinitions\TeamProjectManager.Modules.BuildDefinitions.csproj", "{59B5B1FA-EB79-430B-83CF-C1F9419AF573}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Activity", "TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj", "{704821E4-5BCF-4053-AFE8-915C52933A31}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 8
+		SccNumberOfProjects = 9
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs06
 		SccLocalPath0 = .
@@ -74,6 +76,9 @@ Global
 		SccProjectUniqueName7 = TeamProjectManager.Modules.BuildDefinitions\\TeamProjectManager.Modules.BuildDefinitions.csproj
 		SccProjectName7 = TeamProjectManager.Modules.BuildDefinitions
 		SccLocalPath7 = TeamProjectManager.Modules.BuildDefinitions
+		SccProjectUniqueName8 = TeamProjectManager.Modules.Activity\\TeamProjectManager.Modules.Activity.csproj
+		SccProjectName8 = TeamProjectManager.Modules.Activity
+		SccLocalPath8 = TeamProjectManager.Modules.Activity
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -136,6 +141,14 @@ Global
 		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Any CPU.Build.0 = Release|Any CPU
 		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

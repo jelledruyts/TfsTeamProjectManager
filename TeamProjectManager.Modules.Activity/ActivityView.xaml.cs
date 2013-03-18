@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace TeamProjectManager.Modules.Activity
 {
@@ -21,6 +22,14 @@ namespace TeamProjectManager.Modules.Activity
             set
             {
                 this.DataContext = value;
+            }
+        }
+
+        private void activitiesDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (this.ViewModel.ViewActivityDetailsCommand.CanExecute(null))
+            {
+                this.ViewModel.ViewActivityDetailsCommand.Execute(null);
             }
         }
     }

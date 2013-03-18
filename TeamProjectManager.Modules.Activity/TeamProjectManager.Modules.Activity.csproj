@@ -72,6 +72,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivityViewerDialog.xaml.cs">
+      <DependentUpon>ActivityViewerDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TeamProjectActivityInfo.cs" />
     <Compile Include="ActivityModule.cs" />
     <Compile Include="ActivityView.xaml.cs">
@@ -88,6 +91,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ActivityViewerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ActivityView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

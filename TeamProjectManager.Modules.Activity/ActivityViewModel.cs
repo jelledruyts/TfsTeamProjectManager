@@ -1,26 +1,28 @@
-﻿using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.Build.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Windows;
+using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Build.Client;
+using Microsoft.TeamFoundation.VersionControl.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.Activity
 {
-    // TODO: Allow latest x activities per team project to be viewed in a dialog
     [Export]
     public class ActivityViewModel : ViewModelBase
     {
         #region Properties
 
         public RelayCommand GetActivityCommand { get; private set; }
+        public RelayCommand ViewActivityDetailsCommand { get; private set; }
 
         #endregion
 
@@ -28,22 +30,47 @@ namespace TeamProjectManager.Modules.Activity
 
         [ImportingConstructor]
         public ActivityViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Activity", "Allows you to see recent activity for Team Projects.")
+            : base(eventAggregator, logger, "Activity", "Allows you to see the most recent activity for Team Projects.")
         {
             this.GetActivityCommand = new RelayCommand(GetActivity, CanGetActivity);
+            this.ViewActivityDetailsCommand = new RelayCommand(ViewActivityDetails, CanViewActivityDetails);
         }
 
         #endregion
 
         #region Observable Properties
 
-        public ICollection<TeamProjectActivityInfo> Activity
+        public int NumberOfActivities
         {
-            get { return this.GetValue(ActivityProperty); }
-            set { this.SetValue(ActivityProperty, value); }
+            get { return this.GetValue(NumberOfActivitiesProperty); }
+            set { this.SetValue(NumberOfActivitiesProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<TeamProjectActivityInfo>> ActivityProperty = new ObservableProperty<ICollection<TeamProjectActivityInfo>, ActivityViewModel>(o => o.Activity);
+        public static ObservableProperty<int> NumberOfActivitiesProperty = new ObservableProperty<int, ActivityViewModel>(o => o.NumberOfActivities, 10);
+
+        public string SourceControlExclusions
+        {
+            get { return this.GetValue(SourceControlExclusionsProperty); }
+            set { this.SetValue(SourceControlExclusionsProperty, value); }
+        }
+
+        public static ObservableProperty<string> SourceControlExclusionsProperty = new ObservableProperty<string, ActivityViewModel>(o => o.SourceControlExclusions, Constants.DefaultSourceControlHistoryExclusions);
+
+        public ICollection<TeamProjectActivityInfo> Activities
+        {
+            get { return this.GetValue(ActivitiesProperty); }
+            set { this.SetValue(ActivitiesProperty, value); }
+        }
+
+        public static ObservableProperty<ICollection<TeamProjectActivityInfo>> ActivitiesProperty = new ObservableProperty<ICollection<TeamProjectActivityInfo>, ActivityViewModel>(o => o.Activities);
+
+        public TeamProjectActivityInfo SelectedActivity
+        {
+            get { return this.GetValue(SelectedActivityProperty); }
+            set { this.SetValue(SelectedActivityProperty, value); }
+        }
+
+        public static ObservableProperty<TeamProjectActivityInfo> SelectedActivityProperty = new ObservableProperty<TeamProjectActivityInfo, ActivityViewModel>(o => o.SelectedActivity);
 
         #endregion
 
@@ -56,10 +83,8 @@ namespace TeamProjectManager.Modules.Activity
 
         private void GetActivity(object argument)
         {
-            var numberOfActivities = 5;
-            // TODO
-            //var exclusions = (string.IsNullOrEmpty(this.Exclusions) ? new string[0] : this.Exclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            var exclusions = new string[0];
+            var numberOfActivities = this.NumberOfActivities;
+            var exclusions = (string.IsNullOrEmpty(this.SourceControlExclusions) ? new string[0] : this.SourceControlExclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
 
             var teamProjects = this.SelectedTeamProjects.ToList();
             var task = new ApplicationTask("Retrieving activity", teamProjects.Count);
@@ -111,7 +136,6 @@ namespace TeamProjectManager.Modules.Activity
                         }
 
                         // Get the latest work item tracking activity.
-                        // TODO
                         var parameters = new Dictionary<string, object>() {
                                 { "TeamProject", teamProject.Name}
                             };
@@ -119,19 +143,17 @@ namespace TeamProjectManager.Modules.Activity
                         var workItems = workItemsQuery.Cast<WorkItem>().Take(numberOfActivities).ToList();
                         var workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, string.Format(CultureInfo.CurrentCulture, "{0} {1}: \"{2}\"", w.Type.Name, w.Id, w.Title))).ToList();
 
-                        // TODO: Check if this also returns new (unchanged) work items.
-
-                        // Get the latest build.
+                        // Get the latest builds.
                         var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
                         spec.QueryOptions = QueryOptions.Definitions;
                         spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
                         spec.MaxBuildsPerDefinition = numberOfActivities;
                         spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
-                        // TODO: Retrieve *all* changed builds (numberOfActivities)
                         var builds = buildServer.QueryBuilds(spec).Builds;
-                        var teamBuildActivities = builds.Select(b => new ComponentActivityInfo("Team Build", b.StartTime, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildDefinition.Name, b.BuildNumber)));
+                        var teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildDefinition.Name, b.BuildNumber)));
 
-                        activity.Add(new TeamProjectActivityInfo(teamProject.Name, sourceControlActivities, workItemActivities, teamBuildActivities));
+                        // Assemble the complete activity details.
+                        activity.Add(new TeamProjectActivityInfo(teamProject.Name, numberOfActivities, sourceControlActivities, workItemActivities, teamBuildActivities));
                     }
                     catch (Exception exc)
                     {
@@ -151,11 +173,27 @@ namespace TeamProjectManager.Modules.Activity
                 }
                 else
                 {
-                    this.Activity = (ICollection<TeamProjectActivityInfo>)e.Result;
-                    task.SetComplete("Retrieved " + this.Activity.Count.ToCountString("activity result"));
+                    this.Activities = (ICollection<TeamProjectActivityInfo>)e.Result;
+                    task.SetComplete("Retrieved " + this.Activities.Count.ToCountString("activity result"));
                 }
             };
             worker.RunWorkerAsync();
+        }
+
+        #endregion
+
+        #region ViewActivityDetails Command
+
+        private bool CanViewActivityDetails(object argument)
+        {
+            return this.SelectedActivity != null;
+        }
+
+        private void ViewActivityDetails(object argument)
+        {
+            var dialog = new ActivityViewerDialog(this.SelectedActivity);
+            dialog.Owner = Application.Current.MainWindow;
+            dialog.ShowDialog();
         }
 
         #endregion

@@ -50,5 +50,10 @@ namespace TeamProjectManager.Common
         /// The neutral resources language of the assemblies that make up the application.
         /// </summary>
         public const string AssemblyNeutralResourcesLanguage = "en-US";
+
+        /// <summary>
+        /// The default substrings of changeset comments to exclude from source control history.
+        /// </summary>
+        public const string DefaultSourceControlHistoryExclusions = "***NO_CI***;Auto-Build: Version Update;Checked in by server upgrade";
     }
 }

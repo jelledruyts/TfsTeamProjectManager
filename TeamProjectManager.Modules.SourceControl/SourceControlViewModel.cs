@@ -12,6 +12,7 @@ using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Controls;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -63,7 +64,7 @@ namespace TeamProjectManager.Modules.SourceControl
             set { this.SetValue(ExclusionsProperty, value); }
         }
 
-        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, "***NO_CI***;Auto-Build: Version Update;Checked in by server upgrade");
+        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, Constants.DefaultSourceControlHistoryExclusions);
 
         public ObservableCollection<SourceControlSettings> SourceControlSettings
         {

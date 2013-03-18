@@ -9,25 +9,43 @@
     <Grid>
         <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
 
-        <Grid Visibility="{Binding Path=TfsSupportedVisibility}">
+        <Grid Visibility="{Binding Path=TfsSupportedVisibility}" i:HelpProvider.HelpContent="Allows you to see the most recent activity in each Team Project. This can be useful if you want to see which projects are still actively being worked on, for example.">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Content="Get Activity" Margin="0,5,0,5" Command="{Binding Path=GetActivityCommand}" />
-            <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Activity}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+            
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Number Of Activities" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=NumberOfActivities, UpdateSourceTrigger=PropertyChanged}" ToolTip="The total number of activities to retrieve for each Team Project" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Exclude Source Control Changeset When Comment Contains" Margin="0,5,0,0" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=SourceControlExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" />
+
+                <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Get Activity" Command="{Binding Path=GetActivityCommand}" Margin="0,5,0,0" />
+            </Grid>
+            
+            <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=Activities}" x:Name="activitiesDataGrid" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" SelectedItem="{Binding Path=SelectedActivity}" MouseDoubleClick="activitiesDataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
+                    <DataGridTextColumn Header="Last Activity Component" Binding="{Binding Path=MostRecentActivity.ComponentName}" />
                     <DataGridTextColumn Header="Last Activity Time" Binding="{Binding Path=MostRecentActivity.Time}" />
                     <DataGridTextColumn Header="Last Activity Description" Binding="{Binding Path=MostRecentActivity.Description}" />
-                    <DataGridTextColumn Header="Source Control - Last Activity Time" Binding="{Binding Path=MostRecentSourceControlActivity.Time}" />
-                    <DataGridTextColumn Header="Source Control - Last Activity Description" Binding="{Binding Path=MostRecentSourceControlActivity.Description}" />
-                    <DataGridTextColumn Header="Work Item Tracking - Last Activity Time" Binding="{Binding Path=MostRecentWorkItemTrackingActivity.Time}" />
-                    <DataGridTextColumn Header="Work Item Tracking - Last Activity Description" Binding="{Binding Path=MostRecentWorkItemTrackingActivity.Description}" />
-                    <DataGridTextColumn Header="Team Build - Last Activity Time" Binding="{Binding Path=MostRecentTeamBuildActivity.Time}" />
-                    <DataGridTextColumn Header="Team Build - Last Activity Description" Binding="{Binding Path=MostRecentTeamBuildActivity.Description}" />
                 </DataGrid.Columns>
             </DataGrid>
+            
+            <Button Grid.Row="2" Content="View Activity Details" Margin="0,5,0,0" Command="{Binding Path=ViewActivityDetailsCommand}" />
         </Grid>
 
     </Grid>

@@ -54,6 +54,6 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// The default substrings of changeset comments to exclude from source control history.
         /// </summary>
-        public const string DefaultSourceControlHistoryExclusions = "***NO_CI***;Auto-Build: Version Update;Checked in by server upgrade";
+        public const string DefaultSourceControlHistoryExclusions = "Auto-Build: Version Update;Checked in by server upgrade";
     }
 }

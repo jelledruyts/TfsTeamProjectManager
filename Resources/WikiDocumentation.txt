@@ -1,6 +1,7 @@
 ! Contents
 
 *Features*
+* [Activity|#Activity]
 * [Build Definitions|#Build Definitions]
 * [Build Process Templates|#Build Process Templates]
 * [Security|#Security]
@@ -13,6 +14,16 @@
 * [How To Contribute|How To Contribute]
 
 ! Features
+
+{anchor:Activity}
+!! Activity
+
+Allows you to see the most recent activity in each Team Project.
+This can be useful if you want to see which projects are still actively being worked on, for example.
+
+[image:Get Activity|Activity-GetActivity.png]
+
+[image:View Activity Details|Activity-ActivityDetails.png]
 
 {anchor:Build Definitions}
 !! Build Definitions

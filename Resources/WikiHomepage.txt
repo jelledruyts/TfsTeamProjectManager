@@ -8,6 +8,8 @@ TFS Team Project Manager automates various tasks across Team Projects in Team Fo
 
 Team Project Manager can help you...
 
+* *View activity*
+** View recent activity (in Source Control, Work Item Tracking and Team Build)
 * *Manage build definitions*
 ** View and delete build definitions
 ** Update common properties within build definitions
@@ -47,6 +49,8 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.5
+** Added activity module that allows you to see the most recent activity (in Source Control, Work Item Tracking and Team Build) for Team Projects.
 * v1.4.4793 (February 14, 2013)
 ** Added support for moving work item comparison sources up and down
 ** Improved work item comparison to better support TFS 2012 Update 1

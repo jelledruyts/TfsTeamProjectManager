@@ -18,10 +18,14 @@
             <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Activity}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
-                    <DataGridTextColumn Header="Last Activity" Binding="{Binding Path=LastActivityTime}" />
-                    <DataGridTextColumn Header="Last Activity - Version Control" Binding="{Binding Path=LastActivityInVersionControlTime}" />
-                    <DataGridTextColumn Header="Last Activity - Work Item Tracking" Binding="{Binding Path=LastActivityInWorkItemTrackingTime}" />
-                    <DataGridTextColumn Header="Last Activity - Team Build" Binding="{Binding Path=LastActivityInTeamBuildTime}" />
+                    <DataGridTextColumn Header="Last Activity Time" Binding="{Binding Path=MostRecentActivity.Time}" />
+                    <DataGridTextColumn Header="Last Activity Description" Binding="{Binding Path=MostRecentActivity.Description}" />
+                    <DataGridTextColumn Header="Source Control - Last Activity Time" Binding="{Binding Path=MostRecentSourceControlActivity.Time}" />
+                    <DataGridTextColumn Header="Source Control - Last Activity Description" Binding="{Binding Path=MostRecentSourceControlActivity.Description}" />
+                    <DataGridTextColumn Header="Work Item Tracking - Last Activity Time" Binding="{Binding Path=MostRecentWorkItemTrackingActivity.Time}" />
+                    <DataGridTextColumn Header="Work Item Tracking - Last Activity Description" Binding="{Binding Path=MostRecentWorkItemTrackingActivity.Description}" />
+                    <DataGridTextColumn Header="Team Build - Last Activity Time" Binding="{Binding Path=MostRecentTeamBuildActivity.Time}" />
+                    <DataGridTextColumn Header="Team Build - Last Activity Description" Binding="{Binding Path=MostRecentTeamBuildActivity.Description}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

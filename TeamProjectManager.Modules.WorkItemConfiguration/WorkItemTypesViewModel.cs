@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -8,9 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.Win32;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -194,7 +194,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
                         foreach (WorkItemType workItemType in project.WorkItemTypes)
                         {
-                            var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = '" + workItemType.Name.Replace("'", "''") + "' AND [System.TeamProject] = '" + workItemType.Project.Name.Replace("'", "''") + "'");
+                            var parameters = new Dictionary<string, object>() {
+                                { "WorkItemType", workItemType.Name },
+                                { "TeamProject", workItemType.Project.Name}
+                            };
+                            var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = @WorkItemType AND [System.TeamProject] = @TeamProject", parameters);
                             var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
                             var workItemTypeDefinition = WorkItemTypeDefinition.FromXml(workItemType.Export(false));
                             results.Add(new WorkItemTypeInfo(teamProject, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList(), workItemTypeDefinition));

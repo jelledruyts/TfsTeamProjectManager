@@ -18,8 +18,8 @@
             <TabItem Header="All">
                 <DataGrid ItemsSource="{Binding Path=AllActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Component" Binding="{Binding Path=ComponentName}" />
                         <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
+                        <DataGridTextColumn Header="Component" Binding="{Binding Path=ComponentName}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>

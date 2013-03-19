@@ -117,7 +117,7 @@ namespace TeamProjectManager.Modules.Activity
                                 if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
                                 {
                                     foundChangesetsForProject++;
-                                    var commentSuffix = string.IsNullOrEmpty(changeset.Comment) ? null : ": " + changeset.Comment;
+                                    var commentSuffix = string.IsNullOrEmpty(changeset.Comment) ? null : ": " + changeset.Comment.Trim();
                                     sourceControlActivities.Add(new ComponentActivityInfo("Source Control", changeset.CreationDate, string.Format(CultureInfo.CurrentCulture, "Changeset {0} by \"{1}\"{2}", changeset.ChangesetId, changeset.Committer, commentSuffix)));
                                     if (foundChangesetsForProject == numberOfActivities)
                                     {

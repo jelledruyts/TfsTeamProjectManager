@@ -39,8 +39,8 @@
             <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=Activities}" x:Name="activitiesDataGrid" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" SelectedItem="{Binding Path=SelectedActivity}" MouseDoubleClick="activitiesDataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
-                    <DataGridTextColumn Header="Last Activity Component" Binding="{Binding Path=MostRecentActivity.ComponentName}" />
                     <DataGridTextColumn Header="Last Activity Time" Binding="{Binding Path=MostRecentActivity.Time}" />
+                    <DataGridTextColumn Header="Last Activity Component" Binding="{Binding Path=MostRecentActivity.ComponentName}" />
                     <DataGridTextColumn Header="Last Activity Description" Binding="{Binding Path=MostRecentActivity.Description}" />
                 </DataGrid.Columns>
             </DataGrid>

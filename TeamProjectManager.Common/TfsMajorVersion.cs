@@ -14,21 +14,26 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// Represents Team Foundation Server 8 (TFS 2005).
         /// </summary>
-        V8 = 8,
+        V8 = 80,
 
         /// <summary>
         /// Represents Team Foundation Server 9 (TFS 2008).
         /// </summary>
-        V9 = 9,
+        V9 = 90,
 
         /// <summary>
         /// Represents Team Foundation Server 10 (TFS 2010).
         /// </summary>
-        V10 = 10,
+        V10 = 100,
 
         /// <summary>
         /// Represents Team Foundation Server 11 (TFS 2012).
         /// </summary>
-        V11 = 11
+        V11 = 110,
+
+        /// <summary>
+        /// Represents Team Foundation Server 11 Update 1 (TFS 2012.1).
+        /// </summary>
+        V11Update1 = 111
     }
 }

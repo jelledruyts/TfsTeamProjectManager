@@ -73,7 +73,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 { TfsMajorVersion.V8, baseSystemFields },
                 { TfsMajorVersion.V9, baseSystemFields },
                 { TfsMajorVersion.V10, baseSystemFields },
-                { TfsMajorVersion.V11, tfs11SystemFields }
+                { TfsMajorVersion.V11, tfs11SystemFields },
+                { TfsMajorVersion.V11Update1, tfs11SystemFields }
             };
         }
 

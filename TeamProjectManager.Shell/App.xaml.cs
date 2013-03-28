@@ -24,7 +24,7 @@ namespace TeamProjectManager.Shell
 
             // Create the logger.
             this.logger = new Logger();
-            this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0})", ApplicationVersion.ToString()), TraceEventType.Information);
+            this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0} - {1})", ApplicationVersion.ToString(), InternalConstants.EditionName), TraceEventType.Information);
             App.LogFilePath = this.logger.LogFilePath;
 
             // Ensure that the current culture is used for all controls (see http://www.west-wind.com/Weblog/posts/796725.aspx).

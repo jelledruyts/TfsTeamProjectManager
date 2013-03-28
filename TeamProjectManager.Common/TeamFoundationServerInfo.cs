@@ -44,7 +44,11 @@ namespace TeamProjectManager.Common
                     break;
                 case TfsMajorVersion.V11:
                     this.DisplayVersion = "Team Foundation Server 2012";
-                    this.ShortDisplayVersion = "TFS 2012";
+                    this.ShortDisplayVersion = "TFS 2012.0";
+                    break;
+                case TfsMajorVersion.V11Update1:
+                    this.DisplayVersion = "Team Foundation Server 2012 Update 1";
+                    this.ShortDisplayVersion = "TFS 2012.1";
                     break;
                 default:
                     this.DisplayVersion = "Unknown version of Team Foundation Server";

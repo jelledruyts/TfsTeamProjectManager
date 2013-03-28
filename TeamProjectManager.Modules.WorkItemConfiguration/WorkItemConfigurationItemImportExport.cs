@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.ProcessConfiguration.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.ProcessConfiguration.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 
@@ -76,7 +75,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
                         try
                         {
-                            project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.OuterXml);
+                            project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
                         }
                         catch (Exception exc)
                         {

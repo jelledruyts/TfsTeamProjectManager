@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Server;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -6,10 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.Server;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -206,53 +206,46 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var frameworkEntries = registrationService.GetRegistrationEntries("Framework");
                 if (frameworkEntries.Length > 0)
                 {
-                    // We are talking to at least TFS 2010.
-                    if (frameworkEntries.Any(e => e.ServiceInterfaces != null && e.ServiceInterfaces.Any(i => i.Url.IndexOf("v4.0", StringComparison.OrdinalIgnoreCase) >= 0)))
+                    // If there are Framework registration entries, we are talking to at least TFS 2010.
+                    var serviceInterfaces = frameworkEntries.SelectMany(e => e.ServiceInterfaces ?? new ServiceInterface[0]);
+
+                    if (serviceInterfaces.Any(i => string.Equals(i.Name, "FileContainersResource", StringComparison.OrdinalIgnoreCase)))
                     {
+                        // We are talking to TFS 2012 Update 1, which is v11.1.
+                        return TfsMajorVersion.V11Update1;
+                    }
+                    if (serviceInterfaces.Any(i => string.Equals(i.Name, "IdentityManagementService2", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        // We are talking to TFS 2012, which is v11.
                         return TfsMajorVersion.V11;
                     }
-                    else
-                    {
-                        return TfsMajorVersion.V10;
-                    }
+
+                    // We are talking to TFS 2010, which is v10.
+                    return TfsMajorVersion.V10;
                 }
                 else
                 {
                     var vstfsEntries = registrationService.GetRegistrationEntries("vstfs");
-                    if (vstfsEntries.Length != 1)
+                    if (vstfsEntries.Length == 1)
                     {
-                        // We must be talking to an unknown version of TFS.
-                        return TfsMajorVersion.Unknown;
-                    }
-                    else
-                    {
-                        var groupSecurity2Found = false;
-                        foreach (ServiceInterface serviceInterface in vstfsEntries[0].ServiceInterfaces)
-                        {
-                            if (serviceInterface.Name.Equals("GroupSecurity2", StringComparison.OrdinalIgnoreCase))
-                            {
-                                groupSecurity2Found = true;
-                            }
-                        }
-
-                        if (groupSecurity2Found)
+                        if (vstfsEntries[0].ServiceInterfaces.Any(i => i != null && string.Equals(i.Name, "GroupSecurity2", StringComparison.OrdinalIgnoreCase)))
                         {
                             // We are talking to TFS 2008, which is v9.
                             return TfsMajorVersion.V9;
                         }
-                        else
-                        {
-                            // We are talking to TFS 2005, which is v8.
-                            return TfsMajorVersion.V8;
-                        }
+
+                        // We are talking to TFS 2005, which is v8.
+                        return TfsMajorVersion.V8;
                     }
                 }
             }
             catch (TeamFoundationServerException exc)
             {
                 logger.Log("An exception occurred while determining the TFS major version", exc);
-                return TfsMajorVersion.Unknown;
             }
+
+            // We must be talking to an unknown version of TFS.
+            return TfsMajorVersion.Unknown;
         }
 
         #endregion

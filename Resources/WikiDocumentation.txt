@@ -62,9 +62,9 @@ This can be useful when you want to get an overview of all the security groups b
 
 [image:View / Delete Groups|Security-ViewDeleteGroups.png]
 
-!!! Add Group
+!!! Add / Update Group
 
-Allows you to add security groups across multiple Team Projects.
+Allows you to add or update security groups across multiple Team Projects.
 This can be useful when you want to have consistent security groups or when you want to import new work item types that require certain security groups to be present.
 
 [image:Add Group|Security-AddGroup.png]

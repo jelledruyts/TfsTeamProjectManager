@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:local="clr-namespace:TeamProjectManager.Modules.Security"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -46,11 +47,13 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Add Group" i:HelpProvider.HelpContent="Allows you to add security groups across multiple Team Projects. This can be useful when you want to have consistent security groups or when you want to import new work item types that require certain security groups to be present.">
+            <TabItem Header="Add / Update Group" i:HelpProvider.HelpContent="Allows you to add or update security groups across multiple Team Projects. This can be useful when you want to have consistent security groups or when you want to import new work item types that require certain security groups to be present.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -59,16 +62,92 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Row="0" Grid.Column="0" Content="Name" />
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=NewSecurityGroupName, UpdateSourceTrigger=PropertyChanged}" Margin="5,5,0,0" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=SecurityGroupChange.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,5,0,0" />
 
                     <Label Grid.Row="1" Grid.Column="0" Content="Description" Margin="0,5,0,0" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=NewSecurityGroupDescription, UpdateSourceTrigger=PropertyChanged}" Margin="5,5,0,0" AcceptsReturn="False" MinHeight="70" MaxLength="256" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=SecurityGroupChange.Description, UpdateSourceTrigger=PropertyChanged}" Margin="5,5,0,0" AcceptsReturn="False" MinHeight="70" MaxLength="256" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" />
 
-                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Security Group" Command="{Binding Path=AddSecurityGroupCommand}" Margin="0,5,0,0" />
+                    <Label Grid.Row="2" Grid.Column="0" Content="Members" Margin="0,5,0,0" />
+                    <Grid Grid.Row="2" Grid.Column="1" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Users To Add" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Path=SecurityGroupChange.UsersToAdd}" ToolTip="Separate multiple entries with a semicolon (;)" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="Users To Remove" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Path=SecurityGroupChange.UsersToRemove}" IsEnabled="{Binding Path=SecurityGroupChange.RemoveAllUsers, Converter={StaticResource inverseBooleanConverter}}" ToolTip="Separate multiple entries with a semicolon (;)" />
+                        <CheckBox Grid.Row="1" Grid.Column="2" Margin="5,0,0,0" Content="Remove all existing users" VerticalAlignment="Center" IsChecked="{Binding Path=SecurityGroupChange.RemoveAllUsers}" />
+                    </Grid>
+                    
+                    <Label Grid.Row="3" Grid.Column="0" Content="Permissions" Margin="0,5,0,0" />
+                    <Grid Grid.Row="3" Grid.Column="1" Margin="5,5,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TabControl Grid.Row="0" Grid.IsSharedSizeScope="True">
+                            <TabControl.Resources>
+                                <DataTemplate DataType="{x:Type local:PermissionChange}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="PermissionName" />
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="PermissionNone" />
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="PermissionAllow" />
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="PermissionDeny" />
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="PermissionInherit" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Path=Permission.DisplayName}" />
+                                        <RadioButton Grid.Column="1" Content="Don't Change" Margin="5,0,0,0" IsChecked="{Binding Path=Action, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=None}" ToolTip="Does not change the existing permission" />
+                                        <RadioButton Grid.Column="2" Content="Allow" Margin="5,0,0,0" IsChecked="{Binding Path=Action, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Allow}" ToolTip="Allows the permission" />
+                                        <RadioButton Grid.Column="3" Content="Deny" Margin="5,0,0,0" IsChecked="{Binding Path=Action, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Deny}" ToolTip="Denies the permission" />
+                                        <RadioButton Grid.Column="4" Content="Inherit" Margin="5,0,0,0" IsChecked="{Binding Path=Action, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Inherit}" ToolTip="Inherits the permission" />
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.Resources>
+                            <TabItem Header="Team Project">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.TeamProjectPermissions}" />
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Areas">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.WorkItemAreasPermissions}" />
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Iterations">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.WorkItemIterationsPermissions}" />
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Build">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.TeamBuildPermissions}" />
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Source Control">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.SourceControlPermissions}" />
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                        <WrapPanel Grid.Row="1" Margin="0,5,0,0">
+                            <TextBlock><Hyperlink Command="{Binding Path=ResetSecurityPermissionsCommand}" ToolTip="Rest the permissions">reset</Hyperlink></TextBlock>
+                            <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=LoadSecurityPermissionsCommand}" ToolTip="Load the permissions from a saved file">load...</Hyperlink></TextBlock>
+                            <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=SaveSecurityPermissionsCommand}" ToolTip="Save the permissions to a file">save...</Hyperlink></TextBlock>
+                        </WrapPanel>
+                    </Grid>
+
+                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Add / Update Security Group" Command="{Binding Path=AddOrUpdateSecurityGroupCommand}" Margin="0,5,0,0" />
                 </Grid>
             </TabItem>
-            
+
         </TabControl>
-        
+
     </Grid>
 </UserControl>

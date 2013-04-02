@@ -19,6 +19,7 @@
     <c:EnumToBooleanConverter x:Key="enumConverter" />
     <c:CaseConverter x:Key="caseConverter" />
     <c:SingleLineConverter x:Key="singleLineConverter" />
+    <c:InverseBooleanConverter x:Key="inverseBooleanConverter" />
     <i:HelpContentConverter x:Key="helpContentConverter" />
 
     <Style TargetType="{x:Type Grid}" />

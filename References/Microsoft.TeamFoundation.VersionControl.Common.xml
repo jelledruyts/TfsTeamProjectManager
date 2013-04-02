@@ -1,0 +1,1134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.TeamFoundation.VersionControl.Common</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.ChangePendedFlags"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ChangePendedFlags.Unknown">
+      <summary>Server does not support this mechanism.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ChangePendedFlags.None">
+      <summary>No flags were set.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ChangePendedFlags.WorkingFolderMappingsUpdated">
+      <summary>One or more working folders was updated in this call.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.None">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.ValidateCheckInOwner">
+      <summary>Make sure that the identity specified as the checkin owner refers to a valid user</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.SuppressEvent">
+      <summary>Suppress events for this checkin</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.DeleteShelveset">
+      <summary>Delete the shelveset after a successful submission into the repository</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.OverrideGatedCheckIn">
+      <summary>Bypass gated checkin validation for this checkin</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.QueueBuildForGatedCheckIn">
+      <summary>Automatically queue the build for gated checkin validation if it is possible</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.AllContentUploaded">
+      <summary>The server will permit a call to CheckIn with a null or empty list of items to check in, (checkin /all) even if there is a change with the edit bit set.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.AllowUnchangedContent">
+      <summary>t=The server will allow items which have a pending edit to be checked in even if the content hasn't changed instead of undoing the change (default)</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.NoAutoResolve">
+      <summary>Used only on the client. Instructs the client not to try to auto resolve conflicts</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInOptions2.NoConflictsCheckForGatedCheckIn">
+      <summary>This flag only affects the server's behavior when the server paths being checked in affect a gated build definition. In this case the server will ordinarily call CheckPendingChanges before shelving the workspace and throwing back a GatedCheckinException. If the call to CheckPendingChanges creates conflicts, then no GatedCheckinException will be thrown; instead CheckIn fails and informs the user that they must resolve their conflicts. If this flag is specified, this call to CheckPendingChanges is skipped. This allows the gated checkin shelveset to be created even when the items being checked in are not at latest, for example. The build agent workspace will unshelve the shelveset and attempt to resolve conflicts at that time.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.CheckInState">
+      <summary>represents checkin state.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInState.Unknown">
+      <summary>default initial state.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInState.Paging">
+      <summary>Checkin is being paged up to the server.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInState.Committed">
+      <summary>checkin operation was commited.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CheckInState.Failed">
+      <summary>CheckIn() did not throw an exception, but nothing was checked in (e.g. all pending changes undone)</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.CodeChurnConstants">
+      <summary>Constants used by the Code Churn Job for access to registry, properties, and settings.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.CodeChurnConstants.DetailsPropertyName"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.CodeChurnUtility">
+      <summary>Utility class, used for parsing code churn details.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.CodeChurnUtility.ConvertToInt(System.Byte[],System.Int32@,System.Int32@,System.Int32@,System.Int32@)">
+      <summary>Takes a code churn property value in binary form and parses it to return the code churn details.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.ConflictOptions">
+      <summary>Contains options the server wants to communicate to the client about the conflict</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ConflictOptions.None">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ConflictOptions.DisallowAutoMerge">
+      <summary>This option informs the client, that it should disallow auto-merge.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ConflictOptions.PendingLocalVersionMismatch">
+      <summary>Indicates that this conflict is due to a local / pending version mismatch.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ConflictOptions.LocalChangesRedundantInTargetVersion">
+      <summary>Currently only used for version conflicts. This bit is set if the local pending changes are redundant (cannot apply) to the version being moved to.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags">
+      <summary>Options that are used when the system calls Destroy on the WebService.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.None">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.Preview">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.StartCleanup">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.KeepHistory">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.Silent">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.AffectedChanges">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DestroyFlags.DeleteWorkspaceState">
+      <summary />
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffFile">
+      <summary>A sequence of lines from a file.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffFile.Create(System.IO.Stream,System.Text.Encoding,Microsoft.TeamFoundation.VersionControl.Common.DiffOptions)">
+      <summary>Creates a DiffFile for the specified stream.</summary>
+      <returns>The DiffFile for the stream.</returns>
+      <param name="stream">The stream to use.</param>
+      <param name="encoding">The encoding of characters in the stream.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffFile.Create(System.String,System.Text.Encoding,Microsoft.TeamFoundation.VersionControl.Common.DiffOptions)">
+      <summary>Creates a DiffFile for the specified file.</summary>
+      <returns>The DiffFile for the file.</returns>
+      <param name="filePath">The path of the file to use.</param>
+      <param name="fileEncoding">The character encoding of the file.</param>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffFile.Encoding">
+      <summary>Returns the encoding used to create the DiffFile instance</summary>
+      <returns>Returns <see cref="T:System.Text.Encoding" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffFile.HasPreamble">
+      <summary>Returns true if the encoding of the file supports a preamble and the file contains a preamble</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffLine">
+      <summary>A line from a file.</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffLine.Content">
+      <summary>Gets the line content.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffLine.EndOfLineTerminator">
+      <summary>Gets the End-of-Line terminator for this line.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.EndOfLineTerminator" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLine.GetHashCode">
+      <summary>Gets the hash code for the line.</summary>
+      <returns>The hash code for the line</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLine.ToString">
+      <summary>Retrieves the DiffLine as a string</summary>
+      <returns>Returns the DiffLine</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer">
+      <summary>Helper class to compare DiffLines</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer.#ctor(Microsoft.TeamFoundation.VersionControl.Common.DiffOptions)"></member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer.Equals(Microsoft.TeamFoundation.VersionControl.Common.DiffLine,Microsoft.TeamFoundation.VersionControl.Common.DiffLine)">
+      <summary>Returns true if the given elements are equal.</summary>
+      <returns>True if the two elements are equal</returns>
+      <param name="x">The left element</param>
+      <param name="y">The right element</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer.Equals(System.Object,System.Object)">
+      <summary>Returns true if the given elements are equal.</summary>
+      <returns>True if the two elements are equal</returns>
+      <param name="left">The left element</param>
+      <param name="right">The right element</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer.GetHashCode(Microsoft.TeamFoundation.VersionControl.Common.DiffLine)">
+      <summary>Provide the hash code for the given DiffElement</summary>
+      <returns>The hash code</returns>
+      <param name="element">The DiffElement to get the hash code for</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffLineComparer.GetHashCode(System.Object)">
+      <summary>Provide the hash code for the given DiffElement</summary>
+      <returns>The hash code</returns>
+      <param name="element">The DiffElement to get the hash code for</param>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags">
+      <summary>Diff option flags NOTE: This was copied almost verbatim from the old engine, because we already shipped this enum.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.None">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreEndOfLineDifference">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreCase">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreWhiteSpace">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreKanaType">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreSymbols">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreNonSpace">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreWidth">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.EnablePreambleHandling">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreLeadingAndTrailingWhiteSpace">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.ScanFullFileForEncodingDetection">
+      <summary>When true, the file will be scanned for encoding detection.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.ThrowIfDetectedEncodingMismatch">
+      <summary>Throws if the file cannot be read using the encoding we detected.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags.IgnoreEndOfFileEndOfLineDifference">
+      <summary>Ignores the end of line difference in the last line of the file if the differences is that one of the files has an end of line (return)</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions">
+      <summary>The options that are available with performing diffs.NOTE: This was copied almost verbatim from the old engine, because we already shipped this class.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.#ctor">
+      <summary>Constructs a new DiffOptions instance</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.CodePageOverride">
+      <summary>Code page override from the command-line, non-zero means provide the override</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.CommandLineOptions">
+      <summary>Command-line options to pass to a third-party tool</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.ContextLines">
+      <summary>The number of lines of context to provide for output formats that use them.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.CultureInfo">
+      <summary>Returns the CultureInfo that should be used if any DiffOption flags require it.</summary>
+      <returns>Returns <see cref="T:System.Globalization.CultureInfo" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.Flags">
+      <summary>The various flags that can be set for a difference operation.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.VersionControl.Common.DiffOptionFlags" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.GetCodePage(System.Int32)">
+      <summary>Gets the code page override if available. Otherwise returns the provided fall-back code page.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.OutputType">
+      <summary>Output type to use</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.Recursive">
+      <summary>Whether this diff should be recursive</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.SetTargetEncodingToConsole">
+      <summary>A helper method to set the target encoding to the encoding of the Console.</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.SourceEncoding">
+      <summary>The encoding of the source files.</summary>
+      <returns>Returns <see cref="T:System.Text.Encoding" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.SourceLabel">
+      <summary>The string that should be used to label the source diff stream.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.StreamWriter">
+      <summary>Gets or sets the output stream writer.</summary>
+      <returns>Returns <see cref="T:System.IO.StreamWriter" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.TargetEncoding">
+      <summary>The encoding of the output stream.</summary>
+      <returns>Returns <see cref="T:System.Text.Encoding" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.TargetLabel">
+      <summary>The string that should be used to label the target diff stream.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.UseThirdPartyTool">
+      <summary>Whether this diff should attempt to start up a third-party tool</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.VssFormatType">
+      <summary>Returns the VSS output subtype that will be used when formatting the output stream (if any at all). This property is strictly for backward compatability purposes. This property defaults to VssOutputType.Vss as does the VSS command line.</summary>
+      <returns>Returns the kind of VSS diff output that will be generated.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffOptions.VssOutputWidth">
+      <summary>If this property is set then the VSS output will be adjusted to fit inside this width. When set to -1 none of the output is trimmed at all.</summary>
+      <returns>Returns the width of the VSS output format.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType">
+      <summary>The various difference output types that are possible. The VSS output type has several subtypes. NOTE: This was copied almost verbatim from the old engine, because we already shipped this enum.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.Context">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.RCS">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.Ed">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.Unified">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.UnixNormal">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.VSS">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.Binary">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffOutputType.Visual">
+      <summary />
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment">
+      <summary>A linked list of difference hunks.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.LatestByteLength">
+      <summary>Returns the length in bytes in the latest file stream for this hunk.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.LatestLength">
+      <summary>The length (in tokens) of the latest file in this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.LatestStart">
+      <summary>The starting token index in the latest file for this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.LatestStartOffset">
+      <summary>The starting byte offset of the latest file for this hunk.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.ModifiedByteLength">
+      <summary>Returns the length in bytes in the destination file stream for this hunk.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.ModifiedLength">
+      <summary>The length (in tokens) of the modified file in this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.ModifiedStart">
+      <summary>The starting token index in the modified file for this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.ModifiedStartOffset">
+      <summary>The index of the starting modifed token in the token array.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.Next">
+      <summary>The next hunk in a DiffSegment sequence. Returns null if this is the end of the list.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.OriginalByteLength">
+      <summary>Returns the length in bytes in original file stream for this hunk.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.OriginalLength">
+      <summary>Returns the number of tokens in the orginal file for this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.OriginalStart">
+      <summary>Returns the orginal starting token index for this DiffSegment.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.OriginalStartOffset">
+      <summary>The index of the original starting position in the token array.</summary>
+      <returns>Returns <see cref="T:System.Int64" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSegment.Type">
+      <summary>Returns the DiffSegmentType of this DiffSegment. (Common, Modified, Conflict)</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType">
+      <summary>The type of the DiffSegment/MergeHunk.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType.Common">
+      <summary>The contents of both files are the same for the range of the hunk.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType.Modified">
+      <summary>The contents of both files are different for the range of the hunk.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType.Latest">
+      <summary>The contents of Common and Latest are different for the range of the hunk.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType.Conflict">
+      <summary>Both the Common/Modified and Common/Latest regions of this file are different.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.DiffSegmentType.DiffCommon">
+      <summary>Modified and Latest regions of this file are identical, but the Common version is different.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary">
+      <summary>A summary of the differences between two files</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.#ctor(Microsoft.TeamFoundation.VersionControl.Common.DiffFile,Microsoft.TeamFoundation.VersionControl.Common.DiffFile,Microsoft.TeamFoundation.Diff.IDiffChange[],System.Boolean)">
+      <summary>Constructs a new DiffSummary from the given files and diff change list. The diff change list will be included in the summary if it is requested.</summary>
+      <param name="original">The original file sequence</param>
+      <param name="modified">The modified file sequence</param>
+      <param name="diffList">The diff list</param>
+      <param name="includeChanges">If true, the diff change list will be included in the summary</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+      <summary>Creates a DiffSummary with the given values</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.Changes">
+      <summary>The list of changes</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.IDiffChange" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.ModifiedLineCount">
+      <summary>The number of lines in the modified file</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.OriginalLineCount">
+      <summary>The number of lines in the original file</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.ToString">
+      <summary>Returns the DiffSummary as a string</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.TotalLinesAdded">
+      <summary>The total number of lines that were added</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.TotalLinesDeleted">
+      <summary>The total number of lines that were deleted</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.DiffSummary.TotalLinesModified">
+      <summary>The total number of lines that were modified</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions">
+      <summary>Defines the permission bitmasks used in the database for system-wide permissions Used in tblPermission.GrantedPermission and tblPermission.RevokedPermission</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions.CreateWorkspace">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions.AdminWorkspaces">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions.AdminShelvesets">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions.AdminConnections">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.GlobalPermissions.AdminConfiguration">
+      <summary />
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange">
+      <summary>Represents information about a specific change in a merge operation.</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange.ChangeType">
+      <summary>The type of difference.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange.LatestChange">
+      <summary>The Latest change object that represents all latest changes</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.IDiffChange" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange.LatestChanges">
+      <summary>The Latest changes against the Original.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.IDiffChange" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange.ModifiedChange">
+      <summary>The Modified change object that represents all modified changes</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.IDiffChange" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.IMergeChange.ModifiedChanges">
+      <summary>The Modified changes against the Original.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Diff.IDiffChange" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec">
+      <summary>A utility class for manipulating Hatteras Label specifications. It contains routines for parsing, formatting, validating, and so on</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.Combine(System.String,System.String)">
+      <summary>Builds the qualified Label name from the label name and scope parts</summary>
+      <returns>the qualified Label name</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.IsLegalName(System.String)">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.IsLegalName(System.String,System.Boolean)">
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.IsLegalScope(System.String)">
+      <summary>Returns true if labelScope is a valid label scope. Verifies it is a server item without wildcard characters.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.IsLegalSpec(System.String)">
+      <summary>Returns true if labelSpec is a valid label specification.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.IsLegalSpec(System.String,System.Boolean)">
+      <summary>Returns true if labelSpec is a valid label specification.</summary>
+      <param name="labelSpec">Label specification to validate</param>
+      <param name="permitWildcardNames">Indicates whether wildcard characters in label names are permitted</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.LabelSpec.Parse(System.String,System.String,System.Boolean,System.String@,System.String@)">
+      <summary>Parse a Label spec of the form name@scope and return the two parts. If the scope is not specified in the Label specification, use the defaultScope argument.</summary>
+      <param name="spec">the Label spec to parse</param>
+      <param name="defaultScope">Default value for labelScope (may be null)</param>
+      <param name="permitWildcardNames">Indicates whether wildcard characters in label names are permitted</param>
+      <param name="labelName">returned Label name</param>
+      <param name="labelScope">returned Label scope</param>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType">
+      <summary>An enumeration of the possible change types for a merge operation.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType.Modified">
+      <summary>Content from the original sequence has changed in the modified sequence.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType.Latest">
+      <summary>Content from the original sequence has changed in the latest sequence.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType.Both">
+      <summary>Content from the original sequence has changed in both the modified and the latest sequences. The changed content in the modified and latest sequences is identical and non-conflicting.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeChangeType.Conflict">
+      <summary>Content from the original sequence has changed in both the modified and the latest sequences. The changed content in the modified and latest sequences is conflicting.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx">
+      <summary>The complete set of merge options, this is coverted to an int and sent to the server so we can be backward compatible in future versions</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.None">
+      <summary>No option</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.ForceMerge">
+      <summary>Instructs the server to re-merge source versions which have been previously merged</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.Baseless">
+      <summary>Instructs the server to perform a baseless merge between items</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.NoMerge">
+      <summary>Instructs the server not to actually pend the merge, but just return a preview of what must be merged</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.AlwaysAcceptMine">
+      <summary>Instructs the server to discard any changes from the source, keeping only changes from the target.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.Silent">
+      <summary>Instructs the server to supress any get operations and conflicts.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.NoImplicitBaseless">
+      <summary>Only works prior on TFS 2008, instructs the server not to implicitly baseless merge items with the same relative path from the source root and target root. e.g. $/proj/trunk -&gt; $/proj/branch If a new file is added at $/proj/trunk/a.cs and $/proj/branch/a.cs Setting this option will tell the server not to try to merge the 2 files</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.Conservative">
+      <summary>Instructs the server to be conservative when declaring merges as conflicts. Available from TFS 2010.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.MergeOptionsEx.NoAutoResolve">
+      <summary>Used only on the client. Instructs the client not to try to auto resolve conflicts</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary">
+      <summary>The merge summary information provides the total number of changes in the different change classifications. NOTE: This was copied almost verbatim from the old engine, because we already shipped this class.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.TotalBoth">
+      <summary>Total number of changes only in the modified file and latest file (not in the original).</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.TotalCommon">
+      <summary>Total number of changes common to all files.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.TotalConflicting">
+      <summary>Total number of changes that conflict.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.TotalLatest">
+      <summary>Total number of changes only in the latest file.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.MergeSummary.TotalModified">
+      <summary>Total number of changes only in the modified file.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.OwnershipState"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.OwnershipState.Unknown">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.OwnershipState.OwnedByAuthorizedUser">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.OwnershipState.NotOwnedByAuthorizedUser">
+      <summary />
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions">
+      <summary>Options for the PendChanges Web Service. Will be actually sent across the wire as an integer value, instead of as a serialized Enum.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions.None">
+      <summary>The client did not specify any options</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions.GetLatestOnCheckout">
+      <summary>The client requests to synchronize to the latest version of an item on Checkout (PendingEdit). In this case the server will download the latest version of the file to the client.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions.Silent">
+      <summary>This instructs the server not to return GetOps for the operation. In the case when GetLatestOnCheckout and Silent are enabled, you may still receive a GetOp if you have to GetLatest.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions.ForceCheckOutLocalVersion">
+      <summary>This instructs the server to force "CheckOut Local Version" behavior. This flag will supercede the GetLatestOnCheckout flag above if both are specified. This flag will supercede the GetLatestOnCheckout team project annotation.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendChangesOptions.SuppressItemNotFoundFailures">
+      <summary>This flag instructs the client not to report any Failures returned by the server of type ItemNotFoundException as NonFatalErrors.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.PendingChangePropertyVersions">
+      <summary>The valid versions for the SetPendingChangeProperty method</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendingChangePropertyVersions.NonVersioned">
+      <summary>When the pending change is checked in, it will be transitioned to a VersionedItem property not associated with a specific version</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PendingChangePropertyVersions.SpecificVersion">
+      <summary>When the pending change is checked in, it will be transitioned to a VersionedItem Property associated with the version created in the changeset</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.PropertyConstants"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PropertyConstants.CreatedByKey"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.PropertyConstants.QueryAllPropertiesWildcard"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.ProxyFlags">
+      <summary>Flags for proxy records</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ProxyFlags.None">
+      <summary>No flags specified</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ProxyFlags.SiteDefault">
+      <summary>THe proxy is a site default</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.ProxyFlags.GlobalDefault">
+      <summary>The proxy is a global default</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.QueryMergesExtendedOptions">
+      <summary>Options to pass to the query merges extended method</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.QueryMergesExtendedOptions.None">
+      <summary>No options specified</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.QueryMergesExtendedOptions.QueryRenames">
+      <summary>Specifies the query should only query sources of a rename Specifies the query should only query source / targets of a rename The default is to query sources of a merge The default is to query source / targets of a merge</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.QueryMergesExtendedOptions.IncludeDownloadInfo">
+      <summary>Include download information.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.QueryMergesExtendedOptions.QueryTargetMerges">
+      <summary>Specifies that the query should query targets for a given source item.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.AuthenticatedUser"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.CheckinNoteNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ContentField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.Download"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.DownloadServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.EncodingBinary"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.EncodingUnchanged"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ExceptionHeader"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.HashField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.IBISEnablement"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.IndeterminateChangeset"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.IProjectMaintenance"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCAdmin"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCAdminServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCAdminServiceIdentifierString"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider3"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider3ServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider4"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider4Dot3"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider4Dot3ServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProvider4ServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ISCCProviderServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.LengthField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.LinkingProviderInterfaceName"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxChangesetCommentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxCommentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxComputerNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxIdentityNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxLabelCommentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxLabelNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxLocalPathComponentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxLocalPathSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxPolicyNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxPolicyOverrideCommentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxPropertyNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxServerPathComponentSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxServerPathSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxShelvesetNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.MaxWorkspaceNameSize"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ModifiedDateField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.NoCICheckInComment"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.RangeField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.ServerItemField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.Upload"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.UploadServiceIdentifier"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.WorkspaceNameField"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryConstants.WorkspaceOwnerField"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.RepositoryFailureCodes">
+      <summary>Failure codes for version control operations.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryFailureCodes.MergeBranchSourceReadPermissionWarning">
+      <summary>Gets the warning code for missing read permissions when unshelving a shelveset.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryFailureCodes.QueryShelvedItemsReadPermissionWarning">
+      <summary>Gets the warning code for missing read permissions when querying shelved items.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RepositoryFailureCodes.UnshelveReadPermissionWarning">
+      <summary>Gets the warning code for missing read permissions when unshelving a shelveset.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions">
+      <summary>Enum of rollback options that will be used on the client / server. Marshalled to the server as an integer</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions.None">
+      <summary>The client did not specify any options</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions.ToVersion">
+      <summary>Indicates that the client asked for a certain version to be latest In this case the server will download the latest version of the file to the client.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions.Silent">
+      <summary>Indicates to the server not to return any Get operations or conflict information</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions.KeepMergeHistory">
+      <summary>Do not rollback merge history with this rollback operation.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.RollbackOptions.NoAutoResolve">
+      <summary>Used only on the client. Instructs the client not to try to auto resolve conflicts</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.AllGlobalPermissions"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.AllItemPermissions"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.GlobalSecurityResource"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.PrivilegeSecurityNamespaceGuid"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.RepositorySecurityNamespaceGuid"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.WorkspaceRootSecurityResource"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SecurityConstants.WorkspaceSecurityNamespaceGuid"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures">
+      <summary>Enum which has the features supported by either the client or server</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.None">
+      <summary>None of the features in this enum are supported.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.GetLatestOnCheckout">
+      <summary>The client supports optionally synchronizing to the latest version of an item on Checkout (PendingEdit). If this flag is set but GetLatestOnCheckout is not set in PendChangesOptions, then the client will synchronize only if the team project has the GetLatestOnCheckout setting on.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.OneLevelMapping">
+      <summary>This means that the server / client supports one level mappings</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.Destroy">
+      <summary>The destroy feature is available on the server.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.CreateBranch">
+      <summary>The ability to create a committed branch on the server.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.GetChangesForChangeset">
+      <summary>The ability to page changes in a changeset.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.ProxySuite">
+      <summary>This represents the suite of proxy services: AddProxy(), DeleteProxy(), QueryProxies(),</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.LocalVersions">
+      <summary>This represents the ability to query local version information from the server</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.BatchedCheckins">
+      <summary>This represents the ability to page pending changes down from the server, and queue up pending changes for checkin, before committing them.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.WorkspacePermissions">
+      <summary>The server supports workspace permissions</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.CheckinDates">
+      <summary>The server supports the ability to set checkin dates</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.SupportedFeatures.All">
+      <summary>This is a combination of all the features which are supported. Subject to change across releases. You can send this value (from client object model to server, or from server to client object model) and mask with it, but you should not test for equality against it.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VersionControlConstants"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlConstants.NoRevertToUpdate"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlConstants.UpdateRevertToNotPresent"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath">
+      <summary>A utility class for manipulating version control items specifications. It contains routines for parsing, formatting, validating, and so on.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CheckForIllegalDollarInPath(System.String)">
+      <summary>This method throws an InvalidPathException if there is a dollar sign ('$') that follows a path separator ('/'), because no part of a path can start with a dollar sign.</summary>
+      <param name="path">The path to check (path must already be canonicalized).</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Combine(System.String,System.String)">
+      <summary>Return a fully qualified and canonicalized path constructed from parent and relative. If relative is already a fully qualified path, just return a canonicalized copy of relative. If relative is not fully qualified, return the path that results from appending relative to parent and canonicalizing the result. It is assumed that parent is already canonicalized.</summary>
+      <returns>The combined, canonicalized path.</returns>
+      <param name="parent">The parent path to append relative to (if relative is not fully qualified).</param>
+      <param name="relative">The potentially partial path to qualify relative to parent.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Combine(System.String,System.String,System.String)">
+      <summary>Given a base local path, base server path and target local path compute the target server path. This is completed by generating the relative path for the local paths, converting that to a server relative path and combining it with the base server path. Note: This method will throw an invalid path exception if it cannot generate the target server path. Possible reasons for this include the following: 1) local paths are on different drives and are not relative. 2) combining the calculated relative path with the base server path causes a "negative folder depth" (that is directory above root, $/). Examples: Combine(@"c:\myproj\abc\xyz", @"c:\myproj\abc\blech", @"$/abc") -&gt; @"$/blech" Combine(@"c:\myproj\abc\xyz", @"c:\myproj\abc\xyz\x", @"$/xyz") -&gt; @"$/xyz/x" Combine(@"c:\myproj\abc\xyz", @"c:\yourproj\abc\xyz\x", @"$/xyz") -&gt; @"InvalidPathException" Combine(@"c:\myproj\abc\xyz", @"c:\yourproj\abc\xyz", @"$/myproj/abc/xyz") -&gt; @"$/yourproj/abc/xyz"</summary>
+      <returns>Target item's absolute server path.</returns>
+      <param name="baseLocalPath">Source item's local path.</param>
+      <param name="targetLocalPath">Target item's local path.</param>
+      <param name="baseServerPath">Source item's server path.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Compare(System.String,System.String)">
+      <summary>Compare two Version Control item paths.</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Compare(System.String,System.String,System.Int32,System.Int32)">
+      <summary>Compare two Version Control item paths.</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater and less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+      <param name="item1Length">Length of the first item to compare.</param>
+      <param name="item2Length">Length of the second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CompareCaseSensitive(System.String,System.String)">
+      <summary>Compare two Version Control item paths in a case-insensitive manner on every part of the path except for the last item in the path. The last item in the path is compared in a case-sensitive manner.</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CompareTopDown(System.String,System.String)">
+      <summary>Compare two Version Control paths and return their relative ordering. This is like Compare except that it sorts grandchildren after children.</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CompareTopDownUI(System.String,System.String)">
+      <summary>Compare two Version Control paths and returns their relative ordering for display (culture and case insensitive). This is like Compare except that it sorts grandchildren after children.</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CompareUI(System.String,System.String)">
+      <summary>Compare two Version Control item paths for display (culture-sensitive and case-insensitive).</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.CompareUI(System.String,System.String,System.Int32,System.Int32)">
+      <summary>Compare two Version Control item paths for display (culture-sensitive and case-insensitive).</summary>
+      <returns>0 if they are equal, greater than 0 if the first is greater, less than 0 if the second is greater.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+      <param name="item1Length">Length of the first item to compare.</param>
+      <param name="item2Length">Length of the second item to compare.</param>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.DepthFirstTreeComparer">
+      <summary>This comparer can be used to sort version control paths depth-first, just like a tree traversal.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IComparer`1" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Equals(System.String,System.String)">
+      <summary>Compare two file specs for equality.</summary>
+      <returns>Return true if the items match.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.EqualsCaseSensitive(System.String,System.String)">
+      <summary>Checks two file paths for equality. Returns whether they are equal in a case-insensitive manner on every part of the path except for the last item in the path. The last item in the path is compared in a case-sensitive manner.</summary>
+      <returns>True if and only if they are equal in a case-sensitive comparison.</returns>
+      <param name="item1">First item to compare.</param>
+      <param name="item2">Second item to compare.</param>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.FullPathComparer">
+      <summary>Return a string comparer for fully-specified server paths.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetCommonParent(System.String,System.String)">
+      <summary>Given two server paths, return the farthest item from $/ that parents both items. If one of the two paths is null, the other will be returned. If both paths are null, an ArgumentNullException is thrown.</summary>
+      <returns>The farthest item from $/ that parents both path1 and path2.</returns>
+      <param name="path1">A server path starting with $/</param>
+      <param name="path2">A server path starting with $/</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetExtension(System.String)">
+      <summary>Get the file name extension from a version control spec.</summary>
+      <returns>The extension, which does not contain the period.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFileName(System.String)">
+      <summary>Return the last path component from a canonicalized path. For example, passing "$/abc/xyz" would return "xyz". Passing "$/" will return "".</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFolderDepth(System.String)">
+      <summary>Returns the number of levels of path elements in this spec.$/ will return 0 $/abc will return 1 $/abc/xyz will return 2, and so on.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFolderDepth(System.String,System.Int32)">
+      <summary>Returns the number of levels of path elements in this spec up to the maximum depth.$/ will return 0 $/abc will return 1 $/abc/xyz will return 2, and so on.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFolderName(System.String)">
+      <summary>Get the parent folder for the specified canonicalized path. If "$/" is passed, "$/" is returned as the parent.</summary>
+      <returns>The parent folder.</returns>
+      <param name="item">Path to get the parent folder for.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFullPath(System.String)">
+      <summary>Canonicalize the specified items specification and return the string. This will do things such as remove ..'s, convert \ to /, and so on. It throws an InvalidPathException if the item is the empty string, contains invalid characters including an embedded dollar sign (wildcard characters are not considered invalid in this check), or is too long.</summary>
+      <returns>Canonical string form of the item.</returns>
+      <param name="item">Item specification to canonicalize.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetFullPath(System.String,System.Boolean)">
+      <summary>Canonicalize the specified items specification and return the string. This will do things such as remove ..'s, convert \ to /, and so on. It throws an InvalidPathException if the item is the empty string, contains invalid characters including an embedded dollar sign (wildcard characters are not considered invalid in this check), or is too long.</summary>
+      <returns>Canonical string form of the item.</returns>
+      <param name="item">Item specification to canonicalize.</param>
+      <param name="checkReservedCharacters">boolean flag whether to validate version control reserved characters or not.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetRelativeStartIndex(System.String,System.String)">
+      <summary>Given a path and folder, return the index of the substring in path relative to the folder. If the path is not under the folder then 0 is returned (meaning the entire path). MakeRelative(@"$/src/project/abc.cpp", @"$/src") -&gt; 6 MakeRelative(@"$/src/project/abc.cpp", @"$/specs") -&gt; 0 MakeRelative(@"$/src/project/abc.cpp", @"$/src/proj") -&gt; 0</summary>
+      <returns>Index of relative path part in path.</returns>
+      <param name="folder">Folder to make it relative to.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetTeamProject(System.String)">
+      <summary>Return the top level "team project" folder given a server item.</summary>
+      <returns>The top level project from the version control spec.</returns>
+      <param name="item">A fully qualified server item</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.GetTeamProjectName(System.String)">
+      <summary>Return the top level "team project" given a server item.</summary>
+      <returns>The top level project from the version control spec.</returns>
+      <param name="item">A fully qualified server item.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsCanonicalizedPath(System.String,System.Boolean)">
+      <summary>Returns true if the path is canonicalized. The path must not contain a $ at the start of a path part, or any invalid characters.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsImmediateChild(System.String,System.String)">
+      <summary>Returns true if item is an immediate child of parent.</summary>
+      <returns>true if item is an immediate child of parent.</returns>
+      <param name="item">Item to check.</param>
+      <param name="parent">Parent to check against.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsRootFolder(System.String)"></member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsServerItem(System.String)">
+      <summary>Returns true if the specified string appears to be a server item (instead of a local item). The path is not required to be canonicalized. All server item paths are absolute.</summary>
+      <returns>true if the string is a server item.</returns>
+      <param name="path">Path to check.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsSubItem(System.String,System.String)">
+      <summary>Return true if the item is equal to or is under (in the heirarchy) parent.</summary>
+      <returns>True if item is equal or under parent.</returns>
+      <param name="item">Item to check.</param>
+      <param name="parent">Parent to check against.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsTeamProject(System.String)">
+      <summary>Return whether the passed server item is a team project ($/abc, $/def, not $/abc/efg nor $/)</summary>
+      <returns>Whether the item is a team project.</returns>
+      <param name="item">A fully qualified server item</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsValidFolderName(System.String,System.String@)">
+      <summary>Checks if the specified folder name is valid. By folder name, we are referring to a single folder, not the full path.  Wild cards are not allowed here. For example, a folder name in the full path below could be A, B, or C $/A/B/C/file.txt</summary>
+      <returns>True if the folder name is valid.</returns>
+      <param name="name">The folder name to validate.</param>
+      <param name="error">The error string if the folder name is invalid; otherwise, null.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsValidPath(System.String)">
+      <summary>Returns true if path is valid; false otherwise.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.IsWildcard(System.String)">
+      <summary>Determine if the last component of the specified path contains a wildcard character. The path may be fully qualified.</summary>
+      <returns>True if the path contains a wildcard.</returns>
+      <param name="path">The path to check.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.MakeRelative(System.String,System.String)">
+      <summary>Given a path and folder, return the path relative to the folder. If the path is not under the folder the path is returned unmodified. Both path and folder are assumed to be in canonical form. Examples: MakeRelative(@"$/src/project/abc.cpp", @"$/src") -&gt; @"project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/specs") -&gt; @"$/src/project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/src/proj") -&gt; @"$/src/project/abc.cpp"</summary>
+      <returns>Relative path.</returns>
+      <param name="item">Path to make relative.</param>
+      <param name="folder">Folder to make it relative to.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.MakeRelative(System.String,System.String,System.Boolean)">
+      <summary>Given a path and folder, return the path relative to the folder. If the path is not under the folder and the recursive parameter is false then path is returned unmodified. Otherwise, the method iteratively each parent directory in the specified folder and tries to make item relative. Both path and folder are assumed to be in canonical form.  Examples: MakeRelative(@"$/src/project/abc.cpp", @"$/src",false) -&gt; @"project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/specs",false) -&gt; @"$/src/project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/src/proj",false) -&gt; @"$/src/project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/src", true) -&gt; @"project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/specs", true) -&gt; @"../src/project/abc.cpp" MakeRelative(@"$/src/project/abc.cpp", @"$/src/proj", true) -&gt; @"../project/abc.cpp"</summary>
+      <returns>Relative path.</returns>
+      <param name="item">Path to make relative.</param>
+      <param name="folder">Folder to make it relative to.</param>
+      <param name="recursive">Flag to indicate if method should relativize to folder's parents.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Match(System.String,System.String,System.String,System.Boolean)">
+      <summary>Compare an item to see whether it matches a folder and a name that may be a wildcard. If recursive is true then any matching item under the matchFolder will match. Wildcard matching is performed by using the NT file system matching rules.</summary>
+      <returns>true if the item matches, false otherwise.</returns>
+      <param name="item">Item to match.</param>
+      <param name="matchFolder">Folder to match against.</param>
+      <param name="matchPattern">Wildcard to match against.</param>
+      <param name="recursive">Whether or not the match occurs recursively.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.MatchFileName(System.String,System.String)">
+      <summary>Match just the final component of the specified item to the specified wildcard.</summary>
+      <returns>True if the wildcard matches.</returns>
+      <param name="item">Fully qualified path to match.</param>
+      <param name="matchPattern">Wildcard to match to.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Parse(System.String,System.String@,System.String@)">
+      <summary>Parse a canonicalized item spec into a parent folder and the last path component. If "$/" is passed, the parent is "$/" and the name is "".</summary>
+      <param name="item">The item to parse into a parent path and a name.</param>
+      <param name="parent">The parent path returned.</param>
+      <param name="name">The name returned.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.PrependRootIfNeeded(System.String)">
+      <summary>Utility method to prepend the root ($/) to a folder - most useful for getting the folder of a team project if you only have his name.</summary>
+      <returns>Folder path starting with root.</returns>
+      <param name="folder">Folder path that may start with $/ already.</param>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.RootFolder"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.Separator"></member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.StringComparer">
+      <summary>This is a property for comparison of server paths in instances like a Dictionary hash.</summary>
+      <returns>Returns <see cref="T:System.StringComparer" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPath.ValidatePath(System.String)">
+      <summary>Validate the server path. Wildcards are not allowed. Exception is thrown if invalid.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.Annotation"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.Changeset"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.ImmutableVersionedItem"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.PendingChange"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.Shelveset"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlPropertyKinds.VersionedItem"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VersionControlWellKnownGroups"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionControlWellKnownGroups.ProxyServiceGroup"></member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions">
+      <summary>Defines the permission bitmasks used in the database for versioned items (files/folders) Used in tblPermission.GrantedPermission and tblPermission.RevokedPermission</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.Read">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.PendChange">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.Checkin">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.Label">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.Lock">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.ReviseOther">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.UnlockOther">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.UndoOther">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.LabelOther">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.AdminProjectRights">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.CheckinOther">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.Merge">
+      <summary>Determines whether a given user has permissions to perform merge operations.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VersionedItemPermissions.ManageBranch">
+      <summary>Determines whether a given user has permissions to manage branch objects. manage includes the following operations: create a branch object, update branch object metadata, destroy branch objects. NOTE THAT THIS PERMISSION DOES NOT APPLY TO REGULAR BRANCHES.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.VssOutputType">
+      <summary>Supported diff output types from Visual Source Safe.NOTE: This was copied almost verbatim from the old engine, because we already shipped this enum.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VssOutputType.Vss">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VssOutputType.Unix">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.VssOutputType.SideBySide">
+      <summary />
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceLocation">
+      <summary>Indicates the location where data (pending changes, local versions) for this workspace are stored.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceLocation.Server">
+      <summary>Indicates a server-side (traditional) workspace, backward compatible with TFS 2005-2010.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceLocation.Local">
+      <summary>Indicates a local workspace, with pending changes and local version data stored on the client.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceOptions"></member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceOptions.None">
+      <summary />
+    </member>
+    <member name="F:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceOptions.SetFileTimeToCheckin">
+      <summary>Sets the last modified time for newly downloaded files to checkin time.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec">
+      <summary>A utility class for manipulating Hatteras workspace specifications. It contains routines for parsing, formatting, validating, and so on</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.Combine(System.String,System.String)">
+      <summary>Builds the qualified workspace name from the separate workspace and owner parts.</summary>
+      <returns>the qualified workspace name</returns>
+      <param name="workspace">workspace name</param>
+      <param name="owner">workspace owner</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.Combine(System.String,System.String,System.String)">
+      <summary>Builds the fully qualified workspace name with owner disambiguation from the separate workspace and owner parts.</summary>
+      <returns>the fully qualified workspace name</returns>
+      <param name="workspace">workspace name</param>
+      <param name="ownerDisplay">workspace owner display name</param>
+      <param name="ownerUnique">workspace owner unique name</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.IsLegalName(System.String)">
+      <summary>Checks to see whether the workspace name consists only of valid characters and is less than the maximum length and does not contain a workspace separator.</summary>
+      <returns>true if the workspace name is valid; false otherwise</returns>
+      <param name="workspaceName">workspace name to check</param>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.OwnerDisambiguationSeparatorEnd">
+      <summary>Returns the end string for the owner disambiguation separator.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.OwnerDisambiguationSeparatorStart">
+      <summary>Returns the start string for the owner disambiguation separator.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.Parse(System.String,System.String,System.String,System.String@,System.String@,System.String@)">
+      <summary>Parse a workspace spec of the form Workspace;user and return the two parts. If the user name is not specified (or fully qualified) in the workspace specification, use information from the defaultUser arguments. NOTE: This method may qualified username (e.g. it lacked the domain\ prefix), this routine does not attempt to provide the missing pieces. The caller is reponsible for doing this.</summary>
+      <param name="spec">the workspace spec to parse</param>
+      <param name="defaultUser">the fully qualified default user</param>
+      <param name="workspaceName">returned workspace name</param>
+      <param name="workspaceOwner">returned workspace owner</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.Parse(System.String,System.String,System.String@,System.String@)">
+      <summary>Parse a workspace spec of the form Workspace;user and return the two parts. If the user name is not specified (or fully qualified) in the workspace specification, use information from the defaultUser argument. NOTE: This method may qualified username (e.g. it lacked the domain\ prefix), this routine does not attempt to provide the missing pieces. The caller is reponsible for doing this.</summary>
+      <param name="spec">the workspace spec to parse</param>
+      <param name="defaultUser">the fully qualified default user</param>
+      <param name="workspaceName">returned workspace name</param>
+      <param name="workspaceOwner">returned workspace owner</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.SanitizeProposedName(System.String)">
+      <summary>Given a proposed name for a shelveset or workspace, truncates it at the maximum length for shelveset and workspace names, and removes invalid characters. Name validation is enforced by the server. The sanitization process for cleaning up a name is current as of the version of this object model.While unlikely, it is possible that if this method is used with a future version of esprtfs, that the name generated may not be valid due to a change in the rules for workspace and shelveset names.</summary>
+      <returns>A sanitized name for the workspace or shelveset</returns>
+      <param name="proposedName">Proposed name for the workspace or shelveset</param>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.VersionControl.Common.WorkspaceSpec.Separator">
+      <summary>Returns the separator character for WorkspaceSpec.</summary>
+      <returns>Returns <see cref="T:System.Char" />.</returns>
+    </member>
+  </members>
+</doc>

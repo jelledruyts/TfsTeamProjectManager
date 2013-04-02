@@ -1,20 +1,21 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.Framework.Client;
-using Microsoft.TeamFoundation.Framework.Common;
-using Microsoft.TeamFoundation.Server;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.Security
 {
+    // TODO: Add support for Teams
     [Export]
     public class SecurityViewModel : ViewModelBase
     {
@@ -22,7 +23,10 @@ namespace TeamProjectManager.Modules.Security
 
         public RelayCommand GetSecurityGroupsCommand { get; private set; }
         public RelayCommand DeleteSelectedSecurityGroupsCommand { get; private set; }
-        public RelayCommand AddSecurityGroupCommand { get; private set; }
+        public RelayCommand AddOrUpdateSecurityGroupCommand { get; private set; }
+        public RelayCommand ResetSecurityPermissionsCommand { get; private set; }
+        public RelayCommand LoadSecurityPermissionsCommand { get; private set; }
+        public RelayCommand SaveSecurityPermissionsCommand { get; private set; }
 
         #endregion
 
@@ -52,21 +56,13 @@ namespace TeamProjectManager.Modules.Security
 
         public static ObservableProperty<ICollection<SecurityGroupInfo>> SelectedSecurityGroupsProperty = new ObservableProperty<ICollection<SecurityGroupInfo>, SecurityViewModel>(o => o.SelectedSecurityGroups);
 
-        public string NewSecurityGroupName
+        public SecurityGroupChange SecurityGroupChange
         {
-            get { return this.GetValue(NewSecurityGroupNameProperty); }
-            set { this.SetValue(NewSecurityGroupNameProperty, value); }
+            get { return this.GetValue(SecurityGroupChangeProperty); }
+            set { this.SetValue(SecurityGroupChangeProperty, value); }
         }
 
-        public static ObservableProperty<string> NewSecurityGroupNameProperty = new ObservableProperty<string, SecurityViewModel>(o => o.NewSecurityGroupName);
-
-        public string NewSecurityGroupDescription
-        {
-            get { return this.GetValue(NewSecurityGroupDescriptionProperty); }
-            set { this.SetValue(NewSecurityGroupDescriptionProperty, value); }
-        }
-
-        public static ObservableProperty<string> NewSecurityGroupDescriptionProperty = new ObservableProperty<string, SecurityViewModel>(o => o.NewSecurityGroupDescription);
+        public static readonly ObservableProperty<SecurityGroupChange> SecurityGroupChangeProperty = new ObservableProperty<SecurityGroupChange, SecurityViewModel>(o => o.SecurityGroupChange);
 
         #endregion
 
@@ -78,12 +74,16 @@ namespace TeamProjectManager.Modules.Security
         {
             this.GetSecurityGroupsCommand = new RelayCommand(GetSecurityGroups, CanGetSecurityGroups);
             this.DeleteSelectedSecurityGroupsCommand = new RelayCommand(DeleteSelectedSecurityGroups, CanDeleteSelectedSecurityGroups);
-            this.AddSecurityGroupCommand = new RelayCommand(AddSecurityGroup, CanAddSecurityGroup);
+            this.AddOrUpdateSecurityGroupCommand = new RelayCommand(AddOrUpdateSecurityGroup, CanAddOrUpdateSecurityGroup);
+            this.ResetSecurityPermissionsCommand = new RelayCommand(ResetSecurityPermissions, CanResetSecurityPermissions);
+            this.LoadSecurityPermissionsCommand = new RelayCommand(LoadSecurityPermissions, CanLoadSecurityPermissions);
+            this.SaveSecurityPermissionsCommand = new RelayCommand(SaveSecurityPermissions, CanSaveSecurityPermissions);
+            this.SecurityGroupChange = new SecurityGroupChange();
         }
 
         #endregion
 
-        #region Commands
+        #region GetSecurityGroups Command
 
         private bool CanGetSecurityGroups(object argument)
         {
@@ -155,6 +155,10 @@ namespace TeamProjectManager.Modules.Security
             worker.RunWorkerAsync();
         }
 
+        #endregion
+
+        #region DeleteSelectedSecurityGroups Command
+
         private bool CanDeleteSelectedSecurityGroups(object argument)
         {
             return this.SelectedSecurityGroups != null && this.SelectedSecurityGroups.Any();
@@ -213,40 +217,124 @@ namespace TeamProjectManager.Modules.Security
             }
         }
 
-        private bool CanAddSecurityGroup(object argument)
+        #endregion
+
+        #region ResetSecurityPermissions Command
+
+        private bool CanResetSecurityPermissions(object argument)
         {
-            return IsAnyTeamProjectSelected() && !string.IsNullOrEmpty(this.NewSecurityGroupName);
+            return true;
         }
 
-        private void AddSecurityGroup(object argument)
+        private void ResetSecurityPermissions(object argument)
         {
-            var result = MessageBox.Show("This will add a new security group to all selected Team Projects. Are you sure you want to continue?", "Confirm Add", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            this.SecurityGroupChange.ResetPermissionChanges();
+            RefreshSecurityGroupChange();
+        }
+
+        #endregion
+
+        #region LoadSecurityPermissions Command
+
+        private bool CanLoadSecurityPermissions(object argument)
+        {
+            return true;
+        }
+
+        private void LoadSecurityPermissions(object argument)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Please select the security permissions file (*.xml) to load.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    var persistedPermissions = SerializationProvider.Read<PermissionChangePersistenceData[]>(dialog.FileName);
+                    this.SecurityGroupChange.ResetPermissionChanges();
+                    foreach (var persistedPermission in persistedPermissions)
+                    {
+                        var permission = this.SecurityGroupChange.PermissionChanges.FirstOrDefault(p => p.Permission.Scope == persistedPermission.Scope && string.Equals(p.Permission.PermissionConstant, persistedPermission.Name, StringComparison.OrdinalIgnoreCase));
+                        if (permission != null)
+                        {
+                            permission.Action = persistedPermission.Action;
+                        }
+                    }
+                    RefreshSecurityGroupChange();
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the security permissions from \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while loading the security permissions. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        #endregion
+
+        #region SaveSecurityPermissions Command
+
+        private bool CanSaveSecurityPermissions(object argument)
+        {
+            return true;
+        }
+
+        private void SaveSecurityPermissions(object argument)
+        {
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Please select the security permissions file (*.xml) to save.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    SerializationProvider.Write<PermissionChangePersistenceData[]>(this.SecurityGroupChange.PermissionChanges.Select(p => new PermissionChangePersistenceData(p)).ToArray(), dialog.FileName);
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while saving the security permissions to \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while saving the security permissions. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        #endregion
+
+        #region AddOrUpdateSecurityGroup Command
+
+        private bool CanAddOrUpdateSecurityGroup(object argument)
+        {
+            return IsAnyTeamProjectSelected() && !string.IsNullOrEmpty(this.SecurityGroupChange.Name);
+        }
+
+        private void AddOrUpdateSecurityGroup(object argument)
+        {
+            var result = MessageBox.Show("This will add a new security group to all selected Team Projects, or update the existing group if it already exists. Are you sure you want to continue?", "Confirm Add", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
                 var teamProjects = this.SelectedTeamProjects.ToList();
-                var groupName = this.NewSecurityGroupName;
-                var groupDescription = this.NewSecurityGroupDescription;
-                var task = new ApplicationTask("Adding security groups", teamProjects.Count);
+                var task = new ApplicationTask("Adding / updating security groups", teamProjects.Count);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
                     var tfs = GetSelectedTfsTeamProjectCollection();
-                    var securityService = tfs.GetService<IIdentityManagementService>();
 
                     var step = 0;
                     var count = 0;
                     foreach (var teamProject in teamProjects)
                     {
-                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Adding security group \"{0}\" to Team Project \"{1}\"", groupName, teamProject.Name));
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Adding / updating security group \"{0}\" for Team Project \"{1}\"", this.SecurityGroupChange.Name, teamProject.Name));
                         try
                         {
-                            securityService.CreateApplicationGroup(teamProject.Uri.ToString(), groupName, groupDescription);
+                            SecurityManager.Apply(task, tfs, teamProject.Name, this.SecurityGroupChange);
                             count++;
                         }
                         catch (Exception exc)
                         {
-                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while adding security group \"{0}\" to Team Project \"{1}\"", groupName, teamProject.Name), exc);
+                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while adding / updating security group \"{0}\" for Team Project \"{1}\"", this.SecurityGroupChange.Name, teamProject.Name), exc);
                         }
                     }
 
@@ -256,18 +344,30 @@ namespace TeamProjectManager.Modules.Security
                 {
                     if (e.Error != null)
                     {
-                        Logger.Log("An unexpected exception occurred while deleting security groups", e.Error);
+                        Logger.Log("An unexpected exception occurred while adding / updating security groups", e.Error);
                         task.SetError(e.Error);
                         task.SetComplete("An unexpected exception occurred");
                     }
                     else
                     {
                         var count = (int)e.Result;
-                        task.SetComplete("Added " + count.ToCountString("security group"));
+                        task.SetComplete("Added / updated " + count.ToCountString("security group"));
                     }
                 };
                 worker.RunWorkerAsync();
             }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void RefreshSecurityGroupChange()
+        {
+            // The SecurityGroupChange is not observable, force a UI binding refresh by removing and re-adding the entire instance.
+            var change = this.SecurityGroupChange;
+            this.SecurityGroupChange = null;
+            this.SecurityGroupChange = change;
         }
 
         #endregion

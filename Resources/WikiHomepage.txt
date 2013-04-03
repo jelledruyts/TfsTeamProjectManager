@@ -20,7 +20,8 @@ Team Project Manager can help you...
 * *Manage security*
 ** Understand which security groups have which members
 ** Delete security groups
-** Add security groups
+** Add or update security groups
+** Manage members and permissions for security groups
 * *Manage source control*
 ** Understand which projects have which source control settings (multiple check-out, get latest on check-out, check-in notes)
 ** Update source control settings
@@ -51,6 +52,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 * v1.5
 ** Added activity module that allows you to see the most recent activity (in Source Control, Work Item Tracking and Team Build) for Team Projects.
+** Updated security module to allow you to manage members and permissions for security groups.
 * v1.4.4793 (February 14, 2013)
 ** Added support for moving work item comparison sources up and down
 ** Improved work item comparison to better support TFS 2012 Update 1

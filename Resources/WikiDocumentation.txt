@@ -67,7 +67,7 @@ This can be useful when you want to get an overview of all the security groups b
 Allows you to add or update security groups across multiple Team Projects.
 This can be useful when you want to have consistent security groups or when you want to import new work item types that require certain security groups to be present.
 
-[image:Add Group|Security-AddGroup.png]
+[image:Add Group|Security-AddUpdateGroup.png]
 
 {anchor:Source Control}
 !! Source Control

@@ -19,7 +19,7 @@ namespace TeamProjectManager.Modules.Security
             this.Name = name;
             this.Description = description;
             this.Members = members ?? new string[0];
-            this.MembersList = string.Join(", ", this.Members);
+            this.MembersList = string.Join("; ", this.Members);
         }
     }
 }

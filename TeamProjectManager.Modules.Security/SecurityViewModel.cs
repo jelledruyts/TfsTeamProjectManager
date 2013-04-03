@@ -15,7 +15,6 @@ using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.Security
 {
-    // TODO: Add support for Teams
     [Export]
     public class SecurityViewModel : ViewModelBase
     {
@@ -100,7 +99,7 @@ namespace TeamProjectManager.Modules.Security
             worker.DoWork += (sender, e) =>
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
-                var securityService = tfs.GetService<IIdentityManagementService>();
+                var ims = tfs.GetService<IIdentityManagementService>();
 
                 var step = 0;
                 var securityGroups = new List<SecurityGroupInfo>();
@@ -109,23 +108,18 @@ namespace TeamProjectManager.Modules.Security
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
                     try
                     {
-                        foreach (var applicationGroup in securityService.ListApplicationGroups(teamProject.Uri.ToString(), ReadIdentityOptions.None).Where(g => g.IsActive).OrderBy(g => g.DisplayName))
+                        foreach (var applicationGroup in ims.ListApplicationGroups(teamProject.Uri.ToString(), ReadIdentityOptions.None).Where(g => g.IsActive).OrderBy(g => g.DisplayName))
                         {
                             var members = new List<string>();
                             if (membershipMode != MembershipQuery.None)
                             {
-                                var applicationGroupWithMembers = securityService.ReadIdentity(applicationGroup.Descriptor, membershipMode, ReadIdentityOptions.None);
+                                var applicationGroupWithMembers = ims.ReadIdentity(applicationGroup.Descriptor, membershipMode, ReadIdentityOptions.None);
                                 if (applicationGroupWithMembers.Members != null && applicationGroupWithMembers.Members.Any())
                                 {
-                                    members.AddRange(securityService.ReadIdentities(applicationGroupWithMembers.Members, membershipMode, ReadIdentityOptions.None).Where(m => m != null).Select(m => m.DisplayName));
+                                    members.AddRange(ims.ReadIdentities(applicationGroupWithMembers.Members, membershipMode, ReadIdentityOptions.None).Where(m => m != null).Select(m => m.DisplayName));
                                 }
                             }
-                            object descriptionObject = null;
-                            string description = null;
-                            if (applicationGroup.TryGetProperty("Description", out descriptionObject))
-                            {
-                                description = descriptionObject.ToString();
-                            }
+                            var description = applicationGroup.GetAttribute("Description", null);
                             var securityGroup = new SecurityGroupInfo(teamProject, applicationGroup.Descriptor.Identifier, applicationGroup.DisplayName, description, members);
                             securityGroups.Add(securityGroup);
                         }

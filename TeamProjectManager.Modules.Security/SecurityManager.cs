@@ -218,6 +218,8 @@ namespace TeamProjectManager.Modules.Security
 
         private static void ApplyGroupMemberChanges(ApplicationTask task, SecurityGroupChange securityGroup, IdentityDescriptor groupDescriptor, IIdentityManagementService ims, IList<TeamFoundationIdentity> existingMembers)
         {
+            var existingMemberAccountNames = existingMembers.Select(m => GetAccountName(m));
+
             // Remove requested members.
             if (securityGroup.RemoveAllUsers)
             {
@@ -230,9 +232,9 @@ namespace TeamProjectManager.Modules.Security
             {
                 if (!string.IsNullOrEmpty(securityGroup.UsersToRemove))
                 {
-                    foreach (var userToRemove in securityGroup.UsersToRemove.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                    foreach (var userToRemove in securityGroup.UsersToRemove.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(u => u.Trim()))
                     {
-                        if (existingMembers.Any(m => string.Equals(m.UniqueName, userToRemove, StringComparison.OrdinalIgnoreCase)))
+                        if (existingMemberAccountNames.Any(m => string.Equals(m, userToRemove, StringComparison.OrdinalIgnoreCase)))
                         {
                             PerformUserAction(task, ims, userToRemove, identityToRemove => ims.RemoveMemberFromApplicationGroup(groupDescriptor, identityToRemove.Descriptor));
                         }
@@ -243,13 +245,29 @@ namespace TeamProjectManager.Modules.Security
             // Add requested members.
             if (!string.IsNullOrEmpty(securityGroup.UsersToAdd))
             {
-                foreach (var userToAdd in securityGroup.UsersToAdd.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var userToAdd in securityGroup.UsersToAdd.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(u => u.Trim()))
                 {
-                    if (!existingMembers.Any(m => string.Equals(m.UniqueName, userToAdd, StringComparison.OrdinalIgnoreCase)))
+                    if (!existingMemberAccountNames.Any(m => string.Equals(m, userToAdd, StringComparison.OrdinalIgnoreCase)))
                     {
                         PerformUserAction(task, ims, userToAdd, identityToAdd => ims.AddMemberToApplicationGroup(groupDescriptor, identityToAdd.Descriptor));
                     }
                 }
+            }
+        }
+
+        private static string GetAccountName(TeamFoundationIdentity identity)
+        {
+            var scopeName = identity.GetAttribute("ScopeName", null);
+            var account = identity.GetAttribute("Account", null);
+            if (!string.IsNullOrEmpty(scopeName) && !string.IsNullOrEmpty(account))
+            {
+                // If the identity has a scope name, it's a TFS group and the domain name is a classification URI (vstfs:///Classification/...).
+                // In that case, the account name should be "[ScopeName]\Group" (e.g. "[MyTeamProject]\Contributors").
+                return "[{0}]\\{1}".FormatInvariant(scopeName, account);
+            }
+            else
+            {
+                return identity.UniqueName;
             }
         }
 

@@ -50,7 +50,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v1.5
+* v1.5.4852 (April 14, 2013)
 ** Added activity module that allows you to see the most recent activity (in Source Control, Work Item Tracking and Team Build) for Team Projects.
 ** Updated security module to allow you to manage members and permissions for security groups.
 * v1.4.4793 (February 14, 2013)

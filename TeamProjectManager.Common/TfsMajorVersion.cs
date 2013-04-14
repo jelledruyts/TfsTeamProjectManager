@@ -44,6 +44,11 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// Represents Team Foundation Server 11 Update 2 (TFS 2012.2).
         /// </summary>
-        V11Update2 = 112
+        V11Update2 = 112,
+
+        /// <summary>
+        /// Represents the highest known version of Team Foundation Server.
+        /// </summary>
+        HighestKnownVersion = V11Update2
     }
 }

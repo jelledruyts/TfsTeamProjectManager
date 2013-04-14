@@ -52,7 +52,15 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             set { this.SetValue(InfoMessageProperty, value); }
         }
 
-        public static ObservableProperty<string> InfoMessageProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessage, "Please select a project collection");
+        public static ObservableProperty<string> InfoMessageProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessage, "Please select a Team Project Collection");
+
+        public string InfoMessageToolTip
+        {
+            get { return this.GetValue(InfoMessageToolTipProperty); }
+            set { this.SetValue(InfoMessageToolTipProperty, value); }
+        }
+
+        public static readonly ObservableProperty<string> InfoMessageToolTipProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.InfoMessageToolTip);
 
         public bool IsTeamProjectsLoadComplete
         {
@@ -139,7 +147,6 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
         }
 
-
         private void RefreshTeamProjects(bool forceRefresh)
         {
             if (forceRefresh || (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer == null && this.SelectedTeamProjectCollection.TeamProjects == null))
@@ -147,7 +154,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var teamProjectCollectionToRefresh = this.SelectedTeamProjectCollection;
                 this.SelectedTeamProjectCollection = null;
                 var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Retrieving team projects for \"{0}\"", teamProjectCollectionToRefresh.Name));
-                this.InfoMessage = "Loading...";
+                SetInfoMessage("Loading...", null);
                 this.PublishStatus(new StatusEventArgs(task));
                 this.IsTeamProjectsLoadComplete = false;
                 this.TeamProjectsVisibility = Visibility.Collapsed;
@@ -165,7 +172,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                     if (e.Error != null)
                     {
                         this.Logger.Log("An unexpected exception occurred while retrieving team projects", e.Error);
-                        this.InfoMessage = "Could not connect";
+                        SetInfoMessage("Could not connect", e.Error.Message);
                         task.SetError(e.Error);
                         task.SetComplete("An unexpected exception occurred");
                     }
@@ -186,12 +193,18 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             {
                 if (this.SelectedTeamProjectCollection == null)
                 {
-                    this.InfoMessage = InfoMessageProperty.DefaultValue;
+                    SetInfoMessage(InfoMessageProperty.DefaultValue, null);
                     this.TeamProjectsVisibility = Visibility.Collapsed;
                 }
                 else
                 {
-                    this.InfoMessage = "Connected to " + this.SelectedTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion;
+                    var infoMessage = "Connected to {0}".FormatCurrent(this.SelectedTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion);
+                    var toolTip = "Connected to {0}".FormatCurrent(this.SelectedTeamProjectCollection.TeamFoundationServer.DisplayVersion);
+                    if (this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion == TfsMajorVersion.HighestKnownVersion)
+                    {
+                        toolTip += " or later";
+                    }
+                    SetInfoMessage(infoMessage, toolTip);
                     this.TeamProjectsVisibility = Visibility.Visible;
                 }
                 this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(this.SelectedTeamProjectCollection));
@@ -243,6 +256,12 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
             // We must be talking to an unknown version of TFS.
             return new TeamFoundationServerInfo(TfsMajorVersion.Unknown, "Unknown version of Team Foundation Server", "Unknown TFS Version");
+        }
+
+        private void SetInfoMessage(string infoMessage, string toolTip)
+        {
+            this.InfoMessage = infoMessage;
+            this.InfoMessageToolTip = toolTip;
         }
 
         #endregion

@@ -155,7 +155,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 worker.DoWork += (sender, e) =>
                 {
                     var tfs = GetTfsTeamProjectCollection(teamProjectCollectionToRefresh.Uri);
-                    var tfsInfo = new TeamFoundationServerInfo(GetTfsMajorVersion(tfs, this.Logger));
+                    var tfsInfo = GetTeamFoundationServerInfo(tfs, this.Logger);
                     var store = tfs.GetService<ICommonStructureService>();
                     var teamProjects = store.ListAllProjects().Where(p => p.Status == Microsoft.TeamFoundation.Common.ProjectState.WellFormed).Select(p => new TeamProjectInfo(teamProjectCollectionToRefresh, p.Name, new Uri(p.Uri))).OrderBy(p => p.Name).ToList();
                     e.Result = new Tuple<TeamFoundationServerInfo, ICollection<TeamProjectInfo>>(tfsInfo, teamProjects);
@@ -198,45 +198,42 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
         }
 
-        private static TfsMajorVersion GetTfsMajorVersion(TfsTeamProjectCollection tfs, ILogger logger)
+        private static TeamFoundationServerInfo GetTeamFoundationServerInfo(TfsTeamProjectCollection tfs, ILogger logger)
         {
             try
             {
+                // Determine the version of TFS based on the service interfaces that are available.
                 var registrationService = (IRegistration)tfs.GetService(typeof(IRegistration));
-                var frameworkEntries = registrationService.GetRegistrationEntries("Framework");
-                if (frameworkEntries.Length > 0)
+                var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
+                                        from si in e.ServiceInterfaces
+                                        select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService3", StringComparison.OrdinalIgnoreCase)))
                 {
-                    // If there are Framework registration entries, we are talking to at least TFS 2010.
-                    var serviceInterfaces = frameworkEntries.SelectMany(e => e.ServiceInterfaces ?? new ServiceInterface[0]);
-
-                    if (serviceInterfaces.Any(i => string.Equals(i.Name, "FileContainersResource", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        // We are talking to TFS 2012 Update 1, which is v11.1.
-                        return TfsMajorVersion.V11Update1;
-                    }
-                    if (serviceInterfaces.Any(i => string.Equals(i.Name, "IdentityManagementService2", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        // We are talking to TFS 2012, which is v11.
-                        return TfsMajorVersion.V11;
-                    }
-
-                    // We are talking to TFS 2010, which is v10.
-                    return TfsMajorVersion.V10;
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V11Update2, "Team Foundation Server 2012 Update 2", "TFS 2012.2");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService2", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V11Update1, "Team Foundation Server 2012 Update 1", "TFS 2012.1");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V11, "Team Foundation Server 2012", "TFS 2012.0");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestResultsServiceEx", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V10SP1, "Team Foundation Server 2010 Service Pack 1", "TFS 2010 SP1");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "LocationService", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V10, "Team Foundation Server 2010", "TFS 2010 RTM");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "vstfs", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "GroupSecurity2", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V9, "Team Foundation Server 2008", "TFS 2008");
                 }
                 else
                 {
-                    var vstfsEntries = registrationService.GetRegistrationEntries("vstfs");
-                    if (vstfsEntries.Length == 1)
-                    {
-                        if (vstfsEntries[0].ServiceInterfaces.Any(i => i != null && string.Equals(i.Name, "GroupSecurity2", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            // We are talking to TFS 2008, which is v9.
-                            return TfsMajorVersion.V9;
-                        }
-
-                        // We are talking to TFS 2005, which is v8.
-                        return TfsMajorVersion.V8;
-                    }
+                    return new TeamFoundationServerInfo(TfsMajorVersion.V8, "Team Foundation Server 2005", "TFS 2005");
                 }
             }
             catch (TeamFoundationServerException exc)
@@ -245,7 +242,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
 
             // We must be talking to an unknown version of TFS.
-            return TfsMajorVersion.Unknown;
+            return new TeamFoundationServerInfo(TfsMajorVersion.Unknown, "Unknown version of Team Foundation Server", "Unknown TFS Version");
         }
 
         #endregion

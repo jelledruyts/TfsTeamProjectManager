@@ -70,11 +70,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             // Create a lookup table of system fields per major version of TFS.
             SystemFields = new Dictionary<TfsMajorVersion, Dictionary<string, Dictionary<string, string>>>
             {
-                { TfsMajorVersion.V8, baseSystemFields },
-                { TfsMajorVersion.V9, baseSystemFields },
-                { TfsMajorVersion.V10, baseSystemFields },
-                { TfsMajorVersion.V11, tfs11SystemFields },
-                { TfsMajorVersion.V11Update1, tfs11SystemFields }
+                { TfsMajorVersion.Unknown, baseSystemFields },
+                { TfsMajorVersion.V11, tfs11SystemFields }
             };
         }
 
@@ -196,7 +193,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
             // Add certain fields that are auto-generated if they're not present.
             var fieldDefinitionsNode = normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE/FIELDS");
-            var currentSystemFields = SystemFields[tfsMajorVersion];
+            var highestMatchingTfsVersionWithSystemFields = SystemFields.Keys.OrderBy(v => (int)v).Last(v => v <= tfsMajorVersion);
+            var currentSystemFields = SystemFields[highestMatchingTfsVersionWithSystemFields];
             foreach (var refname in currentSystemFields.Keys)
             {
                 var field = fieldDefinitionsNode.SelectSingleNode(string.Format(CultureInfo.InvariantCulture, "FIELD[@refname='{0}']", refname));

@@ -59,7 +59,7 @@
                                             </Style>
                                         </ProgressBar.Style>
                                     </ProgressBar>
-                                    <Button Grid.Column="1" ToolTip="Cancel" Command="{Binding Path=RequestCancelCommand}" Height="10" Width="10" Padding="0" Margin="0,0,5,0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                    <Button Grid.Column="1" ToolTip="Cancel" Command="{Binding Path=RequestCancelCommand}" Height="10" Width="10" Padding="0" Margin="0,0,5,0">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                 <Style.Triggers>
@@ -69,11 +69,28 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Button.Style>
-                                        <Button.Content>
-                                            <Canvas Margin="-1,-1,0,0">
-                                                <Path Data="M0,0 L1,1 M0,1 L1,0" Stretch="Fill" Stroke="Black" StrokeThickness="1" Width="5" Height="5" />
-                                            </Canvas>
-                                        </Button.Content>
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Grid>
+                                                    <Path x:Name="buttonPath" Width="6" Height="6"
+                                                      Margin="0" Data="M0,0 L1,1 M0,1 L1,0" 
+                                                      Stroke="Gray" StrokeThickness="1.5"
+                                                      StrokeStartLineCap="Square" StrokeEndLineCap="Square"
+                                                      Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="buttonPath" Property="Stroke" Value="Red"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="true">
+                                                        <Setter TargetName="buttonPath" Property="Stroke" Value="Red"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter TargetName="buttonPath" Property="Stroke" Value="DarkGray"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
                                     </Button>
                                     <TextBlock Grid.Column="2" Text="{Binding Path=Task.PercentComplete, Mode=OneWay, StringFormat='{}{0:00%} | '}" Foreground="{DynamicResource UserMessageFontBrush}" FontSize="12" TextTrimming="CharacterEllipsis" />
                                 </Grid>

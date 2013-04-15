@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -6,9 +9,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.Win32;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -116,7 +116,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void GetProcessConfigurations(object argument)
         {
             var teamProjects = this.SelectedTeamProjects.ToList();
-            var task = new ApplicationTask("Retrieving process configurations", teamProjects.Count);
+            var task = new ApplicationTask("Retrieving process configurations", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -146,6 +146,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = results;
@@ -210,7 +215,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
 
-            var task = new ApplicationTask("Exporting process configurations", processConfigurationExports.Count);
+            var task = new ApplicationTask("Exporting process configurations", processConfigurationExports.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -335,7 +340,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void PerformImport(Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
         {
             var numberOfSteps = teamProjectsWithProcessConfigurations.Aggregate(0, (a, p) => a += p.Value.Count);
-            var task = new ApplicationTask("Importing process configurations", numberOfSteps);
+            var task = new ApplicationTask("Importing process configurations", numberOfSteps, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>

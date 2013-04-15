@@ -99,7 +99,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void GetWorkItemCategories(object argument)
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var task = new ApplicationTask("Retrieving work item categories", teamProjectNames.Count);
+            var task = new ApplicationTask("Retrieving work item categories", teamProjectNames.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -125,6 +125,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = results;
@@ -161,7 +166,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 return;
             }
 
-            var task = new ApplicationTask("Deleting " + workItemCategoriesToDelete.Count.ToCountString("work item category"), workItemCategoriesToDelete.Count);
+            var task = new ApplicationTask("Deleting " + workItemCategoriesToDelete.Count.ToCountString("work item category"), workItemCategoriesToDelete.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -202,7 +207,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     {
                         task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                     }
-
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
                 }
             };
             worker.RunWorkerCompleted += (sender, e) =>
@@ -287,7 +296,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 return;
             }
 
-            var task = new ApplicationTask("Importing work item category list", this.SelectedTeamProjects.Count);
+            var task = new ApplicationTask("Importing work item category list", this.SelectedTeamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -307,6 +316,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while importing the work item category list for Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
             };

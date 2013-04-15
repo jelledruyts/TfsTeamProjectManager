@@ -151,6 +151,34 @@ namespace TeamProjectManager.Common.Infrastructure
         /// </summary>
         public static ObservableProperty<int?> CurrentStepProperty = new ObservableProperty<int?, ApplicationTask>(o => o.CurrentStep);
 
+        /// <summary>
+        /// Gets a value that determines if this task can be canceled.
+        /// </summary>
+        public bool CanCancel
+        {
+            get { return this.GetValue(CanCancelProperty); }
+            private set { this.SetValue(CanCancelProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition for the <see cref="CanCancel"/> observable property.
+        /// </summary>
+        public static ObservableProperty<bool> CanCancelProperty = new ObservableProperty<bool, ApplicationTask>(o => o.CanCancel);
+
+        /// <summary>
+        /// Gets a value that determines if this task was requested to be canceled.
+        /// </summary>
+        public bool IsCanceled
+        {
+            get { return this.GetValue(IsCanceledProperty); }
+            private set { this.SetValue(IsCanceledProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition for the <see cref="IsCanceled"/> observable property.
+        /// </summary>
+        public static ObservableProperty<bool> IsCanceledProperty = new ObservableProperty<bool, ApplicationTask>(o => o.IsCanceled);
+
         #endregion
 
         #region Constructors
@@ -160,7 +188,7 @@ namespace TeamProjectManager.Common.Infrastructure
         /// </summary>
         /// <param name="name">The name of this task.</param>
         public ApplicationTask(string name)
-            : this(name, null)
+            : this(name, null, false)
         {
         }
 
@@ -170,6 +198,27 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <param name="name">The name of this task.</param>
         /// <param name="totalSteps">The total number of steps to be completed in this task.</param>
         public ApplicationTask(string name, int? totalSteps)
+            : this(name, totalSteps, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationTask"/> class.
+        /// </summary>
+        /// <param name="name">The name of this task.</param>
+        /// <param name="canCancel">A value that determines if this task can be canceled.</param>
+        public ApplicationTask(string name, bool canCancel)
+            : this(name, null, canCancel)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationTask"/> class.
+        /// </summary>
+        /// <param name="name">The name of this task.</param>
+        /// <param name="totalSteps">The total number of steps to be completed in this task.</param>
+        /// <param name="canCancel">A value that determines if this task can be canceled.</param>
+        public ApplicationTask(string name, int? totalSteps, bool canCancel)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -178,6 +227,7 @@ namespace TeamProjectManager.Common.Infrastructure
             this.Name = name;
             this.StatusHistory = new ObservableCollection<string>();
             this.TotalSteps = totalSteps;
+            this.CanCancel = canCancel;
         }
 
         #endregion
@@ -346,6 +396,22 @@ namespace TeamProjectManager.Common.Infrastructure
             this.IsWarning = false;
             this.IsError = true;
             SetStatus(errorMessage, exception);
+        }
+
+        #endregion
+
+        #region Request Cancel
+
+        /// <summary>
+        /// Requests that this task is canceled.
+        /// </summary>
+        public void RequestCancel()
+        {
+            if (!this.CanCancel)
+            {
+                throw new InvalidOperationException("The task does not support cancellation.");
+            }
+            this.IsCanceled = true;
         }
 
         #endregion

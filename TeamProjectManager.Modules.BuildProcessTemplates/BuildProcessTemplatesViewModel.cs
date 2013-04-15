@@ -158,7 +158,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
         private void GetBuildProcessTemplates(object argument)
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var task = new ApplicationTask("Retrieving build process templates", teamProjectNames.Count);
+            var task = new ApplicationTask("Retrieving build process templates", teamProjectNames.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -216,7 +216,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             if (result == MessageBoxResult.Yes)
             {
                 var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-                var task = new ApplicationTask((this.Simulate ? "Simulating registering build process template" : "Registering build process template"), teamProjectNames.Count);
+                var task = new ApplicationTask((this.Simulate ? "Simulating registering build process template" : "Registering build process template"), teamProjectNames.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -253,7 +253,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             if (result == MessageBoxResult.Yes)
             {
                 var buildProcessTemplates = this.SelectedBuildProcessTemplates.Select(p => p.ProcessTemplate).ToList();
-                var task = new ApplicationTask("Unregistering build process templates", buildProcessTemplates.Count);
+                var task = new ApplicationTask("Unregistering build process templates", buildProcessTemplates.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>

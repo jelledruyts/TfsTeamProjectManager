@@ -224,7 +224,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var sources = this.ComparisonSources.ToList();
-            var task = new ApplicationTask("Comparing work item configurations", teamProjectNames.Count);
+            var task = new ApplicationTask("Comparing work item configurations", teamProjectNames.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -253,6 +253,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = results;

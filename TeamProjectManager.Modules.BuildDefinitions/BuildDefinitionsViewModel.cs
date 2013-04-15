@@ -68,7 +68,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         private void GetBuildDefinitions(object argument)
         {
             var teamProjects = this.SelectedTeamProjects.ToList();
-            var task = new ApplicationTask("Retrieving build definitions", teamProjects.Count);
+            var task = new ApplicationTask("Retrieving build definitions", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -91,6 +91,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
 
@@ -130,7 +135,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             if (result == true)
             {
                 var buildDefinitionInfoUpdate = dialog.BuildDefinitionInfoUpdate;
-                var task = new ApplicationTask("Updating build definitions", buildDefinitionsToUpdate.Count);
+                var task = new ApplicationTask("Updating build definitions", buildDefinitionsToUpdate.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -151,6 +156,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                         catch (Exception exc)
                         {
                             task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while updating build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToUpdate.Name, buildDefinitionToUpdate.TeamProject), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
 
@@ -188,7 +198,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             if (result == MessageBoxResult.Yes)
             {
                 var buildDefinitionsToDelete = this.SelectedBuildDefinitions;
-                var task = new ApplicationTask("Deleting build definitions", buildDefinitionsToDelete.Count);
+                var task = new ApplicationTask("Deleting build definitions", buildDefinitionsToDelete.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -210,6 +220,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                         catch (Exception exc)
                         {
                             task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToDelete.Name, buildDefinitionToDelete.TeamProject), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
 

@@ -87,7 +87,7 @@ namespace TeamProjectManager.Modules.Activity
             var exclusions = (string.IsNullOrEmpty(this.SourceControlExclusions) ? new string[0] : this.SourceControlExclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
 
             var teamProjects = this.SelectedTeamProjects.ToList();
-            var task = new ApplicationTask("Retrieving activity", teamProjects.Count);
+            var task = new ApplicationTask("Retrieving activity", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -108,7 +108,7 @@ namespace TeamProjectManager.Modules.Activity
                         var sourceControlActivities = new List<ComponentActivityInfo>();
                         var foundChangesetsForProject = 0;
                         VersionSpec versionTo = null;
-                        while (foundChangesetsForProject < numberOfActivities)
+                        while (foundChangesetsForProject < numberOfActivities && !task.IsCanceled)
                         {
                             const int pageCount = 10;
                             var history = vcs.QueryHistory("$/" + teamProject.Name, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
@@ -136,21 +136,29 @@ namespace TeamProjectManager.Modules.Activity
                         }
 
                         // Get the latest work item tracking activity.
-                        var parameters = new Dictionary<string, object>() {
+                        IEnumerable<ComponentActivityInfo> workItemActivities = null;
+                        if (!task.IsCanceled)
+                        {
+                            var parameters = new Dictionary<string, object>() {
                                 { "TeamProject", teamProject.Name}
                             };
-                        var workItemsQuery = wit.Query("SELECT [System.Id], [System.ChangedDate], [System.Title] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] DESC", parameters);
-                        var workItems = workItemsQuery.Cast<WorkItem>().Take(numberOfActivities).ToList();
-                        var workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, string.Format(CultureInfo.CurrentCulture, "{0} {1}: \"{2}\"", w.Type.Name, w.Id, w.Title))).ToList();
+                            var workItemsQuery = wit.Query("SELECT [System.Id], [System.ChangedDate], [System.Title] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] DESC", parameters);
+                            var workItems = workItemsQuery.Cast<WorkItem>().Take(numberOfActivities).ToList();
+                            workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, string.Format(CultureInfo.CurrentCulture, "{0} {1}: \"{2}\"", w.Type.Name, w.Id, w.Title))).ToList();
+                        }
 
                         // Get the latest builds.
-                        var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
-                        spec.QueryOptions = QueryOptions.Definitions;
-                        spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
-                        spec.MaxBuildsPerDefinition = numberOfActivities;
-                        spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
-                        var builds = buildServer.QueryBuilds(spec).Builds;
-                        var teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name)));
+                        IEnumerable<ComponentActivityInfo> teamBuildActivities = null;
+                        if (!task.IsCanceled)
+                        {
+                            var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
+                            spec.QueryOptions = QueryOptions.Definitions;
+                            spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
+                            spec.MaxBuildsPerDefinition = numberOfActivities;
+                            spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
+                            var builds = buildServer.QueryBuilds(spec).Builds;
+                            teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name)));
+                        }
 
                         // Assemble the complete activity details.
                         activity.Add(new TeamProjectActivityInfo(teamProject.Name, numberOfActivities, sourceControlActivities, workItemActivities, teamBuildActivities));
@@ -158,6 +166,11 @@ namespace TeamProjectManager.Modules.Activity
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
 

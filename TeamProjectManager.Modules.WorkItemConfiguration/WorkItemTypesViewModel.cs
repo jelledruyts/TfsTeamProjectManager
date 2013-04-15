@@ -173,7 +173,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void GetWorkItemTypes(object argument)
         {
             var teamProjects = this.SelectedTeamProjects.ToList();
-            var task = new ApplicationTask("Retrieving work item types", teamProjects.Count);
+            var task = new ApplicationTask("Retrieving work item types", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -207,6 +207,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = results;
@@ -286,7 +291,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 return;
             }
 
-            var task = new ApplicationTask("Deleting " + workItemTypesToDelete.Count.ToCountString("work item type"), workItemTypesToDelete.Count);
+            var task = new ApplicationTask("Deleting " + workItemTypesToDelete.Count.ToCountString("work item type"), workItemTypesToDelete.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -307,6 +312,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting the work item type \"{0}\" for Team Project \"{1}\"", workItemTypeToDelete.Name, workItemTypeToDelete.TeamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
             };
@@ -368,7 +378,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
 
-            var task = new ApplicationTask("Exporting " + workItemTypesToExport.Count.ToCountString("work item type"), workItemTypesToExport.Count);
+            var task = new ApplicationTask("Exporting " + workItemTypesToExport.Count.ToCountString("work item type"), workItemTypesToExport.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -440,7 +450,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var searchUsesExactMatch = this.SearchUsesExactMatch;
             var searchIncludesWorkItemFields = this.SearchIncludesWorkItemFields;
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Searching for \"{0}\"", searchText), teamProjectNames.Count);
+            var task = new ApplicationTask(string.Format(CultureInfo.CurrentCulture, "Searching for \"{0}\"", searchText), teamProjectNames.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -484,11 +494,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                     }
                                 }
                             }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
                         }
                     }
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = results;
@@ -562,7 +581,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void PerformImport(string description, ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
         {
             var numberOfSteps = GetTotalNumberOfSteps(options, teamProjectsWithWorkItemTypes);
-            var task = new ApplicationTask(description, numberOfSteps);
+            var task = new ApplicationTask(description, numberOfSteps, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>

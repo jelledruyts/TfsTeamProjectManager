@@ -44,45 +44,75 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             if (options.HasFlag(ImportOptions.Validate))
             {
                 WorkItemType.ValidationEventHandler += importEventHandler;
-                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                try
                 {
-                    var project = store.Projects[teamProjectWithWorkItemTypes.Key.Name];
-                    foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                    foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
                     {
-                        task.SetProgress(step++, string.Format("Validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
-                        try
+                        var project = store.Projects[teamProjectWithWorkItemTypes.Key.Name];
+                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
+                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
+                            try
+                            {
+                                WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
+                            }
+                            catch (Exception exc)
+                            {
+                                task.SetError("ERROR - " + exc.Message);
+                            }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
                         }
-                        catch (Exception exc)
+                        if (task.IsCanceled)
                         {
-                            task.SetError("ERROR - " + exc.Message);
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
                 }
-                WorkItemType.ValidationEventHandler -= importEventHandler;
+                finally
+                {
+                    WorkItemType.ValidationEventHandler -= importEventHandler;
+                }
             }
 
             // Import.
-            if (!importValidationFailed && options.HasFlag(ImportOptions.Import))
+            if (!task.IsCanceled && !importValidationFailed && options.HasFlag(ImportOptions.Import))
             {
                 foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
                 {
                     var project = store.Projects[teamProjectWithWorkItemTypes.Key.Name];
                     project.WorkItemTypes.ImportEventHandler += importEventHandler;
-                    foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                    try
                     {
-                        task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
-                        try
+                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
-                        }
-                        catch (Exception exc)
-                        {
-                            task.SetError("ERROR - " + exc.Message);
+                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
+                            try
+                            {
+                                project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
+                            }
+                            catch (Exception exc)
+                            {
+                                task.SetError("ERROR - " + exc.Message);
+                            }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
                         }
                     }
-                    project.WorkItemTypes.ImportEventHandler -= importEventHandler;
+                    finally
+                    {
+                        project.WorkItemTypes.ImportEventHandler -= importEventHandler;
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
                 }
             }
         }
@@ -120,6 +150,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         task.SetError("ERROR - " + exc.Message);
                     }
                 }
+                if (task.IsCanceled)
+                {
+                    task.Status = "Canceled";
+                    break;
+                }
             }
         }
 
@@ -146,6 +181,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     catch (Exception exc)
                     {
                         task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0} \"{1}\"", itemType, workItemConfigurationItem.Item.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
             }

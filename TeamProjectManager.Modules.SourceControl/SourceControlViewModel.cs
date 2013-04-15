@@ -111,7 +111,7 @@ namespace TeamProjectManager.Modules.SourceControl
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var numberOfChangesetsForProject = this.NumberOfChangesets;
             var exclusions = (string.IsNullOrEmpty(this.Exclusions) ? new string[0] : this.Exclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            var task = new ApplicationTask("Retrieving latest changesets", teamProjectNames.Count);
+            var task = new ApplicationTask("Retrieving latest changesets", teamProjectNames.Count, true);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -127,7 +127,7 @@ namespace TeamProjectManager.Modules.SourceControl
                     {
                         var foundChangesetsForProject = 0;
                         VersionSpec versionTo = null;
-                        while (foundChangesetsForProject < numberOfChangesetsForProject)
+                        while (foundChangesetsForProject < numberOfChangesetsForProject && !task.IsCanceled)
                         {
                             const int pageCount = 10;
                             var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
@@ -157,6 +157,11 @@ namespace TeamProjectManager.Modules.SourceControl
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = changesets;
@@ -214,7 +219,7 @@ namespace TeamProjectManager.Modules.SourceControl
         private void GetSourceControlSettings(object argument)
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var task = new ApplicationTask("Retrieving source control settings", teamProjectNames.Count);
+            var task = new ApplicationTask("Retrieving source control settings", teamProjectNames.Count, true);
             this.PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -234,6 +239,11 @@ namespace TeamProjectManager.Modules.SourceControl
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
                 e.Result = settings;
@@ -318,7 +328,7 @@ namespace TeamProjectManager.Modules.SourceControl
             {
                 var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
                 var settings = this.SelectedSourceControlSettings;
-                var task = new ApplicationTask("Updating source control settings", teamProjectNames.Count);
+                var task = new ApplicationTask("Updating source control settings", teamProjectNames.Count, true);
                 this.PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -340,6 +350,11 @@ namespace TeamProjectManager.Modules.SourceControl
                         catch (Exception exc)
                         {
                             task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
                 };

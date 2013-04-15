@@ -93,7 +93,7 @@ namespace TeamProjectManager.Modules.Security
         {
             var teamProjects = this.SelectedTeamProjects.ToList();
             var membershipMode = this.MembershipMode;
-            var task = new ApplicationTask("Retrieving security groups", teamProjects.Count);
+            var task = new ApplicationTask("Retrieving security groups", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
@@ -122,11 +122,20 @@ namespace TeamProjectManager.Modules.Security
                             var description = applicationGroup.GetAttribute("Description", null);
                             var securityGroup = new SecurityGroupInfo(teamProject, applicationGroup.Descriptor.Identifier, applicationGroup.DisplayName, description, members);
                             securityGroups.Add(securityGroup);
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
                         }
                     }
                     catch (Exception exc)
                     {
                         task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
                     }
                 }
 
@@ -164,7 +173,7 @@ namespace TeamProjectManager.Modules.Security
             if (result == MessageBoxResult.Yes)
             {
                 var securityGroupsToDelete = this.SelectedSecurityGroups.ToList();
-                var task = new ApplicationTask("Deleting security groups", securityGroupsToDelete.Count);
+                var task = new ApplicationTask("Deleting security groups", securityGroupsToDelete.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -185,6 +194,11 @@ namespace TeamProjectManager.Modules.Security
                         catch (Exception exc)
                         {
                             task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting security group \"{0}\" in Team Project \"{1}\"", securityGroup.Name, securityGroup.TeamProject.Name), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
 
@@ -309,7 +323,7 @@ namespace TeamProjectManager.Modules.Security
             if (result == MessageBoxResult.Yes)
             {
                 var teamProjects = this.SelectedTeamProjects.ToList();
-                var task = new ApplicationTask("Adding / updating security groups", teamProjects.Count);
+                var task = new ApplicationTask("Adding / updating security groups", teamProjects.Count, true);
                 PublishStatus(new StatusEventArgs(task));
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
@@ -329,6 +343,11 @@ namespace TeamProjectManager.Modules.Security
                         catch (Exception exc)
                         {
                             task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while adding / updating security group \"{0}\" for Team Project \"{1}\"", this.SecurityGroupChange.Name, teamProject.Name), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
                         }
                     }
 

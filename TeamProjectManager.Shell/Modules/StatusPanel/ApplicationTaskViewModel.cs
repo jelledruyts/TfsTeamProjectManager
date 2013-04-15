@@ -29,6 +29,11 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
         /// </summary>
         public RelayCommand ShowDetailsCommand { get; private set; }
 
+        /// <summary>
+        /// Gets the command that cancels the task.
+        /// </summary>
+        public RelayCommand RequestCancelCommand { get; private set; }
+
         #endregion
 
         #region Observable Properties
@@ -104,7 +109,8 @@ namespace TeamProjectManager.Shell.Modules.StatusPanel
                 }
                 this.StatusHistoryDescription = status.Trim();
             }
-            this.ShowDetailsCommand = new RelayCommand((o) => { this.DetailsVisible = true; }, (o) => { return this.DetailsAvailable; });
+            this.ShowDetailsCommand = new RelayCommand((o) => { this.DetailsVisible = true; }, (o) => this.DetailsAvailable);
+            this.RequestCancelCommand = new RelayCommand((o) => { this.Task.RequestCancel(); }, (o) => this.Task.CanCancel && !this.Task.IsCanceled);
             this.DetailsAvailable = (this.Task.StatusHistory.Count > 0);
         }
 

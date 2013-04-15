@@ -38,6 +38,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
                 }
+                if (task.IsCanceled)
+                {
+                    task.Status = "Canceled";
+                    break;
+                }
             }
             return processTemplates;
         }
@@ -123,6 +128,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while registering the build process template \"{0}\" for Team Project \"{1}\"", templateServerPath, teamProjectName), exc);
                 }
+                if (task.IsCanceled)
+                {
+                    task.Status = "Canceled";
+                    break;
+                }
             }
         }
 
@@ -139,6 +149,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 catch (Exception exc)
                 {
                     task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while unregistering the build process template \"{0}\" for Team Project \"{1}\"", buildProcessTemplate.ServerPath, buildProcessTemplate.TeamProject), exc);
+                }
+                if (task.IsCanceled)
+                {
+                    task.Status = "Canceled";
+                    break;
                 }
             }
         }

@@ -438,19 +438,25 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private static void SortChildNodes(XmlNode node, Func<XmlNode, string> identitySelector)
         {
-            foreach (var nodeElement in node.ChildNodes.Cast<XmlNode>().OrderBy(n => identitySelector == null ? n.OuterXml : identitySelector(n)).ToList())
+            if (node != null)
             {
-                node.RemoveChild(nodeElement);
-                node.AppendChild(nodeElement);
+                foreach (var nodeElement in node.ChildNodes.Cast<XmlNode>().OrderBy(n => identitySelector == null ? n.OuterXml : identitySelector(n)).ToList())
+                {
+                    node.RemoveChild(nodeElement);
+                    node.AppendChild(nodeElement);
+                }
             }
         }
 
         private static void SortAttributes(XmlNode node)
         {
-            foreach (var nodeAttribute in node.Attributes.Cast<XmlAttribute>().OrderBy(a => a.Name).ToList())
+            if (node != null)
             {
-                node.Attributes.Remove(nodeAttribute);
-                node.Attributes.Append(nodeAttribute);
+                foreach (var nodeAttribute in node.Attributes.Cast<XmlAttribute>().OrderBy(a => a.Name).ToList())
+                {
+                    node.Attributes.Remove(nodeAttribute);
+                    node.Attributes.Append(nodeAttribute);
+                }
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using TeamProjectManager.Common;
+﻿using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
@@ -19,6 +18,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.TeamProject = teamProject;
             this.Item = item;
             this.SaveAsFileName = saveAsFileName;
+        }
+
+        public WorkItemConfigurationItemExport Clone()
+        {
+            return new WorkItemConfigurationItemExport(this.TeamProject, this.Item.Clone(), this.SaveAsFileName);
         }
     }
 }

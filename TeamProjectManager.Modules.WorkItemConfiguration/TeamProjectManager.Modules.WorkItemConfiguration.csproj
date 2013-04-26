@@ -68,6 +68,9 @@
     <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.XmlTransform">
+      <HintPath>..\packages\Microsoft.Web.Xdt.1.0.0-alpha\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
@@ -89,6 +92,7 @@
   <ItemGroup>
     <Compile Include="AgileProjectConfigurationPart.cs" />
     <Compile Include="CommonProjectConfigurationPart.cs" />
+    <Compile Include="TransformationType.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
     <Compile Include="WorkItemConfigurationItemType.cs" />
@@ -123,6 +127,15 @@
       <DependentUpon>ComparisonView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ComparisonViewModel.cs" />
+    <Compile Include="WorkItemConfigurationItemTransformationEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemConfigurationItemTransformationEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfigurationTransformationItem.cs" />
+    <Compile Include="WorkItemConfigurationTransformationView.xaml.cs">
+      <DependentUpon>WorkItemConfigurationTransformationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemConfigurationTransformationViewModel.cs" />
+    <Compile Include="WorkItemConfigurationTransformer.cs" />
     <Compile Include="WorkItemProcessConfigurationView.xaml.cs">
       <DependentUpon>WorkItemProcessConfigurationView.xaml</DependentUpon>
     </Compile>
@@ -166,6 +179,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="WorkItemConfigurationItemTransformationEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemConfigurationTransformationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WorkItemProcessConfigurationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -188,6 +209,9 @@
       <Project>{6034E65E-4E00-46FA-B683-65AB8F3C47E7}</Project>
       <Name>TeamProjectManager.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

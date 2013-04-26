@@ -10,6 +10,7 @@
 * [Work Item Configuration - Work Item Types|#Work Item Configuration - Work Item Types]
 * [Work Item Configuration - Categories|#Work Item Configuration - Categories]
 * [Work Item Configuration - Process Configuration|#Work Item Configuration - Process Configuration]
+* [Work Item Configuration - Transform|#Work Item Configuration - Transform]
 *Contributing to the project*
 * [How To Contribute|How To Contribute]
 
@@ -162,3 +163,11 @@ Allows you to import work item process configurations (i.e. common and agile con
 This can be useful if you want to change the process configurations being used, e.g. to upgrade them from a previous version.
 
 [image:Import Process Configuration|WorkItemConfiguration-ProcessConfiguration-Import.png]
+
+{anchor:Work Item Configuration - Transform}
+!! Transform
+
+Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration).
+This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.
+
+[image:Transform Work Item Configuration|WorkItemConfiguration-Transform.png]

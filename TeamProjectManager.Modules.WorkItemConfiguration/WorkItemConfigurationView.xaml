@@ -24,5 +24,9 @@
         <TabItem Header="Process Configuration">
             <ContentPresenter Content="{Binding Path=WorkItemProcessConfigurationView, Mode=OneTime}" />
         </TabItem>
+
+        <TabItem Header="Transform" i:HelpProvider.HelpContent="Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration). This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.">
+            <ContentPresenter Content="{Binding Path=WorkItemConfigurationTransformationView, Mode=OneTime}" />
+        </TabItem>
     </TabControl>
 </UserControl>

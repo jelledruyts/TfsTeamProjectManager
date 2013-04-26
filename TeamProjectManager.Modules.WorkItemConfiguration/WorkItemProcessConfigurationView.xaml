@@ -26,8 +26,9 @@
                     </DataGrid.Columns>
                 </DataGrid>
                 <WrapPanel Grid.Row="2" Margin="0,5,0,0">
-                    <Button Content="Export Selected Process Configurations" Command="{Binding Path=ExportSelectedProcessConfigurationsCommand}" />
-                    <Button Content="Edit Selected Process Configurations" Margin="5,0,0,0" Command="{Binding Path=EditSelectedProcessConfigurationsCommand}" />
+                    <Button Content="Export" Command="{Binding Path=ExportSelectedProcessConfigurationsCommand}" />
+                    <Button Content="Edit..." Margin="5,0,0,0" Command="{Binding Path=EditSelectedProcessConfigurationsCommand}" />
+                    <Button Content="Transform..." Margin="5,0,0,0" Command="{Binding Path=TransformSelectedProcessConfigurationsCommand}" />
                 </WrapPanel>
             </Grid>
         </TabItem>

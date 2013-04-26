@@ -17,7 +17,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         #region ImportWorkItemTypes
 
-        public static void ImportWorkItemTypes(ApplicationTask task, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
+        public static void ImportWorkItemTypes(ILogger logger, ApplicationTask task, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
         {
             var step = 0;
             var importValidationFailed = false;
@@ -30,7 +30,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var schemaValidationException = e.Exception as XmlSchemaValidationException;
                     if (schemaValidationException != null)
                     {
-                        message = string.Format("ERROR - XML validation error at row {0}, column {1}: {2}", schemaValidationException.LineNumber, schemaValidationException.LinePosition, message);
+                        message = string.Format("XML validation error at row {0}, column {1}: {2}", schemaValidationException.LineNumber, schemaValidationException.LinePosition, message);
                     }
                     task.SetError(message);
                 }
@@ -58,7 +58,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                             }
                             catch (Exception exc)
                             {
-                                task.SetError("ERROR - " + exc.Message);
+                                var message = string.Format("An error occurred while validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name);
+                                logger.Log(message, exc);
+                                task.SetError(message, exc);
                             }
                             if (task.IsCanceled)
                             {
@@ -96,7 +98,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                             }
                             catch (Exception exc)
                             {
-                                task.SetError("ERROR - " + exc.Message);
+                                var message = string.Format("An error occurred while importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name);
+                                logger.Log(message, exc);
+                                task.SetError(message, exc);
                             }
                             if (task.IsCanceled)
                             {
@@ -121,7 +125,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region ImportProcessConfigurations
 
-        public static void ImportProcessConfigurations(ApplicationTask task, TfsTeamProjectCollection tfs, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
+        public static void ImportProcessConfigurations(ILogger logger, ApplicationTask task, TfsTeamProjectCollection tfs, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
         {
             var step = 0;
             foreach (var teamProjectWithProcessConfigurations in teamProjectsWithProcessConfigurations)
@@ -147,7 +151,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     }
                     catch (Exception exc)
                     {
-                        task.SetError("ERROR - " + exc.Message);
+                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while importing {0} in project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name);
+                        logger.Log(message, exc);
+                        task.SetError(message, exc);
                     }
                 }
                 if (task.IsCanceled)
@@ -162,7 +168,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region ExportWorkItemConfigurationItems
 
-        public static void ExportWorkItemConfigurationItems(ApplicationTask task, string itemType, IList<WorkItemConfigurationItemExport> workItemConfigurationItems)
+        public static void ExportWorkItemConfigurationItems(ILogger logger, ApplicationTask task, string itemType, IList<WorkItemConfigurationItemExport> workItemConfigurationItems)
         {
             if (workItemConfigurationItems.Count > 0)
             {
@@ -180,7 +186,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     }
                     catch (Exception exc)
                     {
-                        task.SetError(string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0} \"{1}\"", itemType, workItemConfigurationItem.Item.Name), exc);
+                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0} \"{1}\"", itemType, workItemConfigurationItem.Item.Name);
+                        logger.Log(message, exc);
+                        task.SetError(message, exc);
                     }
                     if (task.IsCanceled)
                     {

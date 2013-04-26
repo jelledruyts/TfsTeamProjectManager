@@ -24,6 +24,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand GetProcessConfigurationsCommand { get; private set; }
         public RelayCommand ExportSelectedProcessConfigurationsCommand { get; private set; }
         public RelayCommand EditSelectedProcessConfigurationsCommand { get; private set; }
+        public RelayCommand TransformSelectedProcessConfigurationsCommand { get; private set; }
+
         public RelayCommand BrowseCommonConfigurationFilePathCommand { get; private set; }
         public RelayCommand BrowseAgileConfigurationFilePathCommand { get; private set; }
         public RelayCommand ImportProcessConfigurationsCommand { get; private set; }
@@ -99,6 +101,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.GetProcessConfigurationsCommand = new RelayCommand(GetProcessConfigurations, CanGetProcessConfigurations);
             this.ExportSelectedProcessConfigurationsCommand = new RelayCommand(ExportSelectedProcessConfigurations, CanExportSelectedProcessConfigurations);
             this.EditSelectedProcessConfigurationsCommand = new RelayCommand(EditSelectedProcessConfigurations, CanEditSelectedProcessConfigurations);
+            this.TransformSelectedProcessConfigurationsCommand = new RelayCommand(TransformSelectedProcessConfigurations, CanTransformSelectedProcessConfigurations);
+
             this.BrowseCommonConfigurationFilePathCommand = new RelayCommand(BrowseCommonConfigurationFilePath, CanBrowseCommonConfigurationFilePath);
             this.BrowseAgileConfigurationFilePathCommand = new RelayCommand(BrowseAgileConfigurationFilePath, CanBrowseAgileConfigurationFilePath);
             this.ImportProcessConfigurationsCommand = new RelayCommand(ImportProcessConfigurations, CanImportProcessConfigurations);
@@ -178,7 +182,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private bool CanExportSelectedProcessConfigurations(object argument)
         {
-            return (this.SelectedProcessConfigurations != null && this.SelectedProcessConfigurations.Count > 0);
+            return IsAnyTeamProjectSelected() && this.SelectedProcessConfigurations != null && this.SelectedProcessConfigurations.Count > 0;
         }
 
         private void ExportSelectedProcessConfigurations(object argument)
@@ -220,7 +224,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                WorkItemConfigurationItemImportExport.ExportWorkItemConfigurationItems(task, "process configuration", processConfigurationsToExport);
+                WorkItemConfigurationItemImportExport.ExportWorkItemConfigurationItems(this.Logger, task, "process configuration", processConfigurationsToExport);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -244,7 +248,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private bool CanEditSelectedProcessConfigurations(object argument)
         {
-            return IsAnyTeamProjectSelected() && this.SelectedProcessConfigurations != null && this.SelectedProcessConfigurations.Count > 0;
+            return CanExportSelectedProcessConfigurations(argument);
         }
 
         private void EditSelectedProcessConfigurations(object argument)
@@ -258,6 +262,31 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 if (result == MessageBoxResult.Yes)
                 {
                     var teamProjectsWithProcessConfigurations = processConfigurationsToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                    PerformImport(teamProjectsWithProcessConfigurations);
+                }
+            }
+        }
+
+        #endregion
+
+        #region TransformSelectedProcessConfigurations Command
+
+        private bool CanTransformSelectedProcessConfigurations(object argument)
+        {
+            return CanExportSelectedProcessConfigurations(argument);
+        }
+
+        private void TransformSelectedProcessConfigurations(object argument)
+        {
+            var processConfigurationsToTransform = this.SelectedProcessConfigurations.ToList();
+            var dialog = new WorkItemConfigurationItemTransformationEditorDialog(processConfigurationsToTransform, "Process Configuration");
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                var result = MessageBox.Show("This will import the transformed process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    var teamProjectsWithProcessConfigurations = processConfigurationsToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
                     PerformImport(teamProjectsWithProcessConfigurations);
                 }
             }
@@ -347,7 +376,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
-                WorkItemConfigurationItemImportExport.ImportProcessConfigurations(task, tfs, store, teamProjectsWithProcessConfigurations);
+                WorkItemConfigurationItemImportExport.ImportProcessConfigurations(this.Logger, task, tfs, store, teamProjectsWithProcessConfigurations);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {

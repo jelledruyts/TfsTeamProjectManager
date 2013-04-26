@@ -21,6 +21,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         [Import]
         public WorkItemProcessConfigurationView WorkItemProcessConfigurationView { get; set; }
 
+        [Import]
+        public WorkItemConfigurationTransformationView WorkItemConfigurationTransformationView { get; set; }
+
         #endregion
 
         #region Constructors

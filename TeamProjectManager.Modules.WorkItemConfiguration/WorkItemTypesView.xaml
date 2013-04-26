@@ -32,9 +32,10 @@
                     </DataGrid.Columns>
                 </DataGrid>
                 <WrapPanel Grid.Row="2" Margin="0,5,0,0">
-                    <Button Content="Export Selected Work Item Types" Command="{Binding Path=ExportSelectedWorkItemTypesCommand}" />
-                    <Button Content="Delete Selected Work Item Types" Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedWorkItemTypesCommand}" />
-                    <Button Content="Edit Selected Work Item Types" Margin="5,0,0,0" Command="{Binding Path=EditSelectedWorkItemTypesCommand}" />
+                    <Button Content="Export" Command="{Binding Path=ExportSelectedWorkItemTypesCommand}" />
+                    <Button Content="Delete" Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedWorkItemTypesCommand}" />
+                    <Button Content="Edit..." Margin="5,0,0,0" Command="{Binding Path=EditSelectedWorkItemTypesCommand}" />
+                    <Button Content="Transform..." Margin="5,0,0,0" Command="{Binding Path=TransformSelectedWorkItemTypesCommand}" />
                 </WrapPanel>
             </Grid>
         </TabItem>

@@ -165,5 +165,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         }
 
         #endregion
+
+        #region Clone
+
+        public WorkItemConfigurationItem Clone()
+        {
+            return new WorkItemConfigurationItem(this.Type, this.Name, (XmlDocument)this.XmlDefinition.Clone());
+        }
+
+        #endregion
     }
 }

@@ -118,7 +118,7 @@ namespace TeamProjectManager.Modules.Activity
                                 {
                                     foundChangesetsForProject++;
                                     var commentSuffix = string.IsNullOrEmpty(changeset.Comment) ? null : ": " + changeset.Comment.Trim();
-                                    sourceControlActivities.Add(new ComponentActivityInfo("Source Control", changeset.CreationDate, string.Format(CultureInfo.CurrentCulture, "Changeset {0} by \"{1}\"{2}", changeset.ChangesetId, changeset.Committer, commentSuffix)));
+                                    sourceControlActivities.Add(new ComponentActivityInfo("Source Control", changeset.CreationDate, changeset.CommitterDisplayName, string.Format(CultureInfo.CurrentCulture, "Changeset {0}{1}", changeset.ChangesetId, commentSuffix)));
                                     if (foundChangesetsForProject == numberOfActivities)
                                     {
                                         break;
@@ -144,7 +144,7 @@ namespace TeamProjectManager.Modules.Activity
                             };
                             var workItemsQuery = wit.Query("SELECT [System.Id], [System.ChangedDate], [System.Title] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] DESC", parameters);
                             var workItems = workItemsQuery.Cast<WorkItem>().Take(numberOfActivities).ToList();
-                            workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, string.Format(CultureInfo.CurrentCulture, "{0} {1}: \"{2}\"", w.Type.Name, w.Id, w.Title))).ToList();
+                            workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, w.ChangedBy, string.Format(CultureInfo.CurrentCulture, "{0} {1}: {2}", w.Type.Name, w.Id, w.Title))).ToList();
                         }
 
                         // Get the latest builds.
@@ -152,12 +152,12 @@ namespace TeamProjectManager.Modules.Activity
                         if (!task.IsCanceled)
                         {
                             var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
-                            spec.QueryOptions = QueryOptions.Definitions;
+                            spec.QueryOptions = QueryOptions.Definitions | QueryOptions.BatchedRequests;
                             spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
                             spec.MaxBuildsPerDefinition = numberOfActivities;
                             spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
                             var builds = buildServer.QueryBuilds(spec).Builds;
-                            teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name)));
+                            teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, b.RequestedFor, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name)));
                         }
 
                         // Assemble the complete activity details.

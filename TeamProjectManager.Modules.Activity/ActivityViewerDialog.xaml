@@ -20,6 +20,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
                         <DataGridTextColumn Header="Component" Binding="{Binding Path=ComponentName}" />
+                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -28,6 +29,7 @@
                 <DataGrid ItemsSource="{Binding Path=SourceControlActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
+                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -36,6 +38,7 @@
                 <DataGrid ItemsSource="{Binding Path=WorkItemTrackingActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
+                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -44,6 +47,7 @@
                 <DataGrid ItemsSource="{Binding Path=TeamBuildActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
+                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
                         <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                     </DataGrid.Columns>
                 </DataGrid>

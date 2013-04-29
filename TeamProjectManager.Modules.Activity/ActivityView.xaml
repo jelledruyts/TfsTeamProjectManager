@@ -41,6 +41,7 @@
                     <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                     <DataGridTextColumn Header="Last Activity Time" Binding="{Binding Path=MostRecentActivity.Time}" />
                     <DataGridTextColumn Header="Last Activity Component" Binding="{Binding Path=MostRecentActivity.ComponentName}" />
+                    <DataGridTextColumn Header="Last Activity User" Binding="{Binding Path=MostRecentActivity.User}" />
                     <DataGridTextColumn Header="Last Activity Description" Binding="{Binding Path=MostRecentActivity.Description}" />
                 </DataGrid.Columns>
             </DataGrid>

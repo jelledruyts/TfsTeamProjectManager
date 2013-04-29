@@ -8,6 +8,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListBox />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0" />
+        <Button Grid.Row="1" Content="Apply Transformations" Command="{Binding Path=ApplyTransformationsCommand}" Margin="0,5,0,0" />
     </Grid>
 </UserControl>

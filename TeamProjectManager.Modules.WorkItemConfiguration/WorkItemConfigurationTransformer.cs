@@ -128,6 +128,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Transform
 
+        public static XmlDocument Transform(TransformationType type, XmlDocument source, string transformXml)
+        {
+            var resultXml = Transform(type, source.OuterXml, transformXml);
+            var result = new XmlDocument();
+            result.LoadXml(resultXml);
+            return result;
+        }
+
         public static string Transform(TransformationType type, string sourceXml, string transformXml)
         {
             switch (type)

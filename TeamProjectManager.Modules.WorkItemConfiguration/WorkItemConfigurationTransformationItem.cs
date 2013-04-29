@@ -12,7 +12,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public WorkItemConfigurationItemType WorkItemConfigurationItemType { get; set; }
 
         [DataMember]
-        public string WorkItemTypeName { get; set; }
+        public string WorkItemTypeNames { get; set; }
 
         [DataMember]
         public TransformationType TransformationType { get; set; }

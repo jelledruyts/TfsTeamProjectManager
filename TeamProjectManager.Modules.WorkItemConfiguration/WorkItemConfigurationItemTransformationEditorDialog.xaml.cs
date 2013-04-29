@@ -139,9 +139,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 {
                     this.outputTextBox.Text += "Applying transformation to {0} ({1})...".FormatCurrent(item.Item.Name, item.TeamProject.Name);
                     this.outputTextBox.ScrollToEnd();
-                    var resultXml = WorkItemConfigurationTransformer.Transform(this.TransformationType, item.Item.XmlDefinition.OuterXml, transformXml);
-                    var result = new XmlDocument();
-                    result.LoadXml(resultXml);
+                    var result = WorkItemConfigurationTransformer.Transform(this.TransformationType, item.Item.XmlDefinition, transformXml);
                     transformations.Add(item, result);
                 }
 

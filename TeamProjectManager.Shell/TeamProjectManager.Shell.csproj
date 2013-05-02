@@ -136,6 +136,18 @@
     <None Include="App.config" />
     <AppDesigner Include="Properties\" />
     <None Include="App.exe.manifest" />
+    <Content Include="Files\Transformation - Agile 6.0 to 6.2 - User Story.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation - CMMI 6.0 to 6.2 - Requirement.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation - Scrum 2.0 to 2.2 - Bug and Product Backlog Item.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation - TFS2012.X to TFS2012.2 - Agile Configuration.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Modules\Logo\LogoView.xaml">
@@ -195,6 +207,20 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\Comparison Source List - TFS Process Templates.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation List - TFS2012.X to TFS2012.2 - Scrum.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation List - TFS2012.X to TFS2012.2 - Agile.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\Transformation List - TFS2012.X to TFS2012.2 - CMMI.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfWorkItemConfigurationTransformationItem xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.teamprojectmanager.codeplex.com/workitemconfigurationtransform/2013/04">
+  <WorkItemConfigurationTransformationItem>
+    <Description>CMMI 6.0 to 6.2 - Requirement</Description>
+    <TransformationType>Xdt</TransformationType>
+    <TransformationXml>&lt;?xml version="1.0" encoding="utf-8" ?&gt;&#xD;
+&lt;!-- This transformation updates the MSF for CMMI Process Improvement 6.0 "Requirement" definition to v6.2 --&gt;&#xD;
+&lt;!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details --&gt;&#xD;
+&lt;Witd:WITD xmlns:Witd="http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform"&gt;&#xD;
+  &lt;WORKITEMTYPE&gt;&#xD;
+    &lt;WORKFLOW&gt;&#xD;
+      &lt;TRANSITIONS&gt;&#xD;
+        &lt;!-- Set the value of the ResolvedBy and ResolvedDate fields in the transition "Active to Closed" --&gt;&#xD;
+        &lt;TRANSITION from="Active" to="Closed" xdt:Locator="Match(from,to)"&gt;&#xD;
+          &lt;FIELDS&gt;&#xD;
+            &lt;!-- First remove the fields if they exist to make this script idempotent --&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Active' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="clock" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Active' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="currentuser" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+          &lt;/FIELDS&gt;&#xD;
+        &lt;/TRANSITION&gt;&#xD;
+        &lt;!-- Set the value of the ActivatedBy, ActivatedDate, ResolvedBy and ResolvedDate fields in the transition "Proposed to Closed" --&gt;&#xD;
+        &lt;TRANSITION from="Proposed" to="Closed" xdt:Locator="Match(from,to)"&gt;&#xD;
+          &lt;FIELDS&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ActivatedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ActivatedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="clock" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ActivatedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ActivatedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="currentuser" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="clock" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" /&gt;&#xD;
+            &lt;FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])"&gt;&#xD;
+              &lt;SERVERDEFAULT from="currentuser" /&gt;&#xD;
+            &lt;/FIELD&gt;&#xD;
+          &lt;/FIELDS&gt;&#xD;
+        &lt;/TRANSITION&gt;&#xD;
+      &lt;/TRANSITIONS&gt;&#xD;
+    &lt;/WORKFLOW&gt;&#xD;
+  &lt;/WORKITEMTYPE&gt;&#xD;
+&lt;/Witd:WITD&gt;</TransformationXml>
+    <WorkItemConfigurationItemType>WorkItemType</WorkItemConfigurationItemType>
+    <WorkItemTypeNames>Requirement</WorkItemTypeNames>
+  </WorkItemConfigurationTransformationItem>
+  <WorkItemConfigurationTransformationItem>
+    <Description>TFS2012.0 or TFS2012.1 to TFS2012.2 - Agile Configuration</Description>
+    <TransformationType>Xdt</TransformationType>
+    <TransformationXml>&lt;?xml version="1.0"?&gt;&#xD;
+&lt;!-- This transformation updates the Agile Configuration from TFS 2012.0 or TFS 2012.1 to TFS 2012.2 --&gt;&#xD;
+&lt;!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details --&gt;&#xD;
+&lt;AgileProjectConfiguration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform"&gt;&#xD;
+  &lt;ProductBacklog&gt;&#xD;
+    &lt;Columns&gt;&#xD;
+      &lt;!-- First remove the Tags column if it exists to make this script idempotent --&gt;&#xD;
+      &lt;Column refname="System.Tags" xdt:Transform="Remove" xdt:Locator="Match(refname)" /&gt;&#xD;
+      &lt;!-- Insert the Tags column at the end --&gt;&#xD;
+      &lt;Column width="200" refname="System.Tags" xdt:Transform="Insert" /&gt;&#xD;
+    &lt;/Columns&gt;&#xD;
+  &lt;/ProductBacklog&gt;&#xD;
+&lt;/AgileProjectConfiguration&gt;</TransformationXml>
+    <WorkItemConfigurationItemType>AgileConfiguration</WorkItemConfigurationItemType>
+    <WorkItemTypeNames i:nil="true" />
+  </WorkItemConfigurationTransformationItem>
+</ArrayOfWorkItemConfigurationTransformationItem>

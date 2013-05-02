@@ -36,6 +36,9 @@
                 <TextBlock><Hyperlink Command="{Binding Path=SaveTransformationsCommand}" ToolTip="Save the current list of transformations to a file">save</Hyperlink></TextBlock>
             </StackPanel>
         </Grid>
-        <Button Grid.Row="1" Content="Apply Transformations" Command="{Binding Path=ApplyTransformationsCommand}" Margin="0,5,0,0" />
+        <WrapPanel Grid.Row="1" Margin="0,5,0,0">
+            <Button Content="Apply Transformations" Command="{Binding Path=ApplyTransformationsCommand}" />
+            <CheckBox Content="Simulate only, do not save any changes" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
+        </WrapPanel>
     </Grid>
 </UserControl>

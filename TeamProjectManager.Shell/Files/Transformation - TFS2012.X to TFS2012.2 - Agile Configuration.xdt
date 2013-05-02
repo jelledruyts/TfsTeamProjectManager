@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<!-- This transformation updates the Agile Configuration from TFS 2012.0 or TFS 2012.1 to TFS 2012.2 -->
+<!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details -->
+<AgileProjectConfiguration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <ProductBacklog>
+    <Columns>
+      <!-- First remove the Tags column if it exists to make this script idempotent -->
+      <Column refname="System.Tags" xdt:Transform="Remove" xdt:Locator="Match(refname)" />
+      <!-- Insert the Tags column at the end -->
+      <Column width="200" refname="System.Tags" xdt:Transform="Insert" />
+    </Columns>
+  </ProductBacklog>
+</AgileProjectConfiguration>

@@ -44,6 +44,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public static readonly ObservableProperty<WorkItemConfigurationTransformationItem> SelectedTransformationProperty = new ObservableProperty<WorkItemConfigurationTransformationItem, WorkItemConfigurationTransformationViewModel>(o => o.SelectedTransformation);
 
+        public bool Simulate
+        {
+            get { return this.GetValue(SimulateProperty); }
+            set { this.SetValue(SimulateProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> SimulateProperty = new ObservableProperty<bool, WorkItemConfigurationTransformationViewModel>(o => o.Simulate);
+
         #endregion
 
         #region Constructors
@@ -232,14 +240,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void ApplyTransformations(object argument)
         {
-            var result = MessageBox.Show("This will apply the specified transformations to all selected Team Projects. Are you sure you want to continue?", "Confirm Transformation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (result != MessageBoxResult.Yes)
+            var simulate = this.Simulate;
+            if (!simulate)
             {
-                return;
+                var result = MessageBox.Show("This will apply the specified transformations to all selected Team Projects. Are you sure you want to continue?", "Confirm Transformation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
             }
             var teamProjects = this.SelectedTeamProjects.ToList();
             var transformations = this.Transformations.ToList();
-            var task = new ApplicationTask("Transforming work item configuration", teamProjects.Count, true);
+            var task = new ApplicationTask(simulate ? "Simulating transformation of work item configuration" : "Transforming work item configuration", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -262,7 +274,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         {
                             if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.WorkItemType)
                             {
-                                // TODO: Check that works across ALL work item types
                                 // Apply work item type definition transformation, which can apply to multiple work item type definitions (semicolon separated).
                                 // If no work item type names are specified, apply to all work item types in the project.
                                 var workItemTypeNames = (string.IsNullOrEmpty(transformation.WorkItemTypeNames) ? project.WorkItemTypes.Cast<WorkItemType>().Select(w => w.Name) : transformation.WorkItemTypeNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
@@ -277,14 +288,21 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                         if (wit != null)
                                         {
                                             itemToTransform = WorkItemTypeDefinition.FromXml(wit.Export(false));
-                                            transformedItems.Add(itemToTransform);
                                         }
                                     }
                                     if (itemToTransform != null)
                                     {
                                         task.Status = "Transforming \"{0}\"".FormatCurrent(itemToTransform.Name);
                                         var transformed = WorkItemConfigurationTransformer.Transform(transformation.TransformationType, itemToTransform.XmlDefinition, transformation.TransformationXml);
-                                        itemToTransform.XmlDefinition = transformed;
+                                        if (string.Equals(itemToTransform.XmlDefinition.DocumentElement.OuterXml, transformed.DocumentElement.OuterXml))
+                                        {
+                                            task.Status = "The transformation was applied but did not result in any changes, skipping.";
+                                        }
+                                        else
+                                        {
+                                            itemToTransform.XmlDefinition = transformed;
+                                            transformedItems.Add(itemToTransform);
+                                        }
                                     }
                                     else
                                     {
@@ -298,11 +316,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                 if (itemToTransform == null)
                                 {
                                     itemToTransform = WorkItemConfigurationItem.FromXml(project.Categories.Export());
-                                    transformedItems.Add(itemToTransform);
                                 }
                                 task.Status = "Transforming " + itemToTransform.Name;
                                 var transformed = WorkItemConfigurationTransformer.Transform(transformation.TransformationType, itemToTransform.XmlDefinition, transformation.TransformationXml);
-                                itemToTransform.XmlDefinition = transformed;
+                                if (string.Equals(itemToTransform.XmlDefinition.DocumentElement.OuterXml, transformed.DocumentElement.OuterXml))
+                                {
+                                    task.Status = "The transformation was applied but did not result in any changes, skipping.";
+                                }
+                                else
+                                {
+                                    itemToTransform.XmlDefinition = transformed;
+                                    transformedItems.Add(itemToTransform);
+                                }
                             }
                             else if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.AgileConfiguration)
                             {
@@ -310,16 +335,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                 if (itemToTransform == null)
                                 {
                                     itemToTransform = WorkItemConfigurationItemImportExport.GetAgileConfiguration(tfs, project);
-                                    if (itemToTransform != null)
-                                    {
-                                        transformedItems.Add(itemToTransform);
-                                    }
                                 }
                                 if (itemToTransform != null)
                                 {
                                     task.Status = "Transforming " + itemToTransform.Name;
                                     var transformed = WorkItemConfigurationTransformer.Transform(transformation.TransformationType, itemToTransform.XmlDefinition, transformation.TransformationXml);
-                                    itemToTransform.XmlDefinition = transformed;
+                                    if (string.Equals(itemToTransform.XmlDefinition.DocumentElement.OuterXml, transformed.DocumentElement.OuterXml))
+                                    {
+                                        task.Status = "The transformation was applied but did not result in any changes, skipping.";
+                                    }
+                                    else
+                                    {
+                                        itemToTransform.XmlDefinition = transformed;
+                                        transformedItems.Add(itemToTransform);
+                                    }
                                 }
                             }
                             else if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.CommonConfiguration)
@@ -328,16 +357,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                 if (itemToTransform == null)
                                 {
                                     itemToTransform = WorkItemConfigurationItemImportExport.GetCommonConfiguration(tfs, project);
-                                    if (itemToTransform != null)
-                                    {
-                                        transformedItems.Add(itemToTransform);
-                                    }
                                 }
                                 if (itemToTransform != null)
                                 {
                                     task.Status = "Transforming " + itemToTransform.Name;
                                     var transformed = WorkItemConfigurationTransformer.Transform(transformation.TransformationType, itemToTransform.XmlDefinition, transformation.TransformationXml);
-                                    itemToTransform.XmlDefinition = transformed;
+                                    if (string.Equals(itemToTransform.XmlDefinition.DocumentElement.OuterXml, transformed.DocumentElement.OuterXml))
+                                    {
+                                        task.Status = "The transformation was applied but did not result in any changes, skipping.";
+                                    }
+                                    else
+                                    {
+                                        itemToTransform.XmlDefinition = transformed;
+                                        transformedItems.Add(itemToTransform);
+                                    }
                                 }
                             }
                             else
@@ -347,33 +380,42 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         }
 
                         // Only apply the transformations if they all succeeded (i.e. there was no exception).
-                        // First apply all work item types in batch.
-                        var teamProjectsWithWorkItemTypes = new Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>>()
+                        if (simulate)
                         {
-                            { teamProject, transformedItems.Where(t => t.Type == WorkItemConfigurationItemType.WorkItemType).Cast<WorkItemTypeDefinition>().ToList() }
-                        };
-                        WorkItemConfigurationItemImportExport.ImportWorkItemTypes(this.Logger, task, ImportOptions.Import, store, teamProjectsWithWorkItemTypes);
-
-                        // Then apply the other transformed items.
-                        foreach (var transformedItem in transformedItems.Where(w => w.Type != WorkItemConfigurationItemType.WorkItemType))
-                        {
-                            task.Status = "Importing {0} in project \"{1}\"".FormatCurrent(transformedItem.Name, teamProject.Name);
-                            switch (transformedItem.Type)
+                            foreach (var transformedItem in transformedItems)
                             {
-                                case WorkItemConfigurationItemType.Categories:
-                                    project.Categories.Import(transformedItem.XmlDefinition.DocumentElement);
-                                    break;
-                                case WorkItemConfigurationItemType.CommonConfiguration:
-                                    WorkItemConfigurationItemImportExport.SetCommonConfiguration(tfs, project, transformedItem);
-                                    break;
-                                case WorkItemConfigurationItemType.AgileConfiguration:
-                                    WorkItemConfigurationItemImportExport.SetAgileConfiguration(tfs, project, transformedItem);
-                                    break;
-                                default:
-                                    throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + transformedItem.ToString());
+                                task.Status = "Simulating import of \"{0}\" in project \"{1}\"".FormatCurrent(transformedItem.Name, teamProject.Name);
                             }
                         }
+                        else
+                        {
+                            // First apply all work item types in batch.
+                            var teamProjectsWithWorkItemTypes = new Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>>()
+                            {
+                                { teamProject, transformedItems.Where(t => t.Type == WorkItemConfigurationItemType.WorkItemType).Cast<WorkItemTypeDefinition>().ToList() }
+                            };
+                            WorkItemConfigurationItemImportExport.ImportWorkItemTypes(this.Logger, task, ImportOptions.Import, store, teamProjectsWithWorkItemTypes);
 
+                            // Then apply the other transformed items.
+                            foreach (var transformedItem in transformedItems.Where(w => w.Type != WorkItemConfigurationItemType.WorkItemType))
+                            {
+                                task.Status = "Importing {0} in project \"{1}\"".FormatCurrent(transformedItem.Name, teamProject.Name);
+                                switch (transformedItem.Type)
+                                {
+                                    case WorkItemConfigurationItemType.Categories:
+                                        project.Categories.Import(transformedItem.XmlDefinition.DocumentElement);
+                                        break;
+                                    case WorkItemConfigurationItemType.CommonConfiguration:
+                                        WorkItemConfigurationItemImportExport.SetCommonConfiguration(tfs, project, transformedItem);
+                                        break;
+                                    case WorkItemConfigurationItemType.AgileConfiguration:
+                                        WorkItemConfigurationItemImportExport.SetAgileConfiguration(tfs, project, transformedItem);
+                                        break;
+                                    default:
+                                        throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + transformedItem.ToString());
+                                }
+                            }
+                        }
                         numTransformations += transformedItems.Count;
                     }
                     catch (Exception exc)

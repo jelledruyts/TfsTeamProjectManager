@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- This transformation updates the Scrum 2.0 "Bug" and "Product Backlog Item" definitions to v2.2 -->
+<!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details -->
+<Witd:WITD xmlns:Witd="http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <WORKITEMTYPE>
+    <WORKFLOW>
+      <TRANSITIONS>
+        <!-- Add missing transitions -->
+        <!-- First remove the transitions if they exist to make this script idempotent -->
+        <!-- Then insert the transitions at the end -->
+        <TRANSITION from="Approved" to="New" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Approved" to="New" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Moved to the backlog" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Committed" to="New" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Committed" to="New" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Moved to the backlog" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Done" to="New" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Done" to="New" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Moved to the backlog" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Done" to="Approved" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Done" to="Approved" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Additional work found" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Approved" to="Done" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Approved" to="Done" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Work finished" />
+          </REASONS>
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+      </TRANSITIONS>
+    </WORKFLOW>
+  </WORKITEMTYPE>
+</Witd:WITD>

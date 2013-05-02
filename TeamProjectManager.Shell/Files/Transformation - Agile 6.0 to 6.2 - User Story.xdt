@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- This transformation updates the MSF for Agile Software Development 6.0 "User Story" definition to v6.2 -->
+<!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details -->
+<Witd:WITD xmlns:Witd="http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <WORKITEMTYPE>
+    <WORKFLOW>
+      <TRANSITIONS>
+        <!-- Add missing transitions -->
+        <!-- First remove the transitions if they exist to make this script idempotent -->
+        <!-- Then insert the transitions at the end -->
+        <TRANSITION from="Resolved" to="New" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Resolved" to="New" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Moved to the backlog" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Closed" to="New" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="Closed" to="New" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Moved to the backlog" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="New" to="Closed" xdt:Transform="Remove" xdt:Locator="Match(from,to)" />
+        <TRANSITION from="New" to="Closed" xdt:Transform="Insert">
+          <REASONS>
+            <DEFAULTREASON value="Acceptance tests pass" />
+          </REASONS>
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedBy">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+        <!-- Set the values in the ResolvedBy and ResolvedDate fields in the transition "Active to Closed" -->
+        <TRANSITION from="Active" to="Closed" xdt:Locator="Match(from,to)">
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Locator="Match(refname)">
+              <READONLY xdt:Transform="Remove" />
+              <SERVERDEFAULT from="clock" xdt:Transform="Remove" />
+              <SERVERDEFAULT from="clock" xdt:Transform="Insert" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Locator="Match(refname)">
+              <ALLOWEXISTINGVALUE xdt:Transform="Remove" />
+              <READONLY xdt:Transform="Remove" />
+              <SERVERDEFAULT from="currentuser" xdt:Transform="Remove" />
+              <SERVERDEFAULT from="currentuser" xdt:Transform="Insert" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+        <!-- Update the reasons in the transitions "Active to New" and "Active to Closed" -->
+        <TRANSITION from="Active" to="New" xdt:Locator="Match(from,to)">
+          <REASONS>
+            <DEFAULTREASON xdt:Transform="Remove" />
+            <REASON xdt:Transform="RemoveAll" />
+            <REASON value="Implementation halted" xdt:Transform="Insert" />
+            <DEFAULTREASON value="Moved to the backlog" xdt:Transform="Insert" />
+          </REASONS>
+        </TRANSITION>
+        <TRANSITION from="Active" to="Closed" xdt:Locator="Match(from,to)">
+          <REASONS>
+            <DEFAULTREASON xdt:Transform="Remove" />
+            <REASON xdt:Transform="RemoveAll" />
+            <REASON value="Abandoned" xdt:Transform="Insert" />
+            <REASON value="Out of scope" xdt:Transform="Insert" />
+            <REASON value="Rejected" xdt:Transform="Insert" />
+            <DEFAULTREASON value="Acceptance tests pass" xdt:Transform="Insert" />
+          </REASONS>
+        </TRANSITION>
+      </TRANSITIONS>
+    </WORKFLOW>
+  </WORKITEMTYPE>
+</Witd:WITD>

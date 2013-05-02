@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- This transformation updates the MSF for CMMI Process Improvement 6.0 "Requirement" definition to v6.2 -->
+<!-- See http://blogs.msdn.com/b/visualstudioalm/archive/2013/04/04/upgrade-your-2012-process-template-from-rtm-to-update-2.aspx for details -->
+<Witd:WITD xmlns:Witd="http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <WORKITEMTYPE>
+    <WORKFLOW>
+      <TRANSITIONS>
+        <!-- Set the value of the ResolvedBy and ResolvedDate fields in the transition "Active to Closed" -->
+        <TRANSITION from="Active" to="Closed" xdt:Locator="Match(from,to)">
+          <FIELDS>
+            <!-- First remove the fields if they exist to make this script idempotent -->
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Active' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Active' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+        <!-- Set the value of the ActivatedBy, ActivatedDate, ResolvedBy and ResolvedDate fields in the transition "Proposed to Closed" -->
+        <TRANSITION from="Proposed" to="Closed" xdt:Locator="Match(from,to)">
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedDate" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Locator="Match(refname)" xdt:Transform="Remove" />
+            <FIELD refname="Microsoft.VSTS.Common.ResolvedBy" xdt:Transform="InsertBefore(//WORKITEMTYPE/WORKFLOW/TRANSITIONS/TRANSITION[@from='Proposed' and @to='Closed']/FIELDS/FIELD[@refname='Microsoft.VSTS.Common.ClosedDate'])">
+              <SERVERDEFAULT from="currentuser" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+      </TRANSITIONS>
+    </WORKFLOW>
+  </WORKITEMTYPE>
+</Witd:WITD>

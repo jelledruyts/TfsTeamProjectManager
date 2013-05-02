@@ -1,29 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
-    public class WorkItemConfiguration
+    public class WorkItemConfiguration : ObservableObject
     {
-        #region Properties
+        #region Observable Properties
 
-        public string Name { get; set; }
-        public ObservableCollection<WorkItemConfigurationItem> Items { get; private set; }
+        public string Name
+        {
+            get { return this.GetValue(NameProperty); }
+            set { this.SetValue(NameProperty, value); }
+        }
+
+        public static readonly ObservableProperty<string> NameProperty = new ObservableProperty<string, WorkItemConfiguration>(o => o.Name);
 
         public string Description
         {
-            get
-            {
-                return this.Name + (this.Items.Any() ? string.Format(CultureInfo.CurrentCulture, " ({0})", string.Join(", ", this.Items.Select(w => w.Name))) : string.Empty);
-            }
-
+            get { return this.GetValue(DescriptionProperty); }
+            set { this.SetValue(DescriptionProperty, value); }
         }
+
+        public static readonly ObservableProperty<string> DescriptionProperty = new ObservableProperty<string, WorkItemConfiguration>(o => o.Description);
+
+        public bool IsValid
+        {
+            get { return this.GetValue(IsValidProperty); }
+            private set { this.SetValue(IsValidProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> IsValidProperty = new ObservableProperty<bool, WorkItemConfigurationTransformationItem>(o => o.IsValid);
+
+        #endregion
+
+        #region Properties
+
+        public ObservableCollection<WorkItemConfigurationItem> Items { get; private set; }
 
         #endregion
 
@@ -38,15 +57,24 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             this.Name = name;
             this.Items = new ObservableCollection<WorkItemConfigurationItem>(items ?? new WorkItemConfigurationItem[0]);
+            this.Items.CollectionChanged += (sender, e) => { RefreshCalculatedProperties(); };
+            RefreshCalculatedProperties();
         }
 
         #endregion
 
-        #region IsValid
+        #region Event Handlers
 
-        public bool IsValid()
+        protected override void OnObservablePropertyChanged(ObservablePropertyChangedEventArgs e)
         {
-            return !string.IsNullOrEmpty(this.Name) && this.Items.Any();
+            base.OnObservablePropertyChanged(e);
+            RefreshCalculatedProperties();
+        }
+
+        private void RefreshCalculatedProperties()
+        {
+            this.Description = this.Name + (this.Items != null && this.Items.Any() ? string.Format(CultureInfo.CurrentCulture, " ({0})", string.Join(", ", this.Items.Select(w => w.Name))) : string.Empty);
+            this.IsValid = !string.IsNullOrEmpty(this.Name) && this.Items != null && this.Items.Any();
         }
 
         #endregion

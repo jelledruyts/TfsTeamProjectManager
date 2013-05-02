@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@ using System.Windows;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
+using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
@@ -19,8 +21,28 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         #region Properties
 
+        public RelayCommand AddTransformationCommand { get; private set; }
+        public RelayCommand EditSelectedTransformationCommand { get; private set; }
+        public RelayCommand RemoveSelectedTransformationCommand { get; private set; }
+        public RelayCommand RemoveAllTransformationsCommand { get; private set; }
+        public RelayCommand MoveSelectedTransformationUpCommand { get; private set; }
+        public RelayCommand MoveSelectedTransformationDownCommand { get; private set; }
+        public RelayCommand LoadTransformationsCommand { get; private set; }
+        public RelayCommand SaveTransformationsCommand { get; private set; }
         public RelayCommand ApplyTransformationsCommand { get; private set; }
         public ObservableCollection<WorkItemConfigurationTransformationItem> Transformations { get; private set; }
+
+        #endregion
+
+        #region Observable Properties
+
+        public WorkItemConfigurationTransformationItem SelectedTransformation
+        {
+            get { return this.GetValue(SelectedTransformationProperty); }
+            set { this.SetValue(SelectedTransformationProperty, value); }
+        }
+
+        public static readonly ObservableProperty<WorkItemConfigurationTransformationItem> SelectedTransformationProperty = new ObservableProperty<WorkItemConfigurationTransformationItem, WorkItemConfigurationTransformationViewModel>(o => o.SelectedTransformation);
 
         #endregion
 
@@ -30,8 +52,173 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public WorkItemConfigurationTransformationViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base(eventAggregator, logger, "Work Item Configuration Transformation", "Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration). This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.")
         {
+            this.AddTransformationCommand = new RelayCommand(AddTransformation, CanAddTransformation);
+            this.EditSelectedTransformationCommand = new RelayCommand(EditSelectedTransformation, CanEditSelectedTransformation);
+            this.RemoveSelectedTransformationCommand = new RelayCommand(RemoveSelectedTransformation, CanRemoveSelectedTransformation);
+            this.RemoveAllTransformationsCommand = new RelayCommand(RemoveAllTransformations, CanRemoveAllTransformations);
+            this.MoveSelectedTransformationUpCommand = new RelayCommand(MoveSelectedTransformationUp, CanMoveSelectedTransformationUp);
+            this.MoveSelectedTransformationDownCommand = new RelayCommand(MoveSelectedTransformationDown, CanMoveSelectedTransformationDown);
+            this.LoadTransformationsCommand = new RelayCommand(LoadTransformations, CanLoadTransformations);
+            this.SaveTransformationsCommand = new RelayCommand(SaveTransformations, CanSaveTransformations);
             this.ApplyTransformationsCommand = new RelayCommand(ApplyTransformations, CanApplyTransformations);
             this.Transformations = new ObservableCollection<WorkItemConfigurationTransformationItem>();
+        }
+
+        #endregion
+
+        #region AddTransformation Command
+
+        private bool CanAddTransformation(object argument)
+        {
+            return true;
+        }
+
+        private void AddTransformation(object argument)
+        {
+            var dialog = new WorkItemConfigurationTransformationItemEditorDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            var result = dialog.ShowDialog();
+            if (result == true)
+            {
+                this.Transformations.Add(dialog.Transformation);
+            }
+        }
+
+        #endregion
+
+        #region EditSelectedTransformation Command
+
+        private bool CanEditSelectedTransformation(object argument)
+        {
+            return this.SelectedTransformation != null;
+        }
+
+        private void EditSelectedTransformation(object argument)
+        {
+            var dialog = new WorkItemConfigurationTransformationItemEditorDialog(this.SelectedTransformation);
+            dialog.Owner = Application.Current.MainWindow;
+            dialog.ShowDialog();
+        }
+
+        #endregion
+
+        #region RemoveSelectedTransformation Command
+
+        private bool CanRemoveSelectedTransformation(object argument)
+        {
+            return this.SelectedTransformation != null;
+        }
+
+        private void RemoveSelectedTransformation(object argument)
+        {
+            this.Transformations.Remove(this.SelectedTransformation);
+        }
+
+        #endregion
+
+        #region RemoveAllTransformations Command
+
+        private bool CanRemoveAllTransformations(object argument)
+        {
+            return this.Transformations.Any();
+        }
+
+        private void RemoveAllTransformations(object argument)
+        {
+            this.Transformations.Clear();
+        }
+
+        #endregion
+
+        #region MoveSelectedTransformationUp Command
+
+        private bool CanMoveSelectedTransformationUp(object argument)
+        {
+            return this.SelectedTransformation != null && this.Transformations.IndexOf(this.SelectedTransformation) > 0;
+        }
+
+        private void MoveSelectedTransformationUp(object argument)
+        {
+            var currentIndex = this.Transformations.IndexOf(this.SelectedTransformation);
+            this.Transformations.Move(currentIndex, currentIndex - 1);
+        }
+
+        #endregion
+
+        #region MoveSelectedTransformationDown Command
+
+        private bool CanMoveSelectedTransformationDown(object argument)
+        {
+            return this.SelectedTransformation != null && this.Transformations.IndexOf(this.SelectedTransformation) < this.Transformations.Count - 1;
+        }
+
+        private void MoveSelectedTransformationDown(object argument)
+        {
+            var currentIndex = this.Transformations.IndexOf(this.SelectedTransformation);
+            this.Transformations.Move(currentIndex, currentIndex + 1);
+        }
+
+        #endregion
+
+        #region LoadTransformations Command
+
+        private bool CanLoadTransformations(object argument)
+        {
+            return true;
+        }
+
+        private void LoadTransformations(object argument)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Please select the transformation list (*.xml) to load.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    var transformations = SerializationProvider.Read<WorkItemConfigurationTransformationItem[]>(dialog.FileName);
+                    this.Transformations.Clear();
+                    foreach (var transformation in transformations)
+                    {
+                        this.Transformations.Add(transformation);
+                    }
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the transformation list from \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while loading the transformation list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        #endregion
+
+        #region SaveTransformations Command
+
+        private bool CanSaveTransformations(object argument)
+        {
+            return this.Transformations.Any();
+        }
+
+        private void SaveTransformations(object argument)
+        {
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Please select the transformation list (*.xml) to save.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                try
+                {
+                    SerializationProvider.Write<WorkItemConfigurationTransformationItem[]>(this.Transformations.ToArray(), dialog.FileName);
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while saving the transformation list to \"{0}\"", dialog.FileName), exc);
+                    MessageBox.Show("An error occurred while saving the transformation list. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
         }
 
         #endregion
@@ -73,10 +260,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         var transformedItems = new List<WorkItemConfigurationItem>();
                         foreach (var transformation in transformations)
                         {
-                            if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.WorkItemType && !string.IsNullOrEmpty(transformation.WorkItemTypeNames))
+                            if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.WorkItemType)
                             {
+                                // TODO: Check that works across ALL work item types
                                 // Apply work item type definition transformation, which can apply to multiple work item type definitions (semicolon separated).
-                                var workItemTypeNames = (string.IsNullOrEmpty(transformation.WorkItemTypeNames) ? new string[0] : transformation.WorkItemTypeNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                                // If no work item type names are specified, apply to all work item types in the project.
+                                var workItemTypeNames = (string.IsNullOrEmpty(transformation.WorkItemTypeNames) ? project.WorkItemTypes.Cast<WorkItemType>().Select(w => w.Name) : transformation.WorkItemTypeNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
                                 foreach (var workItemTypeName in workItemTypeNames)
                                 {
                                     // If the work item type has already been processed before, continue with that version.

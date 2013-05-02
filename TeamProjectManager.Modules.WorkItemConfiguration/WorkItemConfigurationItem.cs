@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
@@ -68,41 +69,61 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 throw new ArgumentNullException("xmlDefinition");
             }
-            WorkItemConfigurationItemType type;
-            string name;
             var typeName = xmlDefinition.DocumentElement.LocalName;
             if (typeName.Equals("WITD", StringComparison.OrdinalIgnoreCase))
             {
-                type = WorkItemConfigurationItemType.WorkItemType;
                 var nameNode = xmlDefinition.SelectSingleNode("//WORKITEMTYPE/@name");
-                name = nameNode == null ? null : nameNode.Value;
+                var name = nameNode == null ? null : nameNode.Value;
+                return new WorkItemTypeDefinition(name, xmlDefinition);
             }
             else if (typeName.Equals("AgileProjectConfiguration", StringComparison.OrdinalIgnoreCase))
             {
-                type = WorkItemConfigurationItemType.AgileConfiguration;
-                name = AgileConfigurationName;
+                return new WorkItemConfigurationItem(WorkItemConfigurationItemType.AgileConfiguration, xmlDefinition);
             }
             else if (typeName.Equals("CommonProjectConfiguration", StringComparison.OrdinalIgnoreCase))
             {
-                type = WorkItemConfigurationItemType.CommonConfiguration;
-                name = CommonConfigurationName;
+                return new WorkItemConfigurationItem(WorkItemConfigurationItemType.CommonConfiguration, xmlDefinition);
             }
             else if (typeName.Equals("CATEGORIES", StringComparison.OrdinalIgnoreCase))
             {
-                type = WorkItemConfigurationItemType.Categories;
-                name = CategoriesName;
+                return new WorkItemConfigurationItem(WorkItemConfigurationItemType.Categories, xmlDefinition);
             }
             else
             {
                 throw new ArgumentException("The work item configuration item's type could not be determined from the XML definition.");
             }
-            if (type == WorkItemConfigurationItemType.WorkItemType)
+        }
+
+        #endregion
+
+        #region Static GetDisplayName Helper
+
+        public static string GetDisplayName(WorkItemConfigurationItemType type)
+        {
+            return GetDisplayName(type, null);
+        }
+
+        public static string GetDisplayName(WorkItemConfigurationItemType type, string workItemTypeName)
+        {
+            switch (type)
             {
-                return new WorkItemTypeDefinition(name, xmlDefinition);
-            }
-            else
-            {
-                return new WorkItemConfigurationItem(type, name, xmlDefinition);
+                case WorkItemConfigurationItemType.AgileConfiguration:
+                    return WorkItemConfigurationItem.AgileConfigurationName;
+                case WorkItemConfigurationItemType.CommonConfiguration:
+                    return WorkItemConfigurationItem.CommonConfigurationName;
+                case WorkItemConfigurationItemType.WorkItemType:
+                    if (!string.IsNullOrEmpty(workItemTypeName))
+                    {
+                        return "{0}: {1}".FormatCurrent(WorkItemConfigurationItem.WorkItemTypeDefinitionName, workItemTypeName);
+                    }
+                    else
+                    {
+                        return WorkItemConfigurationItem.WorkItemTypeDefinitionName;
+                    }
+                case WorkItemConfigurationItemType.Categories:
+                    return WorkItemConfigurationItem.CategoriesName;
+                default:
+                    return type.ToString();
             }
         }
 
@@ -117,6 +138,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         #endregion
 
         #region Constructors
+
+        public WorkItemConfigurationItem(WorkItemConfigurationItemType type, XmlDocument xmlDefinition)
+            : this(type, GetDisplayName(type), xmlDefinition)
+        {
+        }
 
         public WorkItemConfigurationItem(WorkItemConfigurationItemType type, string name, XmlDocument xmlDefinition)
         {

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.Win32;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 
@@ -146,7 +146,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void UpdateUI()
         {
             this.removeHyperlink.IsEnabled = this.itemsDataGrid.SelectedItems.Count > 0;
-            this.okButton.IsEnabled = this.Configuration.IsValid();
         }
     }
 }

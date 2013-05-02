@@ -125,7 +125,7 @@ namespace TeamProjectManager.Common.ObjectModel
         /// Raises the <see cref="E:PropertyChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/> instance containing the event data.</param>
-        protected void OnObservablePropertyChanged(ObservablePropertyChangedEventArgs e)
+        protected virtual void OnObservablePropertyChanged(ObservablePropertyChangedEventArgs e)
         {
             if (this.ObservablePropertyChanged != null)
             {
@@ -146,7 +146,7 @@ namespace TeamProjectManager.Common.ObjectModel
         /// Raises the <see cref="E:PropertyChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/> instance containing the event data.</param>
-        protected void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             if (this.PropertyChanged != null)
             {

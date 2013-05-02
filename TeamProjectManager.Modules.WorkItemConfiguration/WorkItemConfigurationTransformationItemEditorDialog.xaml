@@ -1,0 +1,77 @@
+﻿<Window x:Class="TeamProjectManager.Modules.WorkItemConfiguration.WorkItemConfigurationTransformationItemEditorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemConfiguration"
+        Title="Edit Transformation"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Height="480" Width="640">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Description" />
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Description}" Margin="5,5,0,0" />
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Applies To" Margin="0,5,0,0" />
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding Path=WorkItemConfigurationItemType}" x:Name="workItemConfigurationItemTypesComboBox" />
+
+            <Label Grid.Row="2" Grid.Column="0" Content="Work Item Types" Margin="0,5,0,0" />
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=WorkItemTypeNames}" Margin="5,5,0,0">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="IsEnabled" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=WorkItemConfigurationItemType}" Value="WorkItemType">
+                                <Setter Property="IsEnabled" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <TextBlock Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Margin="5,0,0,0" Foreground="{DynamicResource UserMessageFontBrush}">Specify the names of the work item types to apply the transformation to, or leave empty to apply to all work item types. Separate multiple entries with a semicolon (;).</TextBlock>
+
+            <GroupBox Grid.Row="4" Grid.ColumnSpan="2" Margin="0,5,0,0" Header="Transformation" Padding="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Load" x:Name="loadTransformationXmlButton" Click="loadTransformationXmlButton_Click" />
+                        <WrapPanel Grid.Column="1" Margin="5,0,0,0">
+                            <Label Content="Type:" VerticalAlignment="Center" />
+                            <RadioButton Margin="5,0,0,0" Content="XDT" IsChecked="{Binding Path=TransformationType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Xdt}" ToolTip="Uses the XML Document Transformation language which is typically used for Web.config transformations" VerticalAlignment="Center" />
+                            <RadioButton Margin="5,0,0,0" Content="XSLT" IsChecked="{Binding Path=TransformationType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Xslt}" ToolTip="Uses the XSLT 1.0 language" VerticalAlignment="Center" />
+                        </WrapPanel>
+                    </Grid>
+                    <TextBox Grid.Row="1" Text="{Binding Path=TransformationXml, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" IsEnabled="{Binding Path=IsValid}" />
+            <Button Content="Cancel" IsCancel="True" Width="75" x:Name="cancelButton" Margin="5,0,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>

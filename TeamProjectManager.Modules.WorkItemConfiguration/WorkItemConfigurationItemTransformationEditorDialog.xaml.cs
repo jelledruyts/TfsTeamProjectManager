@@ -91,7 +91,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 this.transformationTextBox.Text = File.ReadAllText(dialog.FileName);
                 var extension = Path.GetExtension(dialog.FileName);
-                if (!string.IsNullOrEmpty(extension) && extension.StartsWith(".xsl", StringComparison.OrdinalIgnoreCase))
+                if (this.transformationTextBox.Text.IndexOf("http://www.w3.org/1999/XSL/Transform", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     this.TransformationType = TransformationType.Xslt;
                 }

@@ -131,6 +131,9 @@
       <DependentUpon>WorkItemConfigurationItemTransformationEditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorkItemConfigurationTransformationItem.cs" />
+    <Compile Include="WorkItemConfigurationTransformationItemEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemConfigurationTransformationItemEditorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorkItemConfigurationTransformationView.xaml.cs">
       <DependentUpon>WorkItemConfigurationTransformationView.xaml</DependentUpon>
     </Compile>
@@ -180,6 +183,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WorkItemConfigurationItemTransformationEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemConfigurationTransformationItemEditorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

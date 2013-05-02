@@ -23,6 +23,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand AddComparisonSourceCommand { get; private set; }
         public RelayCommand EditSelectedComparisonSourceCommand { get; private set; }
         public RelayCommand RemoveSelectedComparisonSourceCommand { get; private set; }
+        public RelayCommand RemoveAllComparisonSourcesCommand { get; private set; }
         public RelayCommand MoveSelectedComparisonSourceUpCommand { get; private set; }
         public RelayCommand MoveSelectedComparisonSourceDownCommand { get; private set; }
         public RelayCommand LoadComparisonSourcesCommand { get; private set; }
@@ -77,6 +78,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.AddComparisonSourceCommand = new RelayCommand(AddComparisonSource, CanAddComparisonSource);
             this.EditSelectedComparisonSourceCommand = new RelayCommand(EditSelectedComparisonSource, CanEditSelectedComparisonSource);
             this.RemoveSelectedComparisonSourceCommand = new RelayCommand(RemoveSelectedComparisonSource, CanRemoveSelectedComparisonSource);
+            this.RemoveAllComparisonSourcesCommand = new RelayCommand(RemoveAllComparisonSources, CanRemoveAllComparisonSources);
             this.MoveSelectedComparisonSourceUpCommand = new RelayCommand(MoveSelectedComparisonSourceUp, CanMoveSelectedComparisonSourceUp);
             this.MoveSelectedComparisonSourceDownCommand = new RelayCommand(MoveSelectedComparisonSourceDown, CanMoveSelectedComparisonSourceDown);
             this.LoadComparisonSourcesCommand = new RelayCommand(LoadComparisonSources, CanLoadComparisonSources);
@@ -125,6 +127,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void RemoveSelectedComparisonSource(object argument)
         {
             this.ComparisonSources.Remove(this.SelectedComparisonSource);
+        }
+
+        private bool CanRemoveAllComparisonSources(object argument)
+        {
+            return this.ComparisonSources.Any();
+        }
+
+        private void RemoveAllComparisonSources(object argument)
+        {
+            this.ComparisonSources.Clear();
         }
 
         private bool CanMoveSelectedComparisonSourceUp(object argument)
@@ -192,7 +204,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private bool CanSaveComparisonSources(object argument)
         {
-            return true;
+            return this.ComparisonSources.Any();
         }
 
         private void SaveComparisonSources(object argument)

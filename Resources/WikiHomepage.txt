@@ -32,6 +32,7 @@ Team Project Manager can help you...
 ** Import new or update existing work item types
 ** Manage work item categories
 ** Manage process configuration (i.e. common and agile configuration)
+** Transform work item tracking configuration (i.e. apply XML transformations on work item type definitions, categories, process configuration)
 For more details on how all this works, see the [Documentation] page.
 
 If you can think of other great features, please let us know through the discussion forums or the issue tracker! Or (even better) because it's built with a very modular framework ([url:Microsoft Prism|http://compositewpf.codeplex.com/]) you can also contribute by building your own modules!
@@ -50,6 +51,11 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.6.4871 (May 3rd, 2013)
+** Added support for XML transformations of work item tracking configuration files (work item type definitions, categories, process configuration).
+** Activity module now also shows the user that performed the activity.
+** Tasks can now be canceled when they are executing.
+** Fixed NullReferenceException when comparing certain types of Team Projects.
 * v1.5.4852 (April 14, 2013)
 ** Added activity module that allows you to see the most recent activity (in Source Control, Work Item Tracking and Team Build) for Team Projects.
 ** Updated security module to allow you to manage members and permissions for security groups.

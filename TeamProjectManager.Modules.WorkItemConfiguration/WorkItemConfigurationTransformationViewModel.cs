@@ -377,10 +377,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                             {
                                 throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + transformation.WorkItemConfigurationItemType.ToString());
                             }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
                         }
 
                         // Only apply the transformations if they all succeeded (i.e. there was no exception).
-                        if (simulate)
+                        if (task.IsCanceled)
+                        {
+                            break;
+                        }
+                        else if (simulate)
                         {
                             foreach (var transformedItem in transformedItems)
                             {

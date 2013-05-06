@@ -3,6 +3,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -29,7 +30,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand EditSelectedWorkItemTypesCommand { get; private set; }
         public RelayCommand TransformSelectedWorkItemTypesCommand { get; private set; }
 
-        public RelayCommand BrowseWorkItemTypesFilePathCommand { get; private set; }
+        public RelayCommand AddWorkItemTypeFileCommand { get; private set; }
+        public RelayCommand RemoveSelectedWorkItemTypeFileCommand { get; private set; }
+        public RelayCommand RemoveAllWorkItemTypeFilesCommand { get; private set; }
         public RelayCommand ValidateCommand { get; private set; }
         public RelayCommand ValidateAndImportCommand { get; private set; }
         public RelayCommand ImportCommand { get; private set; }
@@ -56,29 +59,21 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public static ObservableProperty<ICollection<WorkItemTypeInfo>> SelectedWorkItemTypesProperty = new ObservableProperty<ICollection<WorkItemTypeInfo>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypes);
 
-        public string WorkItemTypesFilePath
-        {
-            get { return this.GetValue(WorkItemTypesFilePathProperty); }
-            set { this.SetValue(WorkItemTypesFilePathProperty, value); }
-        }
-
-        public static ObservableProperty<string> WorkItemTypesFilePathProperty = new ObservableProperty<string, WorkItemTypesViewModel>(o => o.WorkItemTypesFilePath, OnWorkItemTypesFilePathChanged);
-
-        public ICollection<WorkItemTypeDefinition> WorkItemTypeFiles
+        public ObservableCollection<string> WorkItemTypeFiles
         {
             get { return this.GetValue(WorkItemTypeFilesProperty); }
-            set { this.SetValue(WorkItemTypeFilesProperty, value); }
+            private set { this.SetValue(WorkItemTypeFilesProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<WorkItemTypeDefinition>> WorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeDefinition>, WorkItemTypesViewModel>(o => o.WorkItemTypeFiles);
+        public static ObservableProperty<ObservableCollection<string>> WorkItemTypeFilesProperty = new ObservableProperty<ObservableCollection<string>, WorkItemTypesViewModel>(o => o.WorkItemTypeFiles);
 
-        public ICollection<WorkItemTypeDefinition> SelectedWorkItemTypeFiles
+        public string SelectedWorkItemTypeFile
         {
-            get { return this.GetValue(SelectedWorkItemTypeFilesProperty); }
-            set { this.SetValue(SelectedWorkItemTypeFilesProperty, value); }
+            get { return this.GetValue(SelectedWorkItemTypeFileProperty); }
+            set { this.SetValue(SelectedWorkItemTypeFileProperty, value); }
         }
 
-        public static ObservableProperty<ICollection<WorkItemTypeDefinition>> SelectedWorkItemTypeFilesProperty = new ObservableProperty<ICollection<WorkItemTypeDefinition>, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypeFiles);
+        public static readonly ObservableProperty<string> SelectedWorkItemTypeFileProperty = new ObservableProperty<string, WorkItemTypesViewModel>(o => o.SelectedWorkItemTypeFile);
 
         public string SearchText
         {
@@ -120,47 +115,22 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public WorkItemTypesViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base(eventAggregator, logger, "Work Item Types", "Allows you to manage work item type definitions.")
         {
+            this.WorkItemTypeFiles = new ObservableCollection<string>();
+
             this.GetWorkItemTypesCommand = new RelayCommand(GetWorkItemTypes, CanGetWorkItemTypes);
             this.ExportSelectedWorkItemTypesCommand = new RelayCommand(ExportSelectedWorkItemTypes, CanExportSelectedWorkItemTypes);
             this.DeleteSelectedWorkItemTypesCommand = new RelayCommand(DeleteSelectedWorkItemTypes, CanDeleteSelectedWorkItemTypes);
             this.EditSelectedWorkItemTypesCommand = new RelayCommand(EditSelectedWorkItemTypes, CanEditSelectedWorkItemTypes);
             this.TransformSelectedWorkItemTypesCommand = new RelayCommand(TransformSelectedWorkItemTypes, CanTransformSelectedWorkItemTypes);
 
-            this.BrowseWorkItemTypesFilePathCommand = new RelayCommand(BrowseWorkItemTypesFilePath, CanBrowseWorkItemTypesFilePath);
+            this.AddWorkItemTypeFileCommand = new RelayCommand(AddWorkItemTypeFile, CanAddWorkItemTypeFile);
+            this.RemoveSelectedWorkItemTypeFileCommand = new RelayCommand(RemoveSelectedWorkItemTypeFile, CanRemoveSelectedWorkItemTypeFile);
+            this.RemoveAllWorkItemTypeFilesCommand = new RelayCommand(RemoveAllWorkItemTypeFiles, CanRemoveAllWorkItemTypeFiles);
             this.ValidateCommand = new RelayCommand(Validate, CanValidate);
             this.ValidateAndImportCommand = new RelayCommand(ValidateAndImport, CanValidateAndImport);
             this.ImportCommand = new RelayCommand(Import, CanImport);
 
             this.SearchCommand = new RelayCommand(Search, CanSearch);
-        }
-
-        #endregion
-
-        #region Events
-
-        private static void OnWorkItemTypesFilePathChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<string> args)
-        {
-            var viewModel = (WorkItemTypesViewModel)sender;
-            var path = viewModel.WorkItemTypesFilePath;
-            if (Directory.Exists(path))
-            {
-                var workItemTypeFiles = new List<WorkItemTypeDefinition>();
-                foreach (var workItemTypeFileName in Directory.GetFiles(path, "*.xml"))
-                {
-                    try
-                    {
-                        workItemTypeFiles.Add(WorkItemTypeDefinition.FromFile(workItemTypeFileName));
-                    }
-                    catch (ArgumentException)
-                    {
-                    }
-                }
-                viewModel.WorkItemTypeFiles = workItemTypeFiles;
-            }
-            else
-            {
-                viewModel.WorkItemTypeFiles = null;
-            }
         }
 
         #endregion
@@ -445,23 +415,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
         }
 
-        private bool CanBrowseWorkItemTypesFilePath(object arguments)
-        {
-            return true;
-        }
-
-        private void BrowseWorkItemTypesFilePath(object argument)
-        {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            dialog.Description = "Please select the path where the Work Item Type Definition files (*.xml) are stored.";
-            dialog.SelectedPath = this.WorkItemTypesFilePath;
-            var result = dialog.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                this.WorkItemTypesFilePath = dialog.SelectedPath;
-            }
-        }
-
         private bool CanSearch(object argument)
         {
             return IsAnyTeamProjectSelected() && !string.IsNullOrEmpty(this.SearchText);
@@ -552,9 +505,51 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             worker.RunWorkerAsync();
         }
 
+        private bool CanAddWorkItemTypeFile(object argument)
+        {
+            return true;
+        }
+
+        private void AddWorkItemTypeFile(object argument)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Please select the Work Item Type Definition files (*.xml) to add.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            dialog.Multiselect = true;
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                this.WorkItemTypeFiles.Clear();
+                foreach (var workItemTypeFileName in dialog.FileNames)
+                {
+                    this.WorkItemTypeFiles.Add(workItemTypeFileName);
+                }
+            }
+        }
+
+        private bool CanRemoveSelectedWorkItemTypeFile(object argument)
+        {
+            return this.SelectedWorkItemTypeFile != null;
+        }
+
+        private void RemoveSelectedWorkItemTypeFile(object argument)
+        {
+            this.WorkItemTypeFiles.Remove(this.SelectedWorkItemTypeFile);
+        }
+
+        private bool CanRemoveAllWorkItemTypeFiles(object argument)
+        {
+            return this.WorkItemTypeFiles.Any();
+        }
+
+        private void RemoveAllWorkItemTypeFiles(object argument)
+        {
+            this.WorkItemTypeFiles.Clear();
+        }
+
         private bool CanValidate(object argument)
         {
-            return IsAnyTeamProjectSelected() && this.SelectedWorkItemTypeFiles != null && this.SelectedWorkItemTypeFiles.Count > 0;
+            return IsAnyTeamProjectSelected() && this.WorkItemTypeFiles.Any();
         }
 
         private void Validate(object argument)
@@ -588,7 +583,19 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void PerformImport(string description, ImportOptions options)
         {
-            var workItemTypes = this.SelectedWorkItemTypeFiles.ToList();
+            var workItemTypes = new List<WorkItemTypeDefinition>();
+            foreach (var workItemTypeFile in this.WorkItemTypeFiles)
+            {
+                try
+                {
+                    workItemTypes.Add(WorkItemTypeDefinition.FromFile(workItemTypeFile));
+                }
+                catch (Exception exc)
+                {
+                    this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the work item type from \"{0}\"", workItemTypeFile), exc);
+                    MessageBox.Show(string.Format(CultureInfo.CurrentCulture, "An error occurred while loading the work item type from \"{0}\". See the log file for details", workItemTypeFile), "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
             var teamProjectsWithWorkItemTypes = this.SelectedTeamProjects.ToDictionary(p => p, p => workItemTypes);
             if (options.HasFlag(ImportOptions.Import))
             {

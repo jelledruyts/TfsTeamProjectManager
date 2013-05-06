@@ -43,41 +43,26 @@
         <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to validate and import new work item type definitions in existing Team Projects. This can be useful if you want to change the work item types being used, e.g. to upgrade them from a previous version.">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" Margin="0,5,0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Column="0" Content="Work Item Type Definitions Path" Margin="0,0,5,0" />
-                    <TextBox Grid.Column="1" Text="{Binding Path=WorkItemTypesFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
-                    <Button Grid.Column="2" Content="..." Command="{Binding Path=BrowseWorkItemTypesFilePathCommand}" Padding="5,0,5,0" />
+                    <ListBox Grid.Column="0" ItemsSource="{Binding Path=WorkItemTypeFiles}" SelectedItem="{Binding Path=SelectedWorkItemTypeFile}" SelectionMode="Single" Margin="5,0,0,0" />
 
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5,0,0,0">
+                        <TextBlock><Hyperlink Command="{Binding Path=AddWorkItemTypeFileCommand}" ToolTip="Add a Work Item Type">add</Hyperlink></TextBlock>
+                        <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedWorkItemTypeFileCommand}" ToolTip="Remove the selected Work Item Type">remove</Hyperlink></TextBlock>
+                        <TextBlock><Hyperlink Command="{Binding Path=RemoveAllWorkItemTypeFilesCommand}" ToolTip="Remove all Work Item Types">remove all</Hyperlink></TextBlock>
+                    </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1" Margin="0,5,0,5">
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <ListBox Grid.Row="0" x:Name="workItemTypeFilesListBox" ItemsSource="{Binding Path=WorkItemTypeFiles}" Style="{StaticResource CheckedListBoxStyle}" SelectionMode="Extended" SelectionChanged="workItemTypeFilesListBox_SelectionChanged" />
-
-                    <WrapPanel Grid.Row="1">
-                        <TextBlock><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectAllCommand}">select all</Hyperlink></TextBlock>
-                        <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=SelectNoneCommand}">select none</Hyperlink></TextBlock>
-                    </WrapPanel>
-
-                </Grid>
-
-                <WrapPanel Grid.Row="2">
+                <WrapPanel Grid.Row="1">
                     <Button Content="Validate" Margin="0,0,5,0" Command="{Binding Path=ValidateCommand}" />
                     <Button Content="Validate &amp; Import" Margin="0,0,5,0" Command="{Binding Path=ValidateAndImportCommand}" />
                     <Button Content="Import" Command="{Binding Path=ImportCommand}" />

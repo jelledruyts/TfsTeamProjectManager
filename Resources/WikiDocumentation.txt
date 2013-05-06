@@ -46,6 +46,8 @@ This can be useful when you want to get an overview of all the builds and their 
 
 [image:View / Unregister Build Process Templates|BuildProcessTemplates-ViewUnregister.png]
 
+[image:View Build Process Templates By Server Path|BuildProcessTemplates-ViewUnregister-ByServerPath.png]
+
 !!! Register / Update
 
 Allows you to register new build process templates across multiple Team Projects, optionally unregistering any other template.
@@ -101,6 +103,8 @@ This can be useful to determine which Team Projects have been created with which
 
 [image:Compare Work Item Configuration|WorkItemConfiguration-Compare.png]
 
+[image:Edit Work Item Configuration|WorkItemConfiguration-Compare-Edit.png]
+
 [image:Comparison Details|WorkItemConfiguration-CompareDetails.png]
 
 {anchor:Work Item Configuration - Work Item Types}
@@ -114,6 +118,8 @@ You can also export their definitions to XML files, edit them in-place, and dele
 [image:View / Export / Delete / Edit Work Item Types|WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png]
 
 [image:Edit Work Item Types|WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png]
+
+[image:Transform Work Item Types|WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png]
 
 !!! Import
 
@@ -157,6 +163,8 @@ Allows you to get an overview of the work item process configurations (i.e. comm
 
 [image:Edit Process Configuration|WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png]
 
+[image:Transform Process Configuration|WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png]
+
 !!! Import
 
 Allows you to import work item process configurations (i.e. common and agile configurations) in existing Team Projects.
@@ -171,3 +179,5 @@ Allows you to transform the XML files that define the work item configuration (i
 This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.
 
 [image:Transform Work Item Configuration|WorkItemConfiguration-Transform.png]
+
+[image:Edit Transformation|WorkItemConfiguration-Transform-Edit.png]

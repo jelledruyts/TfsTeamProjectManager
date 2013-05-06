@@ -51,11 +51,12 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v1.6.4871 (May 3rd, 2013)
+* v1.6.4874 (May 6th, 2013)
 ** Added support for XML transformations of work item tracking configuration files (work item type definitions, categories, process configuration).
 ** Activity module now also shows the user that performed the activity.
 ** Tasks can now be canceled when they are executing.
 ** Fixed NullReferenceException when comparing certain types of Team Projects.
+** Fixed ArgumentNullException when editing build definition that has no process parameters.
 * v1.5.4852 (April 14, 2013)
 ** Added activity module that allows you to see the most recent activity (in Source Control, Work Item Tracking and Team Build) for Team Projects.
 ** Updated security module to allow you to manage members and permissions for security groups.

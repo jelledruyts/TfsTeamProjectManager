@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Resources\BuildDefinitions-Update.png = Resources\BuildDefinitions-Update.png
 		Resources\BuildDefinitions-ViewUpdateDelete.png = Resources\BuildDefinitions-ViewUpdateDelete.png
 		Resources\BuildProcessTemplates-RegisterUpdate.png = Resources\BuildProcessTemplates-RegisterUpdate.png
+		Resources\BuildProcessTemplates-ViewUnregister-ByServerPath.png = Resources\BuildProcessTemplates-ViewUnregister-ByServerPath.png
 		Resources\BuildProcessTemplates-ViewUnregister.png = Resources\BuildProcessTemplates-ViewUnregister.png
 		Resources\Security-AddUpdateGroup.png = Resources\Security-AddUpdateGroup.png
 		Resources\Security-ViewDeleteGroups.png = Resources\Security-ViewDeleteGroups.png
@@ -34,14 +35,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
 		Resources\WorkItemConfiguration-Categories-UpdateImport.png = Resources\WorkItemConfiguration-Categories-UpdateImport.png
 		Resources\WorkItemConfiguration-Categories-ViewDelete.png = Resources\WorkItemConfiguration-Categories-ViewDelete.png
+		Resources\WorkItemConfiguration-Compare-Edit.png = Resources\WorkItemConfiguration-Compare-Edit.png
 		Resources\WorkItemConfiguration-Compare.png = Resources\WorkItemConfiguration-Compare.png
 		Resources\WorkItemConfiguration-CompareDetails.png = Resources\WorkItemConfiguration-CompareDetails.png
 		Resources\WorkItemConfiguration-ProcessConfiguration-Import.png = Resources\WorkItemConfiguration-ProcessConfiguration-Import.png
 		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png
+		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png
 		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png
+		Resources\WorkItemConfiguration-Transform-Edit.png = Resources\WorkItemConfiguration-Transform-Edit.png
+		Resources\WorkItemConfiguration-Transform.png = Resources\WorkItemConfiguration-Transform.png
 		Resources\WorkItemConfiguration-WorkItemTypes-Import.png = Resources\WorkItemConfiguration-WorkItemTypes-Import.png
 		Resources\WorkItemConfiguration-WorkItemTypes-Search.png = Resources\WorkItemConfiguration-WorkItemTypes-Search.png
 		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png
+		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png
 		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png
 	EndProjectSection
 EndProject

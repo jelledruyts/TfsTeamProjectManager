@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.Build.Client;
+using Microsoft.TeamFoundation.Build.Workflow;
+using Microsoft.TeamFoundation.Build.Workflow.Activities;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using Microsoft.TeamFoundation.Build.Client;
-using Microsoft.TeamFoundation.Build.Workflow;
-using Microsoft.TeamFoundation.Build.Workflow.Activities;
 
 namespace TeamProjectManager.Modules.BuildDefinitions
 {
@@ -159,7 +159,10 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         protected static XmlDocument GetProcessParameters(IBuildDefinition buildDefinition, out XmlNamespaceManager nsmgr)
         {
             var processParameters = new XmlDocument();
-            processParameters.LoadXml(buildDefinition.ProcessParameters);
+            if (!string.IsNullOrEmpty(buildDefinition.ProcessParameters))
+            {
+                processParameters.LoadXml(buildDefinition.ProcessParameters);
+            }
             nsmgr = new XmlNamespaceManager(processParameters.NameTable);
             nsmgr.AddNamespace("x", "http://schemas.microsoft.com/winfx/2006/xaml");
             nsmgr.AddNamespace("mtbw", "clr-namespace:Microsoft.TeamFoundation.Build.Workflow;assembly=Microsoft.TeamFoundation.Build.Workflow");

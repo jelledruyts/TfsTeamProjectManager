@@ -22,7 +22,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         static XmlNormalizer()
         {
-            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName", "Microsoft.VSTS.CMMI.RootCause" };
+            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName", "Microsoft.VSTS.CMMI.RootCause", "Microsoft.VSTS.CMMI.Probability" };
             KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
             KnownFieldsWithReportableMeasure = new string[] { "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
             KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy" };
@@ -155,14 +155,21 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private static void NormalizeWorkItemTypeDefinition(XmlDocument normalizedXmlDefinition, TfsMajorVersion tfsMajorVersion)
         {
+            var rawXml = normalizedXmlDefinition.OuterXml;
+
+            // Replace "[Project]\" with "[project]\" everywhere.
+            rawXml = rawXml.Replace(@"[Project]\", @"[project]\");
+
+            normalizedXmlDefinition.LoadXml(rawXml);
+
             // Remove all empty CustomControlOptions.
             foreach (var customControlOptionsNode in normalizedXmlDefinition.SelectNodes("//CustomControlOptions").Cast<XmlElement>().Where(n => !n.HasChildNodes))
             {
                 customControlOptionsNode.ParentNode.RemoveChild(customControlOptionsNode);
             }
 
-            // Remove the "expanditems" attribute for ALLOWEDVALUES and SUGGESTEDVALUES when it is true (the default).
-            foreach (XmlAttribute expandItemsAttribute in normalizedXmlDefinition.SelectNodes("//ALLOWEDVALUES[@expanditems='true']/@expanditems | //SUGGESTEDVALUES[@expanditems='true']/@expanditems"))
+            // Remove the "expanditems" attribute for ALLOWEDVALUES, SUGGESTEDVALUES and PROHIBITEDVALUES when it is true (the default).
+            foreach (XmlAttribute expandItemsAttribute in normalizedXmlDefinition.SelectNodes("//ALLOWEDVALUES[@expanditems='true']/@expanditems | //SUGGESTEDVALUES[@expanditems='true']/@expanditems | //PROHIBITEDVALUES[@expanditems='true']/@expanditems"))
             {
                 expandItemsAttribute.OwnerElement.Attributes.Remove(expandItemsAttribute);
             }
@@ -320,6 +327,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             foreach (XmlNode suggestedValuesList in normalizedXmlDefinition.SelectNodes("//SUGGESTEDVALUES"))
             {
                 SortChildNodes(suggestedValuesList);
+            }
+
+            // Sort child nodes of prohibited values.
+            foreach (XmlNode prohibitedValuesList in normalizedXmlDefinition.SelectNodes("//PROHIBITEDVALUES"))
+            {
+                SortChildNodes(prohibitedValuesList);
             }
 
             // Sort child nodes of transitions.

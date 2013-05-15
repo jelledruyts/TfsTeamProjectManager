@@ -15,7 +15,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             this.TeamProject = teamProject;
             this.WorkItemConfigurationResults = workItemConfigurationResults ?? new WorkItemConfigurationComparisonResult[0];
-            this.BestMatch = this.WorkItemConfigurationResults.First(s => s.PercentMatch == this.WorkItemConfigurationResults.Max(r => r.PercentMatch));
+            this.BestMatch = this.WorkItemConfigurationResults.FirstOrDefault(s => s.PercentMatch == this.WorkItemConfigurationResults.Max(r => r.PercentMatch));
             this.Summary = string.Join("; ", workItemConfigurationResults.Select(w => string.Format(CultureInfo.CurrentCulture, "{0} ({1:0%})", w.Source.Name, w.PercentMatch)));
         }
     }

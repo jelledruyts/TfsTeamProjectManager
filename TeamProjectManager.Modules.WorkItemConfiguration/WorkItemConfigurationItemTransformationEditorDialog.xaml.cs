@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,6 +17,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         #region Properties
 
         public IList<WorkItemConfigurationItemExport> Items { get; private set; }
+        public WorkItemConfigurationItemExport SelectedItem { get; set; }
         public TransformationType TransformationType { get; set; }
 
         #endregion
@@ -26,6 +28,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             InitializeComponent();
             this.Items = items ?? new WorkItemConfigurationItemExport[0];
+            this.SelectedItem = this.Items.FirstOrDefault();
             this.Title = "Transforming " + this.Items.Count.ToCountString(itemType);
             this.DataContext = this;
         }
@@ -113,7 +116,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var output = string.Empty;
                 if (!string.IsNullOrWhiteSpace(input) && !string.IsNullOrWhiteSpace(transformation))
                 {
+                    // Perform the transformation.
                     output = WorkItemConfigurationTransformer.Transform(this.TransformationType, input, transformation);
+
+                    // Also replace macros to complete the preview.
+                    output = WorkItemConfigurationItemImportExport.ReplaceTeamProjectMacros(output, this.SelectedItem.TeamProject);
                 }
                 this.outputTextBox.Text = output;
             }

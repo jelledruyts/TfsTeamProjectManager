@@ -194,7 +194,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Clone
 
-        public WorkItemConfigurationItem Clone()
+        public virtual WorkItemConfigurationItem Clone()
         {
             return new WorkItemConfigurationItem(this.Type, this.Name, (XmlDocument)this.XmlDefinition.Clone());
         }

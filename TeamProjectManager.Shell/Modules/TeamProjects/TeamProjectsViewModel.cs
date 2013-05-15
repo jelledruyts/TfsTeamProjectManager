@@ -222,31 +222,31 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
                 if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService3", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V11Update2, "Team Foundation Server 2012 Update 2", "TFS 2012.2");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11Update2, "Team Foundation Server 2012 Update 2", "TFS 2012.2");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService2", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V11Update1, "Team Foundation Server 2012 Update 1", "TFS 2012.1");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11Update1, "Team Foundation Server 2012 Update 1", "TFS 2012.1");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V11, "Team Foundation Server 2012", "TFS 2012.0");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11, "Team Foundation Server 2012", "TFS 2012.0");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestResultsServiceEx", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V10SP1, "Team Foundation Server 2010 Service Pack 1", "TFS 2010 SP1");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V10SP1, "Team Foundation Server 2010 Service Pack 1", "TFS 2010 SP1");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "LocationService", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V10, "Team Foundation Server 2010", "TFS 2010 RTM");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V10, "Team Foundation Server 2010", "TFS 2010 RTM");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "vstfs", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "GroupSecurity2", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V9, "Team Foundation Server 2008", "TFS 2008");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V9, "Team Foundation Server 2008", "TFS 2008");
                 }
                 else
                 {
-                    return new TeamFoundationServerInfo(TfsMajorVersion.V8, "Team Foundation Server 2005", "TFS 2005");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V8, "Team Foundation Server 2005", "TFS 2005");
                 }
             }
             catch (TeamFoundationServerException exc)
@@ -255,7 +255,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             }
 
             // We must be talking to an unknown version of TFS.
-            return new TeamFoundationServerInfo(TfsMajorVersion.Unknown, "Unknown version of Team Foundation Server", "Unknown TFS Version");
+            return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.Unknown, "Unknown version of Team Foundation Server", "Unknown TFS Version");
         }
 
         private void SetInfoMessage(string infoMessage, string toolTip)

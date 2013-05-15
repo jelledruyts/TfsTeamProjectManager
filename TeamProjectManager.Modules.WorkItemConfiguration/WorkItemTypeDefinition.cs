@@ -31,5 +31,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         }
 
         #endregion
+
+        #region Clone
+
+        public override WorkItemConfigurationItem Clone()
+        {
+            return new WorkItemTypeDefinition(this.Name, (XmlDocument)this.XmlDefinition.Clone());
+        }
+
+        #endregion
     }
 }

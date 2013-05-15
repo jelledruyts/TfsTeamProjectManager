@@ -7,6 +7,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         None = 0,
         Validate = 1,
-        Import = 2
+        Import = 2,
+        SaveCopy = 4
     }
 }

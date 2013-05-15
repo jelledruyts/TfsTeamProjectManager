@@ -31,7 +31,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <ComboBox Grid.Row="0" x:Name="selectedItemComboBox" ItemsSource="{Binding Path=Items}" SelectedIndex="0">
+                    <ComboBox Grid.Row="0" x:Name="selectedItemComboBox" ItemsSource="{Binding Path=Items}" SelectedItem="{Binding Path=SelectedItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock>

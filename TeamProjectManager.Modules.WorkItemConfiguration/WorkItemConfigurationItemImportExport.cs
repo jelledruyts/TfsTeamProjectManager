@@ -3,8 +3,10 @@ using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -40,25 +42,68 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             };
 
+            // Replace any macros.
+            // TODO: Make macros discoverable in UI
+            if (!task.IsCanceled)
+            {
+                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                {
+                    var teamProject = teamProjectWithWorkItemTypes.Key;
+                    var workItemTypeList = teamProjectWithWorkItemTypes.Value;
+                    foreach (var workItemTypeFile in workItemTypeList.ToArray())
+                    {
+                        // Clone the work item type definition so that any callers aren't affected by changed XML definitions.
+                        var clone = (WorkItemTypeDefinition)workItemTypeFile.Clone();
+                        ReplaceTeamProjectMacros(clone.XmlDefinition, teamProject);
+                        workItemTypeList.Remove(workItemTypeFile);
+                        workItemTypeList.Add(clone);
+                    }
+                }
+            }
+
+            // Save a temporary copy for troubleshooting if requested.
+            // TODO: Properly support SaveCopy in the UI
+            if (!task.IsCanceled && options.HasFlag(ImportOptions.SaveCopy))
+            {
+                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                {
+                    var teamProject = teamProjectWithWorkItemTypes.Key;
+                    foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                    {
+                        var directoryName = Path.Combine(Path.GetTempPath(), teamProject.Name);
+                        Directory.CreateDirectory(directoryName);
+                        var fileName = Path.Combine(directoryName, workItemTypeFile.Name + ".xml");
+                        using (var writer = XmlWriter.Create(fileName, new XmlWriterSettings { Indent = true }))
+                        {
+                            workItemTypeFile.XmlDefinition.WriteTo(writer);
+                        }
+                        var message = "Work item type \"{0}\" for Team Project \"{1}\" was saved to \"{2}\"".FormatCurrent(workItemTypeFile.Name, teamProject.Name, fileName);
+                        logger.Log(message, TraceEventType.Verbose);
+                        task.Status = message;
+                    }
+                }
+            }
+
             // Validate.
-            if (options.HasFlag(ImportOptions.Validate))
+            if (!task.IsCanceled && options.HasFlag(ImportOptions.Validate))
             {
                 WorkItemType.ValidationEventHandler += importEventHandler;
                 try
                 {
                     foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
                     {
-                        var project = store.Projects[teamProjectWithWorkItemTypes.Key.Name];
+                        var teamProject = teamProjectWithWorkItemTypes.Key;
+                        var project = store.Projects[teamProject.Name];
                         foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
+                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" for Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name));
                             try
                             {
                                 WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
                             }
                             catch (Exception exc)
                             {
-                                var message = string.Format("An error occurred while validating work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name);
+                                var message = string.Format("An error occurred while validating work item type \"{0}\" for Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name);
                                 logger.Log(message, exc);
                                 task.SetError(message, exc);
                             }
@@ -85,20 +130,21 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
                 {
-                    var project = store.Projects[teamProjectWithWorkItemTypes.Key.Name];
+                    var teamProject = teamProjectWithWorkItemTypes.Key;
+                    var project = store.Projects[teamProject.Name];
                     project.WorkItemTypes.ImportEventHandler += importEventHandler;
                     try
                     {
                         foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name));
+                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name));
                             try
                             {
                                 project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
                             }
                             catch (Exception exc)
                             {
-                                var message = string.Format("An error occurred while importing work item type \"{0}\" in project \"{1}\"", workItemTypeFile.Name, teamProjectWithWorkItemTypes.Key.Name);
+                                var message = string.Format("An error occurred while importing work item type \"{0}\" in Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name);
                                 logger.Log(message, exc);
                                 task.SetError(message, exc);
                             }
@@ -133,7 +179,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var project = store.Projects[teamProjectWithProcessConfigurations.Key.Name];
                 foreach (var processConfiguration in teamProjectWithProcessConfigurations.Value)
                 {
-                    task.SetProgress(step++, string.Format("Importing {0} in project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name));
+                    task.SetProgress(step++, string.Format("Importing {0} in Team Project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name));
                     try
                     {
                         if (processConfiguration.Type == WorkItemConfigurationItemType.CommonConfiguration)
@@ -151,7 +197,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     }
                     catch (Exception exc)
                     {
-                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while importing {0} in project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name);
+                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while importing {0} in Team Project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name);
                         logger.Log(message, exc);
                         task.SetError(message, exc);
                     }
@@ -221,6 +267,60 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public static void SetAgileConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItem agileConfiguration)
         {
             SetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.AgileConfiguration, agileConfiguration);
+        }
+
+        #endregion
+
+        #region Macro Support
+
+        public static IDictionary<string, string> GetTeamProjectMacros(TeamProjectInfo teamProject)
+        {
+            if (teamProject == null)
+            {
+                return new Dictionary<string, string>();
+            }
+            else
+            {
+                return new Dictionary<string, string>() {
+                    { "$$PROJECTNAME$$", teamProject.Name },
+                    { "$$PROJECTURL$$", teamProject.Uri.ToString() },
+                    { "$$COLLECTIONNAME$$", teamProject.TeamProjectCollection.Name },
+                    { "$$COLLECTIONURL$$", teamProject.TeamProjectCollection.Uri.ToString() },
+                    { "$$SERVERNAME$$", teamProject.TeamProjectCollection.TeamFoundationServer.Name },
+                    { "$$SERVERURL$$", teamProject.TeamProjectCollection.TeamFoundationServer.Uri.ToString() }
+                };
+            }
+        }
+
+        public static void ReplaceTeamProjectMacros(XmlDocument xml, TeamProjectInfo teamProject)
+        {
+            ReplaceTeamProjectMacros(xml, GetTeamProjectMacros(teamProject));
+        }
+
+        public static void ReplaceTeamProjectMacros(XmlDocument xml, IDictionary<string, string> macros)
+        {
+            if (xml != null)
+            {
+                var resultXml = ReplaceTeamProjectMacros(xml.OuterXml, macros);
+                xml.LoadXml(resultXml);
+            }
+        }
+
+        public static string ReplaceTeamProjectMacros(string value, TeamProjectInfo teamProject)
+        {
+            return ReplaceTeamProjectMacros(value, GetTeamProjectMacros(teamProject));
+        }
+
+        public static string ReplaceTeamProjectMacros(string value, IDictionary<string, string> macros)
+        {
+            if (!string.IsNullOrEmpty(value) && macros != null && macros.Any())
+            {
+                foreach (var macro in macros)
+                {
+                    value = value.Replace(macro.Key, macro.Value);
+                }
+            }
+            return value;
         }
 
         #endregion

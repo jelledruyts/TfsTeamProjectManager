@@ -161,7 +161,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProject.Name];
-                        var categoriesXml = project.Categories.Export();
+                        var categoriesXml = WorkItemConfigurationItemImportExport.GetCategoriesXml(project);
                         var categoryList = WorkItemCategoryList.Load(categoriesXml);
 
                         foreach (WorkItemType workItemType in project.WorkItemTypes)
@@ -355,7 +355,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                WorkItemConfigurationItemImportExport.ExportWorkItemConfigurationItems(this.Logger, task, "work item type", workItemTypesToExport);
+                WorkItemConfigurationItemImportExport.Export(this.Logger, task, workItemTypesToExport);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -388,8 +388,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var result = MessageBox.Show("This will import the edited work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.WorkItemTypeDefinition).ToList());
-                    PerformImport("Importing work item types", ImportOptions.Import, teamProjectsWithWorkItemTypes);
+                    var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
+                    PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions, teamProjectsWithWorkItemTypes);
                 }
             }
         }
@@ -409,8 +409,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var result = MessageBox.Show("This will import the transformed work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    var teamProjectsWithWorkItemTypes = workItemTypesToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.WorkItemTypeDefinition).ToList());
-                    PerformImport("Importing work item types", ImportOptions.Import, teamProjectsWithWorkItemTypes);
+                    var teamProjectsWithWorkItemTypes = workItemTypesToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
+                    PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions, teamProjectsWithWorkItemTypes);
                 }
             }
         }
@@ -554,7 +554,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void Validate(object argument)
         {
-            PerformImport("Validating work item types", ImportOptions.Validate);
+            PerformImport("Validating work item types", ImportOptions.ValidateWorkItemTypeDefinitions);
         }
 
         private bool CanValidateAndImport(object argument)
@@ -564,7 +564,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void ValidateAndImport(object argument)
         {
-            PerformImport("Validating and importing work item types", ImportOptions.Validate | ImportOptions.Import);
+            PerformImport("Validating and importing work item types", ImportOptions.ValidateWorkItemTypeDefinitions | ImportOptions.ImportWorkItemTypeDefinitions);
         }
 
         private bool CanImport(object argument)
@@ -574,7 +574,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void Import(object argument)
         {
-            PerformImport("Importing work item types", ImportOptions.Import);
+            PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions);
         }
 
         #endregion
@@ -583,7 +583,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void PerformImport(string description, ImportOptions options)
         {
-            var workItemTypes = new List<WorkItemTypeDefinition>();
+            var workItemTypes = new List<WorkItemConfigurationItem>();
             foreach (var workItemTypeFile in this.WorkItemTypeFiles)
             {
                 try
@@ -597,7 +597,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
             var teamProjectsWithWorkItemTypes = this.SelectedTeamProjects.ToDictionary(p => p, p => workItemTypes);
-            if (options.HasFlag(ImportOptions.Import))
+            if (options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
             {
                 var result = MessageBox.Show("This will import the selected work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result != MessageBoxResult.Yes)
@@ -608,7 +608,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             PerformImport(description, options, teamProjectsWithWorkItemTypes);
         }
 
-        private void PerformImport(string description, ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
+        private void PerformImport(string description, ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithWorkItemTypes)
         {
             var numberOfSteps = GetTotalNumberOfSteps(options, teamProjectsWithWorkItemTypes);
             var task = new ApplicationTask(description, numberOfSteps, true);
@@ -618,7 +618,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
-                WorkItemConfigurationItemImportExport.ImportWorkItemTypes(this.Logger, task, options, store, teamProjectsWithWorkItemTypes);
+                WorkItemConfigurationItemImportExport.Import(this.Logger, task, store, teamProjectsWithWorkItemTypes, options);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -636,15 +636,15 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             worker.RunWorkerAsync();
         }
 
-        private static int GetTotalNumberOfSteps(ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
+        private static int GetTotalNumberOfSteps(ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithWorkItemTypes)
         {
             var numberOfSteps = 0;
             var numberOfImports = teamProjectsWithWorkItemTypes.Aggregate(0, (a, p) => a += p.Value.Count);
-            if (options.HasFlag(ImportOptions.Validate))
+            if (options.HasFlag(ImportOptions.ValidateWorkItemTypeDefinitions))
             {
                 numberOfSteps += numberOfImports;
             }
-            if (options.HasFlag(ImportOptions.Import))
+            if (options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
             {
                 numberOfSteps += numberOfImports;
             }

@@ -91,17 +91,17 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Export categories.
-            projectWorkItemTypes.Add(WorkItemConfigurationItem.FromXml(project.Categories.Export()));
+            projectWorkItemTypes.Add(WorkItemConfigurationItemImportExport.GetCategories(project));
 
             // Export process configuration.
             if (includeAgileAndCommonConfiguration)
             {
-                var commonConfig = WorkItemConfigurationItemImportExport.GetCommonConfiguration(tfs, project);
+                var commonConfig = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
                 if (commonConfig != null)
                 {
                     projectWorkItemTypes.Add(commonConfig);
                 }
-                var agileConfig = WorkItemConfigurationItemImportExport.GetAgileConfiguration(tfs, project);
+                var agileConfig = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
                 if (agileConfig != null)
                 {
                     projectWorkItemTypes.Add(agileConfig);

@@ -144,7 +144,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var transformations = new Dictionary<WorkItemConfigurationItemExport, XmlDocument>();
                 foreach (var item in this.Items)
                 {
-                    this.outputTextBox.Text += "Applying transformation to {0} ({1})...".FormatCurrent(item.Item.Name, item.TeamProject.Name);
+                    this.outputTextBox.Text += "Applying transformation to {0} ({1})...".FormatCurrent(item.Item.DisplayName, item.TeamProject.Name);
                     this.outputTextBox.ScrollToEnd();
                     var result = WorkItemConfigurationTransformer.Transform(this.TransformationType, item.Item.XmlDefinition, transformXml);
                     transformations.Add(item, result);

@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.ProcessConfiguration.Client;
+﻿using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
@@ -17,189 +16,104 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
     public static class WorkItemConfigurationItemImportExport
     {
-        #region ImportWorkItemTypes
+        #region Import
 
-        public static void ImportWorkItemTypes(ILogger logger, ApplicationTask task, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
+        public static void Import(ILogger logger, ApplicationTask task, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithConfigurationItems, ImportOptions options)
         {
-            var step = 0;
-            var importValidationFailed = false;
-            ImportEventHandler importEventHandler = (sender, e) =>
-            {
-                if (e.Severity == ImportSeverity.Error)
-                {
-                    importValidationFailed = true;
-                    var message = e.Message;
-                    var schemaValidationException = e.Exception as XmlSchemaValidationException;
-                    if (schemaValidationException != null)
-                    {
-                        message = string.Format("XML validation error at row {0}, column {1}: {2}", schemaValidationException.LineNumber, schemaValidationException.LinePosition, message);
-                    }
-                    task.SetError(message);
-                }
-                else if (e.Severity == ImportSeverity.Warning)
-                {
-                    task.SetWarning(e.Message);
-                }
-            };
-
             // Replace any macros.
-            // TODO: Make macros discoverable in UI
+            // TODO: Make macros discoverable in UI.
             if (!task.IsCanceled)
             {
-                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
                 {
-                    var teamProject = teamProjectWithWorkItemTypes.Key;
-                    var workItemTypeList = teamProjectWithWorkItemTypes.Value;
-                    foreach (var workItemTypeFile in workItemTypeList.ToArray())
+                    var teamProject = teamProjectWithConfigurationItems.Key;
+                    var workItemConfigurationItemList = teamProjectWithConfigurationItems.Value;
+                    foreach (var workItemConfigurationItem in workItemConfigurationItemList.ToArray())
                     {
-                        // Clone the work item type definition so that any callers aren't affected by changed XML definitions.
-                        var clone = (WorkItemTypeDefinition)workItemTypeFile.Clone();
+                        // Clone the item so that any callers aren't affected by a changed XML definitions.
+                        var clone = workItemConfigurationItem.Clone();
                         ReplaceTeamProjectMacros(clone.XmlDefinition, teamProject);
-                        workItemTypeList.Remove(workItemTypeFile);
-                        workItemTypeList.Add(clone);
+                        workItemConfigurationItemList.Remove(workItemConfigurationItem);
+                        workItemConfigurationItemList.Add(clone);
                     }
                 }
             }
 
             // Save a temporary copy for troubleshooting if requested.
-            // TODO: Properly support SaveCopy in the UI
-            if (!task.IsCanceled && options.HasFlag(ImportOptions.SaveCopy))
+            // TODO: Properly support SaveCopy in the UI.
+            if (!task.IsCanceled && options.HasFlag(ImportOptions.SaveCopy) || true) // TODO: Remove || true
             {
-                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
                 {
-                    var teamProject = teamProjectWithWorkItemTypes.Key;
-                    foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                    var teamProject = teamProjectWithConfigurationItems.Key;
+                    foreach (var workItemConfigurationItem in teamProjectWithConfigurationItems.Value)
                     {
-                        var directoryName = Path.Combine(Path.GetTempPath(), teamProject.Name);
+                        var directoryName = Path.Combine(Path.GetTempPath(), Constants.ApplicationName, teamProject.Name);
                         Directory.CreateDirectory(directoryName);
-                        var fileName = Path.Combine(directoryName, workItemTypeFile.Name + ".xml");
+                        var fileName = Path.Combine(directoryName, workItemConfigurationItem.Name + ".xml");
                         using (var writer = XmlWriter.Create(fileName, new XmlWriterSettings { Indent = true }))
                         {
-                            workItemTypeFile.XmlDefinition.WriteTo(writer);
+                            workItemConfigurationItem.XmlDefinition.WriteTo(writer);
                         }
-                        var message = "Work item type \"{0}\" for Team Project \"{1}\" was saved to \"{2}\"".FormatCurrent(workItemTypeFile.Name, teamProject.Name, fileName);
+                        var message = "{0} for Team Project \"{1}\" was saved to \"{2}\"".FormatCurrent(workItemConfigurationItem.DisplayName, teamProject.Name, fileName);
                         logger.Log(message, TraceEventType.Verbose);
                         task.Status = message;
                     }
                 }
             }
 
-            // Validate.
-            if (!task.IsCanceled && options.HasFlag(ImportOptions.Validate))
+            // TODO: Check task for steps.
+            foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
             {
-                WorkItemType.ValidationEventHandler += importEventHandler;
-                try
+                var teamProject = teamProjectWithConfigurationItems.Key;
+                var configurationItems = teamProjectWithConfigurationItems.Value;
+                var project = store.Projects[teamProjectWithConfigurationItems.Key.Name];
+
+                // TODO: Properly support Simulate in the UI.
+                if (options.HasFlag(ImportOptions.Simulate))
                 {
-                    foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                    foreach (var configurationItem in configurationItems)
                     {
-                        var teamProject = teamProjectWithWorkItemTypes.Key;
-                        var project = store.Projects[teamProject.Name];
-                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
-                        {
-                            task.SetProgress(step++, string.Format("Validating work item type \"{0}\" for Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name));
-                            try
-                            {
-                                WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
-                            }
-                            catch (Exception exc)
-                            {
-                                var message = string.Format("An error occurred while validating work item type \"{0}\" for Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name);
-                                logger.Log(message, exc);
-                                task.SetError(message, exc);
-                            }
-                            if (task.IsCanceled)
-                            {
-                                break;
-                            }
-                        }
-                        if (task.IsCanceled)
-                        {
-                            task.Status = "Canceled";
-                            break;
-                        }
+                        task.Status = "Simulating import of {0} in Team Project \"{1}\"".FormatCurrent(configurationItem.DisplayName, teamProject.Name);
                     }
                 }
-                finally
+                else
                 {
-                    WorkItemType.ValidationEventHandler -= importEventHandler;
-                }
-            }
-
-            // Import.
-            if (!task.IsCanceled && !importValidationFailed && options.HasFlag(ImportOptions.Import))
-            {
-                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
-                {
-                    var teamProject = teamProjectWithWorkItemTypes.Key;
-                    var project = store.Projects[teamProject.Name];
-                    project.WorkItemTypes.ImportEventHandler += importEventHandler;
-                    try
+                    // First apply all work item types in batch.
+                    var workItemTypes = configurationItems.Where(t => t.Type == WorkItemConfigurationItemType.WorkItemType).Cast<WorkItemTypeDefinition>().ToList();
+                    if (workItemTypes.Any())
                     {
-                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                        var teamProjectsWithWorkItemTypes = new Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>>() { { teamProject, workItemTypes } };
+                        ImportWorkItemTypes(logger, task, options, store, teamProjectsWithWorkItemTypes);
+                    }
+
+                    // Then apply the other configuration items.
+                    foreach (var configurationItem in configurationItems.Where(w => w.Type != WorkItemConfigurationItemType.WorkItemType))
+                    {
+                        task.Status = string.Format("Importing {0} in Team Project \"{1}\"", configurationItem.DisplayName, teamProject.Name);
+                        try
                         {
-                            task.SetProgress(step++, string.Format("Importing work item type \"{0}\" in Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name));
-                            try
+                            switch (configurationItem.Type)
                             {
-                                project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
-                            }
-                            catch (Exception exc)
-                            {
-                                var message = string.Format("An error occurred while importing work item type \"{0}\" in Team Project \"{1}\"", workItemTypeFile.Name, teamProject.Name);
-                                logger.Log(message, exc);
-                                task.SetError(message, exc);
-                            }
-                            if (task.IsCanceled)
-                            {
-                                break;
+                                case WorkItemConfigurationItemType.Categories:
+                                    SetCategories(project, configurationItem);
+                                    break;
+                                case WorkItemConfigurationItemType.CommonConfiguration:
+                                    SetCommonConfiguration(project, configurationItem);
+                                    break;
+                                case WorkItemConfigurationItemType.AgileConfiguration:
+                                    SetAgileConfiguration(project, configurationItem);
+                                    break;
+                                default:
+                                    throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + configurationItem.Type.ToString());
                             }
                         }
-                    }
-                    finally
-                    {
-                        project.WorkItemTypes.ImportEventHandler -= importEventHandler;
-                    }
-                    if (task.IsCanceled)
-                    {
-                        task.Status = "Canceled";
-                        break;
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region ImportProcessConfigurations
-
-        public static void ImportProcessConfigurations(ILogger logger, ApplicationTask task, TfsTeamProjectCollection tfs, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
-        {
-            var step = 0;
-            foreach (var teamProjectWithProcessConfigurations in teamProjectsWithProcessConfigurations)
-            {
-                var project = store.Projects[teamProjectWithProcessConfigurations.Key.Name];
-                foreach (var processConfiguration in teamProjectWithProcessConfigurations.Value)
-                {
-                    task.SetProgress(step++, string.Format("Importing {0} in Team Project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name));
-                    try
-                    {
-                        if (processConfiguration.Type == WorkItemConfigurationItemType.CommonConfiguration)
+                        catch (Exception exc)
                         {
-                            SetCommonConfiguration(tfs, project, processConfiguration);
+                            var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while importing {0} in Team Project \"{1}\"", configurationItem.DisplayName, teamProjectWithConfigurationItems.Key.Name);
+                            logger.Log(message, exc);
+                            task.SetError(message, exc);
                         }
-                        else if (processConfiguration.Type == WorkItemConfigurationItemType.AgileConfiguration)
-                        {
-                            SetAgileConfiguration(tfs, project, processConfiguration);
-                        }
-                        else
-                        {
-                            throw new ArgumentException("The process configuration item must be either a CommonConfiguration or AgileConfiguration.");
-                        }
-                    }
-                    catch (Exception exc)
-                    {
-                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while importing {0} in Team Project \"{1}\"", processConfiguration.Name, teamProjectWithProcessConfigurations.Key.Name);
-                        logger.Log(message, exc);
-                        task.SetError(message, exc);
                     }
                 }
                 if (task.IsCanceled)
@@ -212,16 +126,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
-        #region ExportWorkItemConfigurationItems
+        #region Export
 
-        public static void ExportWorkItemConfigurationItems(ILogger logger, ApplicationTask task, string itemType, IList<WorkItemConfigurationItemExport> workItemConfigurationItems)
+        public static void Export(ILogger logger, ApplicationTask task, IList<WorkItemConfigurationItemExport> workItemConfigurationItems)
         {
             if (workItemConfigurationItems.Count > 0)
             {
                 var step = 0;
                 foreach (var workItemConfigurationItem in workItemConfigurationItems)
                 {
-                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Exporting {0} \"{1}\" from Team Project \"{2}\"", itemType, workItemConfigurationItem.Item.Name, workItemConfigurationItem.TeamProject.Name));
+                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Exporting {0} from Team Project \"{1}\"", workItemConfigurationItem.Item.DisplayName, workItemConfigurationItem.TeamProject.Name));
                     try
                     {
                         if (!string.IsNullOrEmpty(workItemConfigurationItem.SaveAsFileName))
@@ -232,7 +146,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     }
                     catch (Exception exc)
                     {
-                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0} \"{1}\"", itemType, workItemConfigurationItem.Item.Name);
+                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting {0}", workItemConfigurationItem.Item.DisplayName);
                         logger.Log(message, exc);
                         task.SetError(message, exc);
                     }
@@ -247,26 +161,51 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
-        #region Get & Set CommonConfiguration
+        #region Get & Set Categories
 
-        public static WorkItemConfigurationItem GetCommonConfiguration(TfsTeamProjectCollection tfs, Project project)
+        public static XmlDocument GetCategoriesXml(Project project)
         {
-            return GetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.CommonConfiguration);
+            return project.Categories.Export();
         }
 
-        public static void SetCommonConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItem commonConfiguration)
+        public static WorkItemConfigurationItem GetCategories(Project project)
         {
-            SetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.CommonConfiguration, commonConfiguration);
+            var categoriesXml = GetCategoriesXml(project);
+            return WorkItemConfigurationItem.FromXml(categoriesXml);
         }
 
-        public static WorkItemConfigurationItem GetAgileConfiguration(TfsTeamProjectCollection tfs, Project project)
+        public static void SetCategories(Project project, WorkItemConfigurationItem categories)
         {
-            return GetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.AgileConfiguration);
+            SetCategories(project, categories.XmlDefinition);
         }
 
-        public static void SetAgileConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItem agileConfiguration)
+        public static void SetCategories(Project project, XmlDocument categories)
         {
-            SetProcessConfiguration(tfs, project, WorkItemConfigurationItemType.AgileConfiguration, agileConfiguration);
+            project.Categories.Import(categories.DocumentElement);
+        }
+
+        #endregion
+
+        #region Get & Set Common & Agile Configuration
+
+        public static WorkItemConfigurationItem GetCommonConfiguration(Project project)
+        {
+            return GetProcessConfiguration(project, WorkItemConfigurationItemType.CommonConfiguration);
+        }
+
+        public static void SetCommonConfiguration(Project project, WorkItemConfigurationItem commonConfiguration)
+        {
+            SetProcessConfiguration(project, WorkItemConfigurationItemType.CommonConfiguration, commonConfiguration);
+        }
+
+        public static WorkItemConfigurationItem GetAgileConfiguration(Project project)
+        {
+            return GetProcessConfiguration(project, WorkItemConfigurationItemType.AgileConfiguration);
+        }
+
+        public static void SetAgileConfiguration(Project project, WorkItemConfigurationItem agileConfiguration)
+        {
+            SetProcessConfiguration(project, WorkItemConfigurationItemType.AgileConfiguration, agileConfiguration);
         }
 
         #endregion
@@ -327,9 +266,115 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Helper Methods
 
-        private static WorkItemConfigurationItem GetProcessConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItemType type)
+        private static void ImportWorkItemTypes(ILogger logger, ApplicationTask task, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
         {
-            var configService = tfs.GetService<ProjectProcessConfigurationService>();
+            var step = 0;
+            var importValidationFailed = false;
+            ImportEventHandler importEventHandler = (sender, e) =>
+            {
+                if (e.Severity == ImportSeverity.Error)
+                {
+                    importValidationFailed = true;
+                    var message = e.Message;
+                    var schemaValidationException = e.Exception as XmlSchemaValidationException;
+                    if (schemaValidationException != null)
+                    {
+                        message = string.Format("XML validation error at row {0}, column {1}: {2}", schemaValidationException.LineNumber, schemaValidationException.LinePosition, message);
+                    }
+                    task.SetError(message);
+                }
+                else if (e.Severity == ImportSeverity.Warning)
+                {
+                    task.SetWarning(e.Message);
+                }
+            };
+
+            // Validate.
+            if (!task.IsCanceled && options.HasFlag(ImportOptions.ValidateWorkItemTypeDefinitions))
+            {
+                WorkItemType.ValidationEventHandler += importEventHandler;
+                try
+                {
+                    foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                    {
+                        var teamProject = teamProjectWithWorkItemTypes.Key;
+                        var project = store.Projects[teamProject.Name];
+                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                        {
+                            task.SetProgress(step++, string.Format("Validating {0} for Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name));
+                            try
+                            {
+                                WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
+                            }
+                            catch (Exception exc)
+                            {
+                                var message = string.Format("An error occurred while validating {0} for Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
+                                logger.Log(message, exc);
+                                task.SetError(message, exc);
+                            }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    WorkItemType.ValidationEventHandler -= importEventHandler;
+                }
+            }
+
+            // Import.
+            if (!task.IsCanceled && !importValidationFailed && options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
+            {
+                foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
+                {
+                    var teamProject = teamProjectWithWorkItemTypes.Key;
+                    var project = store.Projects[teamProject.Name];
+                    project.WorkItemTypes.ImportEventHandler += importEventHandler;
+                    try
+                    {
+                        foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
+                        {
+                            task.SetProgress(step++, string.Format("Importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name));
+                            try
+                            {
+                                project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
+                            }
+                            catch (Exception exc)
+                            {
+                                var message = string.Format("An error occurred while importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
+                                logger.Log(message, exc);
+                                task.SetError(message, exc);
+                            }
+                            if (task.IsCanceled)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        project.WorkItemTypes.ImportEventHandler -= importEventHandler;
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static WorkItemConfigurationItem GetProcessConfiguration(Project project, WorkItemConfigurationItemType type)
+        {
+            var configService = project.Store.TeamProjectCollection.GetService<ProjectProcessConfigurationService>();
             string processConfigXml;
             try
             {
@@ -366,8 +411,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             return WorkItemConfigurationItem.FromXml(processConfigXml);
         }
 
-        private static void SetProcessConfiguration(TfsTeamProjectCollection tfs, Project project, WorkItemConfigurationItemType type, WorkItemConfigurationItem item)
+        private static void SetProcessConfiguration(Project project, WorkItemConfigurationItemType type, WorkItemConfigurationItem item)
         {
+            var tfs = project.Store.TeamProjectCollection;
             var configService = tfs.GetService<ProjectProcessConfigurationService>();
             try
             {

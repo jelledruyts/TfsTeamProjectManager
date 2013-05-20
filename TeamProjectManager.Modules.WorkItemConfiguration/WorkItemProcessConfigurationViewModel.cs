@@ -136,12 +136,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProject.Name];
-                        var commonConfiguration = WorkItemConfigurationItemImportExport.GetCommonConfiguration(tfs, project);
+                        var commonConfiguration = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
                         if (commonConfiguration != null)
                         {
                             results.Add(new WorkItemConfigurationItemExport(teamProject, commonConfiguration));
                         }
-                        var agileConfiguration = WorkItemConfigurationItemImportExport.GetAgileConfiguration(tfs, project);
+                        var agileConfiguration = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
                         if (agileConfiguration != null)
                         {
                             results.Add(new WorkItemConfigurationItemExport(teamProject, agileConfiguration));
@@ -194,7 +194,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 // Export to single file.
                 var processConfigurationExport = processConfigurationExports.Single();
                 var dialog = new SaveFileDialog();
-                dialog.FileName = processConfigurationExport.Item.Type.ToString() + ".xml";
+                dialog.FileName = processConfigurationExport.Item.DisplayName + ".xml";
                 dialog.Filter = "XML Files (*.xml)|*.xml";
                 var result = dialog.ShowDialog(Application.Current.MainWindow);
                 if (result == true)
@@ -213,7 +213,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var rootFolder = dialog.SelectedPath;
                     foreach (var processConfigurationExport in processConfigurationExports)
                     {
-                        var fileName = Path.Combine(rootFolder, processConfigurationExport.TeamProject.Name, processConfigurationExport.Item.Type.ToString() + ".xml");
+                        var fileName = Path.Combine(rootFolder, processConfigurationExport.TeamProject.Name, processConfigurationExport.Item.DisplayName + ".xml");
                         processConfigurationsToExport.Add(new WorkItemConfigurationItemExport(processConfigurationExport.TeamProject, processConfigurationExport.Item, fileName));
                     }
                 }
@@ -224,7 +224,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
-                WorkItemConfigurationItemImportExport.ExportWorkItemConfigurationItems(this.Logger, task, "process configuration", processConfigurationsToExport);
+                WorkItemConfigurationItemImportExport.Export(this.Logger, task, processConfigurationsToExport);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
@@ -376,7 +376,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
-                WorkItemConfigurationItemImportExport.ImportProcessConfigurations(this.Logger, task, tfs, store, teamProjectsWithProcessConfigurations);
+                WorkItemConfigurationItemImportExport.Import(this.Logger, task, store, teamProjectsWithProcessConfigurations, ImportOptions.None); // TODO: ImportOptions
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {

@@ -134,20 +134,22 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public WorkItemConfigurationItemType Type { get; private set; }
         public string Name { get; private set; }
         public XmlDocument XmlDefinition { get; set; }
+        public string DisplayName { get; private set; }
 
         #endregion
 
         #region Constructors
 
         public WorkItemConfigurationItem(WorkItemConfigurationItemType type, XmlDocument xmlDefinition)
-            : this(type, GetDisplayName(type), xmlDefinition)
+            : this(type, null, xmlDefinition)
         {
         }
 
         public WorkItemConfigurationItem(WorkItemConfigurationItemType type, string name, XmlDocument xmlDefinition)
         {
             this.Type = type;
-            this.Name = name;
+            this.Name = name ?? GetDisplayName(type);
+            this.DisplayName = GetDisplayName(type, name);
             this.XmlDefinition = xmlDefinition;
         }
 

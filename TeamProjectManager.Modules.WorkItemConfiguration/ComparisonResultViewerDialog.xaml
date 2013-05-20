@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0" Header="Sources">
-                <DataGrid ItemsSource="{Binding Path=WorkItemConfigurationResults}" x:Name="workItemConfigurationResultsDataGrid" SelectedIndex="0" SelectionChanged="workItemConfigurationResultsDataGrid_SelectionChanged" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                <DataGrid ItemsSource="{Binding Path=WorkItemConfigurationResults}" x:Name="workItemConfigurationResultsDataGrid" SelectionChanged="workItemConfigurationResultsDataGrid_SelectionChanged" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Source" Binding="{Binding Path=Source.Name}" />
                         <DataGridTextColumn Header="Match" Binding="{Binding Path=PercentMatch, StringFormat='{}{0:0%}'}" />

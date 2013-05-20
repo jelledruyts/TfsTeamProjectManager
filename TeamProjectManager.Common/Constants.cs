@@ -29,7 +29,7 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// The copyright statement of the application.
         /// </summary>
-        public const string ApplicationCopyright = "Copyright © 2012 " + ApplicationCompany;
+        public const string ApplicationCopyright = "Copyright © " + ApplicationCompany;
 
         /// <summary>
         /// The configuration of the assemblies that make up the application.

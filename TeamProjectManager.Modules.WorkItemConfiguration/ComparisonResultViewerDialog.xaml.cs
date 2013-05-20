@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
@@ -7,7 +8,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Win32;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
@@ -20,6 +20,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             InitializeComponent();
             this.comparisonResult = comparisonResult;
             this.DataContext = this.comparisonResult;
+            this.workItemConfigurationResultsDataGrid.SelectedItem = this.comparisonResult.BestMatch;
             this.diffToolsComboBox.ItemsSource = GetDiffTools();
             this.diffToolsComboBox.SelectedIndex = 0;
             this.Title = string.Format(CultureInfo.CurrentCulture, "Comparison result details for Team Project \"{0}\"", this.comparisonResult.TeamProject);

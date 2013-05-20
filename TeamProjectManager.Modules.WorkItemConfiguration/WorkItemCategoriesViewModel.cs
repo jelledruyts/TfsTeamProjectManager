@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -15,6 +15,7 @@ using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
+    // TODO: Export/Edit tab with raw xml export/edit/transform
     [Export]
     public class WorkItemCategoriesViewModel : ViewModelBase
     {
@@ -115,7 +116,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProjectName];
-                        var categoriesXml = project.Categories.Export();
+                        var categoriesXml = WorkItemConfigurationItemImportExport.GetCategoriesXml(project);
                         var categoryList = WorkItemCategoryList.Load(categoriesXml);
                         foreach (var category in categoryList.Categories)
                         {
@@ -180,7 +181,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProjectName];
-                        var categoriesXml = project.Categories.Export();
+                        var categoriesXml = WorkItemConfigurationItemImportExport.GetCategoriesXml(project);
                         var categoryList = WorkItemCategoryList.Load(categoriesXml);
 
                         foreach (var workItemCategoryToDelete in categoriesByTeamProject)
@@ -201,7 +202,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         }
 
                         categoriesXml = categoryList.Save();
-                        project.Categories.Import(categoriesXml.DocumentElement);
+                        WorkItemConfigurationItemImportExport.SetCategories(project, categoriesXml);
                     }
                     catch (Exception exc)
                     {
@@ -256,7 +257,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         var tfs = GetTfsTeamProjectCollection(teamProjectCollection.Uri);
                         var store = tfs.GetService<WorkItemStore>();
                         var project = store.Projects[teamProject.Name];
-                        var categoriesXml = project.Categories.Export();
+                        var categoriesXml = WorkItemConfigurationItemImportExport.GetCategoriesXml(project);
                         var selectedWorkItemCategoryList = WorkItemCategoryList.Load(categoriesXml);
                         var availableWorkItemTypeReferences = project.WorkItemTypes.Cast<WorkItemType>().Select(w => new WorkItemTypeReference { Name = w.Name }).ToList();
                         e.Result = new Tuple<WorkItemCategoryList, ICollection<WorkItemTypeReference>>(selectedWorkItemCategoryList, availableWorkItemTypeReferences);
@@ -304,14 +305,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
+                var categoriesXml = this.SelectedWorkItemCategoryList.Save();
                 foreach (var teamProject in this.SelectedTeamProjects)
                 {
                     try
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing work item category list in Team Project \"{0}\"", teamProject.Name));
                         var project = store.Projects[teamProject.Name];
-                        var categoriesXml = this.SelectedWorkItemCategoryList.Save();
-                        project.Categories.Import(categoriesXml.DocumentElement);
+                        WorkItemConfigurationItemImportExport.SetCategories(project, categoriesXml);
                     }
                     catch (Exception exc)
                     {

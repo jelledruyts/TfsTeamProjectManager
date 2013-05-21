@@ -18,7 +18,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         #region Import
 
-        public static void Import(ILogger logger, ApplicationTask task, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithConfigurationItems, ImportOptions options)
+        public static void Import(ILogger logger, ApplicationTask task, bool setTaskProgress, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithConfigurationItems, ImportOptions options)
         {
             // Replace any macros.
             // TODO: Make macros discoverable in UI.
@@ -40,8 +40,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Save a temporary copy for troubleshooting if requested.
-            // TODO: Properly support SaveCopy in the UI.
-            if (!task.IsCanceled && options.HasFlag(ImportOptions.SaveCopy) || true) // TODO: Remove || true
+            if (!task.IsCanceled && options.HasFlag(ImportOptions.SaveCopy))
             {
                 foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
                 {
@@ -62,35 +61,47 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
 
-            // TODO: Check task for steps.
+            var step = 0;
             foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
             {
                 var teamProject = teamProjectWithConfigurationItems.Key;
                 var configurationItems = teamProjectWithConfigurationItems.Value;
                 var project = store.Projects[teamProjectWithConfigurationItems.Key.Name];
 
-                // TODO: Properly support Simulate in the UI.
-                if (options.HasFlag(ImportOptions.Simulate))
+                // First apply all work item types in batch.
+                var workItemTypes = configurationItems.Where(t => t.Type == WorkItemConfigurationItemType.WorkItemType).Cast<WorkItemTypeDefinition>().ToList();
+                if (workItemTypes.Any())
                 {
-                    foreach (var configurationItem in configurationItems)
-                    {
-                        task.Status = "Simulating import of {0} in Team Project \"{1}\"".FormatCurrent(configurationItem.DisplayName, teamProject.Name);
-                    }
+                    var teamProjectsWithWorkItemTypes = new Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>>() { { teamProject, workItemTypes } };
+                    ImportWorkItemTypes(logger, task, setTaskProgress, ref step, options, store, teamProjectsWithWorkItemTypes);
                 }
-                else
-                {
-                    // First apply all work item types in batch.
-                    var workItemTypes = configurationItems.Where(t => t.Type == WorkItemConfigurationItemType.WorkItemType).Cast<WorkItemTypeDefinition>().ToList();
-                    if (workItemTypes.Any())
-                    {
-                        var teamProjectsWithWorkItemTypes = new Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>>() { { teamProject, workItemTypes } };
-                        ImportWorkItemTypes(logger, task, options, store, teamProjectsWithWorkItemTypes);
-                    }
 
-                    // Then apply the other configuration items.
-                    foreach (var configurationItem in configurationItems.Where(w => w.Type != WorkItemConfigurationItemType.WorkItemType))
+                // Then apply the other configuration items.
+                foreach (var configurationItem in configurationItems.Where(w => w.Type != WorkItemConfigurationItemType.WorkItemType))
+                {
+                    if (options.HasFlag(ImportOptions.Simulate))
                     {
-                        task.Status = string.Format("Importing {0} in Team Project \"{1}\"", configurationItem.DisplayName, teamProject.Name);
+                        var status = "Simulating import of {0} in Team Project \"{1}\"".FormatCurrent(configurationItem.DisplayName, teamProject.Name);
+                        if (setTaskProgress)
+                        {
+                            task.SetProgress(step++, status);
+                        }
+                        else
+                        {
+                            task.Status = status;
+                        }
+                    }
+                    else
+                    {
+                        var status = "Importing {0} in Team Project \"{1}\"".FormatCurrent(configurationItem.DisplayName, teamProject.Name);
+                        if (setTaskProgress)
+                        {
+                            task.SetProgress(step++, status);
+                        }
+                        else
+                        {
+                            task.Status = status;
+                        }
                         try
                         {
                             switch (configurationItem.Type)
@@ -266,9 +277,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Helper Methods
 
-        private static void ImportWorkItemTypes(ILogger logger, ApplicationTask task, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
+        private static void ImportWorkItemTypes(ILogger logger, ApplicationTask task, bool setTaskProgress, ref int step, ImportOptions options, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemTypeDefinition>> teamProjectsWithWorkItemTypes)
         {
-            var step = 0;
             var importValidationFailed = false;
             ImportEventHandler importEventHandler = (sender, e) =>
             {
@@ -290,7 +300,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             };
 
             // Validate.
-            if (!task.IsCanceled && options.HasFlag(ImportOptions.ValidateWorkItemTypeDefinitions))
+            if (!task.IsCanceled)
             {
                 WorkItemType.ValidationEventHandler += importEventHandler;
                 try
@@ -301,7 +311,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         var project = store.Projects[teamProject.Name];
                         foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            task.SetProgress(step++, string.Format("Validating {0} for Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name));
+                            task.Status = string.Format("Validating {0} for Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
                             try
                             {
                                 WorkItemType.Validate(project, workItemTypeFile.XmlDefinition.OuterXml);
@@ -331,7 +341,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Import.
-            if (!task.IsCanceled && !importValidationFailed && options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
+            if (!task.IsCanceled && !importValidationFailed)
             {
                 foreach (var teamProjectWithWorkItemTypes in teamProjectsWithWorkItemTypes)
                 {
@@ -342,16 +352,39 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     {
                         foreach (var workItemTypeFile in teamProjectWithWorkItemTypes.Value)
                         {
-                            task.SetProgress(step++, string.Format("Importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name));
-                            try
+                            if (options.HasFlag(ImportOptions.Simulate))
                             {
-                                project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
+                                var status = string.Format("Simulating import of {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
+                                if (setTaskProgress)
+                                {
+                                    task.SetProgress(step++, status);
+                                }
+                                else
+                                {
+                                    task.Status = status;
+                                }
                             }
-                            catch (Exception exc)
+                            else
                             {
-                                var message = string.Format("An error occurred while importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
-                                logger.Log(message, exc);
-                                task.SetError(message, exc);
+                                var status = string.Format("Importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
+                                if (setTaskProgress)
+                                {
+                                    task.SetProgress(step++, status);
+                                }
+                                else
+                                {
+                                    task.Status = status;
+                                }
+                                try
+                                {
+                                    project.WorkItemTypes.Import(workItemTypeFile.XmlDefinition.DocumentElement);
+                                }
+                                catch (Exception exc)
+                                {
+                                    var message = string.Format("An error occurred while importing {0} in Team Project \"{1}\"", workItemTypeFile.DisplayName, teamProject.Name);
+                                    logger.Log(message, exc);
+                                    task.SetError(message, exc);
+                                }
                             }
                             if (task.IsCanceled)
                             {

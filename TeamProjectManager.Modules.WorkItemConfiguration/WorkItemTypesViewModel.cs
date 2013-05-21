@@ -33,11 +33,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand AddWorkItemTypeFileCommand { get; private set; }
         public RelayCommand RemoveSelectedWorkItemTypeFileCommand { get; private set; }
         public RelayCommand RemoveAllWorkItemTypeFilesCommand { get; private set; }
-        public RelayCommand ValidateCommand { get; private set; }
-        public RelayCommand ValidateAndImportCommand { get; private set; }
         public RelayCommand ImportCommand { get; private set; }
 
         public RelayCommand SearchCommand { get; private set; }
+
+        public bool Simulate { get; set; }
+        public bool SaveCopy { get; set; }
 
         #endregion
 
@@ -126,8 +127,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.AddWorkItemTypeFileCommand = new RelayCommand(AddWorkItemTypeFile, CanAddWorkItemTypeFile);
             this.RemoveSelectedWorkItemTypeFileCommand = new RelayCommand(RemoveSelectedWorkItemTypeFile, CanRemoveSelectedWorkItemTypeFile);
             this.RemoveAllWorkItemTypeFilesCommand = new RelayCommand(RemoveAllWorkItemTypeFiles, CanRemoveAllWorkItemTypeFiles);
-            this.ValidateCommand = new RelayCommand(Validate, CanValidate);
-            this.ValidateAndImportCommand = new RelayCommand(ValidateAndImport, CanValidateAndImport);
             this.ImportCommand = new RelayCommand(Import, CanImport);
 
             this.SearchCommand = new RelayCommand(Search, CanSearch);
@@ -385,11 +384,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             dialog.Owner = Application.Current.MainWindow;
             if (dialog.ShowDialog() == true)
             {
-                var result = MessageBox.Show("This will import the edited work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the edited work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
                 if (result == MessageBoxResult.Yes)
                 {
                     var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
-                    PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions, teamProjectsWithWorkItemTypes);
+                    PerformImport(options, teamProjectsWithWorkItemTypes);
                 }
             }
         }
@@ -406,11 +410,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             dialog.Owner = Application.Current.MainWindow;
             if (dialog.ShowDialog() == true)
             {
-                var result = MessageBox.Show("This will import the transformed work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the transformed work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
                 if (result == MessageBoxResult.Yes)
                 {
                     var teamProjectsWithWorkItemTypes = workItemTypesToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
-                    PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions, teamProjectsWithWorkItemTypes);
+                    PerformImport(options, teamProjectsWithWorkItemTypes);
                 }
             }
         }
@@ -547,42 +556,22 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.WorkItemTypeFiles.Clear();
         }
 
-        private bool CanValidate(object argument)
+        private bool CanImport(object argument)
         {
             return IsAnyTeamProjectSelected() && this.WorkItemTypeFiles.Any();
         }
 
-        private void Validate(object argument)
-        {
-            PerformImport("Validating work item types", ImportOptions.ValidateWorkItemTypeDefinitions);
-        }
-
-        private bool CanValidateAndImport(object argument)
-        {
-            return CanValidate(argument);
-        }
-
-        private void ValidateAndImport(object argument)
-        {
-            PerformImport("Validating and importing work item types", ImportOptions.ValidateWorkItemTypeDefinitions | ImportOptions.ImportWorkItemTypeDefinitions);
-        }
-
-        private bool CanImport(object argument)
-        {
-            return CanValidate(argument);
-        }
-
         private void Import(object argument)
         {
-            PerformImport("Importing work item types", ImportOptions.ImportWorkItemTypeDefinitions);
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        private void PerformImport(string description, ImportOptions options)
-        {
+            var options = ImportOptions.None;
+            if (this.Simulate)
+            {
+                options |= ImportOptions.Simulate;
+            }
+            if (this.SaveCopy)
+            {
+                options |= ImportOptions.SaveCopy;
+            }
             var workItemTypes = new List<WorkItemConfigurationItem>();
             foreach (var workItemTypeFile in this.WorkItemTypeFiles)
             {
@@ -597,7 +586,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
             var teamProjectsWithWorkItemTypes = this.SelectedTeamProjects.ToDictionary(p => p, p => workItemTypes);
-            if (options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
+            if (!options.HasFlag(ImportOptions.Simulate))
             {
                 var result = MessageBox.Show("This will import the selected work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result != MessageBoxResult.Yes)
@@ -605,26 +594,30 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     return;
                 }
             }
-            PerformImport(description, options, teamProjectsWithWorkItemTypes);
+            PerformImport(options, teamProjectsWithWorkItemTypes);
         }
 
-        private void PerformImport(string description, ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithWorkItemTypes)
+        #endregion
+
+        #region Helper Methods
+
+        private void PerformImport(ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithWorkItemTypes)
         {
-            var numberOfSteps = GetTotalNumberOfSteps(options, teamProjectsWithWorkItemTypes);
-            var task = new ApplicationTask(description, numberOfSteps, true);
+            var numberOfSteps = teamProjectsWithWorkItemTypes.Aggregate(0, (a, p) => a += p.Value.Count);
+            var task = new ApplicationTask("Importing work item types", numberOfSteps, true);
             PublishStatus(new StatusEventArgs(task));
             var worker = new BackgroundWorker();
             worker.DoWork += (sender, e) =>
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
-                WorkItemConfigurationItemImportExport.Import(this.Logger, task, store, teamProjectsWithWorkItemTypes, options);
+                WorkItemConfigurationItemImportExport.Import(this.Logger, task, true, store, teamProjectsWithWorkItemTypes, options);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {
                 if (e.Error != null)
                 {
-                    Logger.Log("An unexpected exception occurred while " + description.ToLower(CultureInfo.CurrentCulture), e.Error);
+                    Logger.Log("An unexpected exception occurred while importing work item types", e.Error);
                     task.SetError(e.Error);
                     task.SetComplete("An unexpected exception occurred");
                 }
@@ -634,21 +627,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             };
             worker.RunWorkerAsync();
-        }
-
-        private static int GetTotalNumberOfSteps(ImportOptions options, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithWorkItemTypes)
-        {
-            var numberOfSteps = 0;
-            var numberOfImports = teamProjectsWithWorkItemTypes.Aggregate(0, (a, p) => a += p.Value.Count);
-            if (options.HasFlag(ImportOptions.ValidateWorkItemTypeDefinitions))
-            {
-                numberOfSteps += numberOfImports;
-            }
-            if (options.HasFlag(ImportOptions.ImportWorkItemTypeDefinitions))
-            {
-                numberOfSteps += numberOfImports;
-            }
-            return numberOfSteps;
         }
 
         private static bool Matches(string searchText, bool exactMatch, string value)

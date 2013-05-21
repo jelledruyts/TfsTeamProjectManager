@@ -8,6 +8,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         public IDictionary<WorkItemConfigurationItemExport, WorkItemConfigurationItemExport> OriginalItemsWithClones { get; private set; }
         public IList<WorkItemConfigurationItemExport> Items { get; private set; }
+        public ImportOptions Options { get; private set; }
 
         public WorkItemConfigurationItemEditorDialog(IList<WorkItemConfigurationItemExport> items, string itemType)
         {
@@ -32,6 +33,15 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var originalItem = originalWithClone.Key;
                 var clone = originalWithClone.Value;
                 originalItem.Item.XmlDefinition = clone.Item.XmlDefinition;
+            }
+            this.Options = ImportOptions.None;
+            if (this.simulateCheckBox.IsChecked == true)
+            {
+                this.Options |= ImportOptions.Simulate;
+            }
+            if (this.saveCopyCheckBox.IsChecked == true)
+            {
+                this.Options |= ImportOptions.SaveCopy;
             }
             this.DialogResult = true;
             this.Close();

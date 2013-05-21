@@ -6,9 +6,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     public enum ImportOptions
     {
         None = 0,
-        ValidateWorkItemTypeDefinitions = 1,
-        ImportWorkItemTypeDefinitions = 2,
-        Simulate = 4,
-        SaveCopy = 8
+        Simulate = 1,
+        SaveCopy = 2
     }
 }

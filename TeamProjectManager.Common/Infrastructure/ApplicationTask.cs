@@ -255,13 +255,23 @@ namespace TeamProjectManager.Common.Infrastructure
         /// <param name="stepPercentComplete">The percentage the current step has completed.</param>
         public void SetProgressForCurrentStep(double stepPercentComplete)
         {
+            SetProgressForCurrentStep(stepPercentComplete, null);
+        }
+
+        /// <summary>
+        /// Sets the incremental progress of the current step.
+        /// </summary>
+        /// <param name="stepPercentComplete">The percentage the current step has completed.</param>
+        /// <param name="status">The current status of the task.</param>
+        public void SetProgressForCurrentStep(double stepPercentComplete, string status)
+        {
             if (!this.TotalSteps.HasValue)
             {
                 throw new InvalidOperationException("The total number of steps must be known when setting progress for the current step.");
             }
             var taskProgress = (double)this.CurrentStep.Value / (double)this.TotalSteps.Value;
             var stepProgress = stepPercentComplete / this.TotalSteps.Value;
-            SetProgress(taskProgress + stepProgress, null);
+            SetProgress(taskProgress + stepProgress, status);
         }
 
         /// <summary>

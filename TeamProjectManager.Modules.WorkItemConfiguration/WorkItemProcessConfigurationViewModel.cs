@@ -30,6 +30,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public RelayCommand BrowseAgileConfigurationFilePathCommand { get; private set; }
         public RelayCommand ImportProcessConfigurationsCommand { get; private set; }
 
+        public bool Simulate { get; set; }
+        public bool SaveCopy { get; set; }
+
         #endregion
 
         #region Observable Properties
@@ -258,11 +261,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             dialog.Owner = Application.Current.MainWindow;
             if (dialog.ShowDialog() == true)
             {
-                var result = MessageBox.Show("This will import the edited process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the edited process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
                 if (result == MessageBoxResult.Yes)
                 {
                     var teamProjectsWithProcessConfigurations = processConfigurationsToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
-                    PerformImport(teamProjectsWithProcessConfigurations);
+                    PerformImport(teamProjectsWithProcessConfigurations, options);
                 }
             }
         }
@@ -283,11 +291,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             dialog.Owner = Application.Current.MainWindow;
             if (dialog.ShowDialog() == true)
             {
-                var result = MessageBox.Show("This will import the transformed process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the transformed process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
                 if (result == MessageBoxResult.Yes)
                 {
                     var teamProjectsWithProcessConfigurations = processConfigurationsToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
-                    PerformImport(teamProjectsWithProcessConfigurations);
+                    PerformImport(teamProjectsWithProcessConfigurations, options);
                 }
             }
         }
@@ -345,7 +358,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private void ImportProcessConfigurations(object argument)
         {
-            var result = MessageBox.Show("This will import the specified process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var options = ImportOptions.None;
+            if (this.Simulate)
+            {
+                options |= ImportOptions.Simulate;
+            }
+            if (this.SaveCopy)
+            {
+                options |= ImportOptions.SaveCopy;
+            }
+            var result = MessageBoxResult.Yes;
+            if (!options.HasFlag(ImportOptions.Simulate))
+            {
+                result = MessageBox.Show("This will import the specified process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            }
             if (result == MessageBoxResult.Yes)
             {
                 var processConfigurations = new List<WorkItemConfigurationItem>();
@@ -358,7 +384,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.AgileConfigurationFilePath));
                 }
                 var teamProjectsWithProcessConfigurations = this.SelectedTeamProjects.ToDictionary(p => p, p => processConfigurations);
-                PerformImport(teamProjectsWithProcessConfigurations);
+                PerformImport(teamProjectsWithProcessConfigurations, options);
             }
         }
 
@@ -366,7 +392,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Helper Methods
 
-        private void PerformImport(Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations)
+        private void PerformImport(Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations, ImportOptions options)
         {
             var numberOfSteps = teamProjectsWithProcessConfigurations.Aggregate(0, (a, p) => a += p.Value.Count);
             var task = new ApplicationTask("Importing process configurations", numberOfSteps, true);
@@ -376,7 +402,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
-                WorkItemConfigurationItemImportExport.Import(this.Logger, task, store, teamProjectsWithProcessConfigurations, ImportOptions.None); // TODO: ImportOptions
+                WorkItemConfigurationItemImportExport.Import(this.Logger, task, true, store, teamProjectsWithProcessConfigurations, options);
             };
             worker.RunWorkerCompleted += (sender, e) =>
             {

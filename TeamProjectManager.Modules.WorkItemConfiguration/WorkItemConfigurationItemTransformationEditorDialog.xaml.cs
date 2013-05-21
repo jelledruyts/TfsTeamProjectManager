@@ -19,6 +19,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public IList<WorkItemConfigurationItemExport> Items { get; private set; }
         public WorkItemConfigurationItemExport SelectedItem { get; set; }
         public TransformationType TransformationType { get; set; }
+        public ImportOptions Options { get; private set; }
+        public bool Simulate { get; set; }
+        public bool SaveCopy { get; set; }
 
         #endregion
 
@@ -55,6 +58,15 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             if (ApplyTransformation())
             {
+                this.Options = ImportOptions.None;
+                if (this.Simulate)
+                {
+                    this.Options |= ImportOptions.Simulate;
+                }
+                if (this.SaveCopy)
+                {
+                    this.Options |= ImportOptions.SaveCopy;
+                }
                 this.DialogResult = true;
                 this.Close();
             }

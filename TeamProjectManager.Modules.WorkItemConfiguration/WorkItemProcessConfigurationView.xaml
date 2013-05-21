@@ -53,7 +53,11 @@
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=AgileConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,5,0" />
                 <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{Binding Path=BrowseAgileConfigurationFilePathCommand}" Padding="5,0,5,0" Margin="0,5,0,0" />
 
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="Import Process Configuration" Command="{Binding Path=ImportProcessConfigurationsCommand}" Margin="0,5,0,0" />
+                <WrapPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,0">
+                    <Button Content="Import Process Configuration" Command="{Binding Path=ImportProcessConfigurationsCommand}" />
+                    <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                    <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </WrapPanel>
             </Grid>
         </TabItem>
     </TabControl>

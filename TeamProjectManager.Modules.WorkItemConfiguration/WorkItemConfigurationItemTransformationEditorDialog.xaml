@@ -83,7 +83,9 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" />
+            <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" />
+            <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
+            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" Margin="5,0,0,0" />
             <Button Content="Cancel" IsCancel="True" Width="75" Margin="5,0,0,0" />
         </StackPanel>
     </Grid>

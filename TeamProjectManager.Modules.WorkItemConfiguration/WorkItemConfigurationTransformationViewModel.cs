@@ -52,6 +52,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public static readonly ObservableProperty<bool> SimulateProperty = new ObservableProperty<bool, WorkItemConfigurationTransformationViewModel>(o => o.Simulate);
 
+        public bool SaveCopy
+        {
+            get { return this.GetValue(SaveCopyProperty); }
+            set { this.SetValue(SaveCopyProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> SaveCopyProperty = new ObservableProperty<bool, WorkItemConfigurationTransformationViewModel>(o => o.SaveCopy);
+
         #endregion
 
         #region Constructors
@@ -241,6 +249,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private void ApplyTransformations(object argument)
         {
             var simulate = this.Simulate;
+            var saveCopy = this.SaveCopy;
             if (!simulate)
             {
                 var result = MessageBox.Show("This will apply the specified transformations to all selected Team Projects. Are you sure you want to continue?", "Confirm Transformation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -251,7 +260,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
             var teamProjects = this.SelectedTeamProjects.ToList();
             var transformations = this.Transformations.ToList();
-            var task = new ApplicationTask(simulate ? "Simulating transformation of work item configuration" : "Transforming work item configuration", teamProjects.Count, true);
+            var task = new ApplicationTask("Transforming work item configuration", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
             var worker = new BackgroundWorker();
@@ -394,12 +403,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                             {
                                 { teamProject, transformedItems }
                             };
-                            var options = ImportOptions.ImportWorkItemTypeDefinitions;
+                            var options = ImportOptions.None;
                             if (simulate)
                             {
                                 options |= ImportOptions.Simulate;
                             }
-                            WorkItemConfigurationItemImportExport.Import(this.Logger, task, store, teamProjectsWithConfigurationItems, ImportOptions.ImportWorkItemTypeDefinitions); // TODO: ImportOptions
+                            if (saveCopy)
+                            {
+                                options |= ImportOptions.SaveCopy;
+                            }
+                            WorkItemConfigurationItemImportExport.Import(this.Logger, task, false, store, teamProjectsWithConfigurationItems, options);
                         }
                         numTransformations += transformedItems.Count;
                     }

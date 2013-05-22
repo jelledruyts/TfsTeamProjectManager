@@ -1,11 +1,13 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using TeamProjectManager.Common;
@@ -15,7 +17,6 @@ using TeamProjectManager.Common.ObjectModel;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
-    // TODO: Export/Edit tab with raw xml export/edit/transform
     [Export]
     public class WorkItemCategoriesViewModel : ViewModelBase
     {
@@ -23,6 +24,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public RelayCommand GetWorkItemCategoriesCommand { get; private set; }
         public RelayCommand DeleteSelectedWorkItemCategoriesCommand { get; private set; }
+        public RelayCommand GetWorkItemCategoriesXmlCommand { get; private set; }
+        public RelayCommand ExportSelectedWorkItemCategoriesXmlCommand { get; private set; }
+        public RelayCommand EditSelectedWorkItemCategoriesXmlCommand { get; private set; }
+        public RelayCommand TransformSelectedWorkItemCategoriesXmlCommand { get; private set; }
         public RelayCommand LoadWorkItemCategoryListCommand { get; private set; }
         public RelayCommand AddWorkItemCategoryCommand { get; private set; }
         public RelayCommand RemoveSelectedWorkItemCategoryCommand { get; private set; }
@@ -47,6 +52,22 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         }
 
         public static ObservableProperty<ICollection<WorkItemCategoryInfo>> SelectedWorkItemCategoriesProperty = new ObservableProperty<ICollection<WorkItemCategoryInfo>, WorkItemCategoriesViewModel>(o => o.SelectedWorkItemCategories);
+
+        public ICollection<WorkItemConfigurationItemExport> WorkItemCategoriesXml
+        {
+            get { return this.GetValue(WorkItemCategoriesXmlProperty); }
+            set { this.SetValue(WorkItemCategoriesXmlProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ICollection<WorkItemConfigurationItemExport>> WorkItemCategoriesXmlProperty = new ObservableProperty<ICollection<WorkItemConfigurationItemExport>, WorkItemCategoriesViewModel>(o => o.WorkItemCategoriesXml);
+
+        public ICollection<WorkItemConfigurationItemExport> SelectedWorkItemCategoriesXml
+        {
+            get { return this.GetValue(SelectedWorkItemCategoriesXmlProperty); }
+            set { this.SetValue(SelectedWorkItemCategoriesXmlProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ICollection<WorkItemConfigurationItemExport>> SelectedWorkItemCategoriesXmlProperty = new ObservableProperty<ICollection<WorkItemConfigurationItemExport>, WorkItemCategoriesViewModel>(o => o.SelectedWorkItemCategoriesXml);
 
         public WorkItemCategoryList SelectedWorkItemCategoryList
         {
@@ -82,6 +103,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             this.GetWorkItemCategoriesCommand = new RelayCommand(GetWorkItemCategories, CanGetWorkItemCategories);
             this.DeleteSelectedWorkItemCategoriesCommand = new RelayCommand(DeleteSelectedWorkItemCategories, CanDeleteSelectedWorkItemCategories);
+            this.GetWorkItemCategoriesXmlCommand = new RelayCommand(GetWorkItemCategoriesXml, CanGetWorkItemCategoriesXml);
+            this.ExportSelectedWorkItemCategoriesXmlCommand = new RelayCommand(ExportSelectedWorkItemCategoriesXml, CanExportSelectedWorkItemCategoriesXml);
+            this.EditSelectedWorkItemCategoriesXmlCommand = new RelayCommand(EditSelectedWorkItemCategoriesXml, CanEditSelectedWorkItemCategoriesXml);
+            this.TransformSelectedWorkItemCategoriesXmlCommand = new RelayCommand(TransformSelectedWorkItemCategoriesXml, CanTransformSelectedWorkItemCategoriesXml);
             this.LoadWorkItemCategoryListCommand = new RelayCommand(LoadWorkItemCategoryList, CanLoadWorkItemCategoryList);
             this.AddWorkItemCategoryCommand = new RelayCommand(AddWorkItemCategory, CanAddWorkItemCategory);
             this.RemoveSelectedWorkItemCategoryCommand = new RelayCommand(RemoveSelectedWorkItemCategory, CanRemoveSelectedWorkItemCategory);
@@ -234,6 +259,177 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             worker.RunWorkerAsync();
         }
 
+        private bool CanGetWorkItemCategoriesXml(object argument)
+        {
+            return IsAnyTeamProjectSelected();
+        }
+
+        private void GetWorkItemCategoriesXml(object argument)
+        {
+            var teamProjects = this.SelectedTeamProjects.ToList();
+            var task = new ApplicationTask("Retrieving work item categories", teamProjects.Count, true);
+            PublishStatus(new StatusEventArgs(task));
+            var step = 0;
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var store = tfs.GetService<WorkItemStore>();
+
+                var results = new List<WorkItemConfigurationItemExport>();
+                foreach (var teamProject in teamProjects)
+                {
+                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
+                    try
+                    {
+                        var project = store.Projects[teamProject.Name];
+                        var categories = WorkItemConfigurationItemImportExport.GetCategories(project);
+                        var categoriesInfo = new WorkItemConfigurationItemExport(teamProject, categories);
+                        results.Add(categoriesInfo);
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProject.Name), exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+                e.Result = results;
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while retrieving work item categories", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    this.WorkItemCategoriesXml = (ICollection<WorkItemConfigurationItemExport>)e.Result;
+                    task.SetComplete("Retrieved " + this.WorkItemCategoriesXml.Count.ToCountString("work item category file"));
+                }
+            };
+            worker.RunWorkerAsync();
+        }
+
+        private bool CanExportSelectedWorkItemCategoriesXml(object argument)
+        {
+            return CanEditSelectedWorkItemCategoriesXml(argument);
+        }
+
+        private void ExportSelectedWorkItemCategoriesXml(object argument)
+        {
+            var categoriesToExport = new List<WorkItemConfigurationItemExport>();
+            var categoriesExports = this.SelectedWorkItemCategoriesXml.ToList();
+            if (categoriesExports.Count == 1)
+            {
+                // Export to single file.
+                var categoriesExport = categoriesExports.Single();
+                var dialog = new SaveFileDialog();
+                dialog.FileName = categoriesExport.Item.DisplayName + ".xml";
+                dialog.Filter = "XML Files (*.xml)|*.xml";
+                var result = dialog.ShowDialog(Application.Current.MainWindow);
+                if (result == true)
+                {
+                    categoriesToExport.Add(new WorkItemConfigurationItemExport(categoriesExport.TeamProject, categoriesExport.Item, dialog.FileName));
+                }
+            }
+            else
+            {
+                // Export to a directory structure.
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                dialog.Description = "Please select the path where to export the Work Item Categories files (*.xml). They will be stored in a folder per Team Project.";
+                var result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var rootFolder = dialog.SelectedPath;
+                    foreach (var categoriesExport in categoriesExports)
+                    {
+                        var fileName = Path.Combine(rootFolder, categoriesExport.TeamProject.Name, categoriesExport.Item.DisplayName + ".xml");
+                        categoriesToExport.Add(new WorkItemConfigurationItemExport(categoriesExport.TeamProject, categoriesExport.Item, fileName));
+                    }
+                }
+            }
+
+            var task = new ApplicationTask("Exporting work item categories", categoriesExports.Count, true);
+            PublishStatus(new StatusEventArgs(task));
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                WorkItemConfigurationItemImportExport.Export(this.Logger, task, categoriesToExport);
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while exporting work item categories", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    task.SetComplete("Exported " + categoriesToExport.Count.ToCountString("work item category file"));
+                }
+            };
+            worker.RunWorkerAsync();
+        }
+
+        private bool CanEditSelectedWorkItemCategoriesXml(object argument)
+        {
+            return this.SelectedWorkItemCategoriesXml != null && this.SelectedWorkItemCategoriesXml.Any();
+        }
+
+        private void EditSelectedWorkItemCategoriesXml(object argument)
+        {
+            var categoriesToEdit = this.SelectedWorkItemCategoriesXml.ToList();
+            var dialog = new WorkItemConfigurationItemEditorDialog(categoriesToEdit, "Work Item Category File");
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the edited work item categories. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
+                if (result == MessageBoxResult.Yes)
+                {
+                    var teamProjectsWithCategories = categoriesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                    PerformImport(teamProjectsWithCategories, options);
+                }
+            }
+        }
+
+        private bool CanTransformSelectedWorkItemCategoriesXml(object argument)
+        {
+            return CanEditSelectedWorkItemCategoriesXml(argument);
+        }
+
+        private void TransformSelectedWorkItemCategoriesXml(object argument)
+        {
+            var categoriesToTransform = this.SelectedWorkItemCategoriesXml.ToList();
+            var dialog = new WorkItemConfigurationItemTransformationEditorDialog(categoriesToTransform, "Work Item Category File");
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                var options = dialog.Options;
+                var result = MessageBoxResult.Yes;
+                if (!options.HasFlag(ImportOptions.Simulate))
+                {
+                    result = MessageBox.Show("This will import the transformed work item categories. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                }
+                if (result == MessageBoxResult.Yes)
+                {
+                    var teamProjectsWithCategories = categoriesToTransform.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                    PerformImport(teamProjectsWithCategories, options);
+                }
+            }
+        }
+
         private bool CanLoadWorkItemCategoryList(object argument)
         {
             return true;
@@ -371,6 +567,38 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         protected override bool IsTfsSupported(TeamFoundationServerInfo server)
         {
             return server.MajorVersion >= TfsMajorVersion.V10;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void PerformImport(Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithCategories, ImportOptions options)
+        {
+            var numberOfSteps = teamProjectsWithCategories.Aggregate(0, (a, p) => a += p.Value.Count);
+            var task = new ApplicationTask("Importing work item categories", numberOfSteps, true);
+            PublishStatus(new StatusEventArgs(task));
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var store = tfs.GetService<WorkItemStore>();
+                WorkItemConfigurationItemImportExport.Import(this.Logger, task, true, store, teamProjectsWithCategories, options);
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while importing work item categories", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    task.SetComplete(task.IsError ? "Failed" : (task.IsWarning ? "Succeeded with warnings" : "Succeeded"));
+                }
+            };
+            worker.RunWorkerAsync();
         }
 
         #endregion

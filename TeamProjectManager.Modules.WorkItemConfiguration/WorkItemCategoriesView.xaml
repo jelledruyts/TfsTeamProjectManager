@@ -11,6 +11,27 @@
 
         <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
 
+            <TabItem Header="Export / Edit" i:HelpProvider.HelpContent="Allows you to export the work item categories to XML files and edit them in-place.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Get Work Item Categories" Margin="0,5,0,5" Command="{Binding Path=GetWorkItemCategoriesXmlCommand}" />
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=WorkItemCategoriesXml}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="workItemCategoriesXmlDataGrid" SelectionChanged="workItemCategoriesXmlDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Export" Command="{Binding Path=ExportSelectedWorkItemCategoriesXmlCommand}" />
+                        <Button Content="Edit..." Margin="5,0,0,0" Command="{Binding Path=EditSelectedWorkItemCategoriesXmlCommand}" />
+                        <Button Content="Transform..." Margin="5,0,0,0" Command="{Binding Path=TransformSelectedWorkItemCategoriesXmlCommand}" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+
             <TabItem Header="View / Delete" i:HelpProvider.HelpContent="Allows you to get an overview of all work item categories across Team Projects, and the work items that belong to them. You can even delete work item categories from Team Projects.">
 
                 <Grid>
@@ -35,7 +56,7 @@
                 </Grid>
 
             </TabItem>
-
+            
             <TabItem Header="Update / Import" i:HelpProvider.HelpContent="Allows you to define work item categories across Team Projects, by creating them from scratch or by importing them from an existing Team Project. This can be useful if you want to change work item categories or if you want to delete work item types that are part of categories (in which case you have to remove them from any categories first).">
 
                 <Grid>

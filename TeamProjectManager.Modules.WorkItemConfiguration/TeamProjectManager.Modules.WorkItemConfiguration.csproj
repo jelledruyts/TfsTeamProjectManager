@@ -92,6 +92,10 @@
   <ItemGroup>
     <Compile Include="AgileProjectConfigurationPart.cs" />
     <Compile Include="CommonProjectConfigurationPart.cs" />
+    <Compile Include="MacroDefinition.cs" />
+    <Compile Include="MacroInformationDialog.xaml.cs">
+      <DependentUpon>MacroInformationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TransformationType.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
@@ -167,6 +171,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="ComparisonResultViewerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroInformationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

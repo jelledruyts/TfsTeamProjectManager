@@ -38,6 +38,7 @@
         </Grid>
         <WrapPanel Grid.Row="1" Margin="0,5,0,0">
             <Button Content="Apply Transformations" Command="{Binding Path=ApplyTransformationsCommand}" />
+            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0"><Hyperlink x:Name="macroInformationHyperlink" Command="{x:Static w:MacroInformationDialog.ShowInstanceCommand}">About macros</Hyperlink></TextBlock>
             <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
             <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
         </WrapPanel>

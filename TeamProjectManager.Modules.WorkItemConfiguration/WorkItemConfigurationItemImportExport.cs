@@ -21,7 +21,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public static void Import(ILogger logger, ApplicationTask task, bool setTaskProgress, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithConfigurationItems, ImportOptions options)
         {
             // Replace any macros.
-            // TODO: Make macros discoverable in UI.
             if (!task.IsCanceled)
             {
                 foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
@@ -223,6 +222,23 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Macro Support
 
+        private const string MacroNameProjectName = "$$PROJECTNAME$$";
+        private const string MacroNameProjectCollectionName = "$$PROJECTCOLLECTIONNAME$$";
+        private const string MacroNameProjectCollectionUrl = "$$PROJECTCOLLECTIONURL$$";
+        private const string MacroNameServerName = "$$SERVERNAME$$";
+        private const string MacroNameServerUrl = "$$SERVERURL$$";
+
+        public static IList<MacroDefinition> GetSupportedMacroDefinitions()
+        {
+            return new List<MacroDefinition> {
+                new MacroDefinition(MacroNameProjectName, "FabrikamFiber", "The name of the Team Project"),
+                new MacroDefinition(MacroNameProjectCollectionName, @"tfs\FabrikamFiberCollection", "The name of the Team Project Collection"),
+                new MacroDefinition(MacroNameProjectCollectionUrl, "http://tfs:8080/tfs/fabrikamfibercollection", "The URL of the Team Project Collection"),
+                new MacroDefinition(MacroNameServerName, "tfs", "The name of the Team Foundation Server"),
+                new MacroDefinition(MacroNameServerUrl, "http://tfs:8080/tfs", "The URL of the Team Foundation Server")
+            };
+        }
+
         public static IDictionary<string, string> GetTeamProjectMacros(TeamProjectInfo teamProject)
         {
             if (teamProject == null)
@@ -232,12 +248,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             else
             {
                 return new Dictionary<string, string>() {
-                    { "$$PROJECTNAME$$", teamProject.Name },
-                    { "$$PROJECTURL$$", teamProject.Uri.ToString() },
-                    { "$$COLLECTIONNAME$$", teamProject.TeamProjectCollection.Name },
-                    { "$$COLLECTIONURL$$", teamProject.TeamProjectCollection.Uri.ToString() },
-                    { "$$SERVERNAME$$", teamProject.TeamProjectCollection.TeamFoundationServer.Name },
-                    { "$$SERVERURL$$", teamProject.TeamProjectCollection.TeamFoundationServer.Uri.ToString() }
+                    { MacroNameProjectName, teamProject.Name },
+                    { MacroNameProjectCollectionName, teamProject.TeamProjectCollection.Name },
+                    { MacroNameProjectCollectionUrl, teamProject.TeamProjectCollection.Uri.ToString() },
+                    { MacroNameServerName, teamProject.TeamProjectCollection.TeamFoundationServer.Name },
+                    { MacroNameServerUrl, teamProject.TeamProjectCollection.TeamFoundationServer.Uri.ToString() }
                 };
             }
         }

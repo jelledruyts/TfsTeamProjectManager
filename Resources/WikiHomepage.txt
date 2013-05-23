@@ -51,6 +51,11 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.6.4891 (May 23rd, 2013)
+** Added support for macros (e.g. $$PROJECTNAME$$) to be replaced when editing/transforming work item configurations.
+** Added support for simulation and saving a copy of any change to the work item configuration files.
+** Added support to export, edit and transform work item categories as XML.
+** Added support for searching within large text boxes (CTRL-F / F3).
 * v1.6.4874 (May 6th, 2013)
 ** Added support for XML transformations of work item tracking configuration files (work item type definitions, categories, process configuration).
 ** Activity module now also shows the user that performed the activity.

@@ -138,6 +138,16 @@ This can be useful if you want to know if certain work items or fields are prese
 {anchor:Work Item Configuration - Categories}
 !! Work Item Configuration - Categories
 
+!!! Export / Edit
+
+Allows you to export the work item categories to XML files and edit them in-place.
+
+[image:Export / Edit Work Item Categories|WorkItemConfiguration-Categories-ExportEdit.png]
+
+[image:Edit Work Item Categories|WorkItemConfiguration-Categories-ExportEdit-Edit.png]
+
+[image:Transform Work Item Categories|WorkItemConfiguration-Categories-ExportEdit-Transform.png]
+
 !!! View / Delete
 
 Allows you to get an overview of all work item categories across Team Projects, and the work items that belong to them.

@@ -1,6 +1,7 @@
 ﻿<Window x:Class="TeamProjectManager.Modules.WorkItemConfiguration.WorkItemConfigurationItemEditorDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
         xmlns:c="clr-namespace:TeamProjectManager.Common.Converters;assembly=TeamProjectManager.Common"
         xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemConfiguration"
         Title="Edit Work Item Types"
@@ -38,7 +39,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <TextBox Grid.Row="1" Text="{Binding ElementName=selectedItemComboBox, Path=SelectedItem.Item.XmlDefinition, Converter={StaticResource xmlDocumentConverter}}" AcceptsReturn="True" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,5,0,0" />
+            <TextBox Grid.Row="1" Text="{Binding ElementName=selectedItemComboBox, Path=SelectedItem.Item.XmlDefinition, Converter={StaticResource xmlDocumentConverter}}" AcceptsReturn="True" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,5,0,0" i:FindProvider.FindEnabled="true" />
 
         </Grid>
 

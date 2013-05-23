@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.Client.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -81,6 +82,7 @@
     <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />
     <Compile Include="Infrastructure\FileSystem.cs" />
+    <Compile Include="Infrastructure\FindProvider.cs" />
     <Compile Include="Infrastructure\HelpContentEventArgs.cs" />
     <Compile Include="Infrastructure\HelpProvider.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />

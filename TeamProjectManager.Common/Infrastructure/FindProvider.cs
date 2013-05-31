@@ -138,33 +138,32 @@ namespace TeamProjectManager.Common.Infrastructure
 
         private static void ExecuteFind(object sender, ExecutedRoutedEventArgs e)
         {
-            var target = (UIElement)e.Source;
-            var textToFind = GetTextToFind(target);
-            textToFind = Microsoft.VisualBasic.Interaction.InputBox("Find what:", "Find", textToFind);
-            PerformFind(target, textToFind);
+            PerformFind((UIElement)e.Source, true);
             e.Handled = true;
         }
 
         private static void CanExecuteFindNext(object sender, CanExecuteRoutedEventArgs e)
         {
-            var target = (UIElement)e.Source;
-            var textToFind = GetTextToFind(target);
-            e.CanExecute = !string.IsNullOrEmpty(textToFind);
+            e.CanExecute = true;
         }
 
         private static void ExecuteFindNext(object sender, ExecutedRoutedEventArgs e)
         {
-            var target = (UIElement)e.Source;
-            var textToFind = GetTextToFind(target);
-            PerformFind(target, textToFind);
+            PerformFind((UIElement)e.Source, false);
+            e.Handled = true;
         }
 
         #endregion
 
         #region Find Implementation
 
-        private static void PerformFind(UIElement target, string textToFind)
+        private static void PerformFind(UIElement target, bool forcePrompt)
         {
+            var textToFind = GetTextToFind(target);
+            if (forcePrompt || string.IsNullOrEmpty(textToFind))
+            {
+                textToFind = Microsoft.VisualBasic.Interaction.InputBox("Find what:", "Find", textToFind);
+            }
             if (string.IsNullOrEmpty(textToFind))
             {
                 return;
@@ -189,8 +188,14 @@ namespace TeamProjectManager.Common.Infrastructure
                     foundTextIndex = textBox.Text.Substring(start).IndexOf(textToFind, StringComparison.CurrentCultureIgnoreCase);
                 }
 
-                if (foundTextIndex >= 0)
+                if (foundTextIndex < 0)
                 {
+                    // If still nothing was found, notify.
+                    MessageBox.Show("The following text could not be found: " + textToFind, "Not Found", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    // If the text was found, highlight it and scroll it into view.
                     textBox.Select(start + foundTextIndex, textToFind.Length);
                     textBox.ScrollToLine(textBox.GetLineIndexFromCharacterIndex(start + foundTextIndex));
                 }

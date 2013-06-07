@@ -77,11 +77,11 @@ namespace TeamProjectManager.Modules.SourceControl
 
                 // Write the (static) styles for the categories so they show up in the Legend.
                 writer.WriteStartElement("Styles");
-                WriteStyle(writer, CategoryIdTeamProject, "Team Project", "#FFBBBBBB");
-                WriteStyle(writer, CategoryIdRootBranch, "Root Branch", "#FF0000FF");
-                WriteStyle(writer, CategoryIdChildBranch, "Child Branch", "#FF00FF00");
-                WriteStyle(writer, CategoryIdLeafBranch, "Leaf Branch", "#FF00FFFF");
-                WriteStyle(writer, CategoryIdOrphanBranch, "Orphan Branch", "#FFFF0000");
+                WriteStyle(writer, CategoryIdTeamProject, "Team Project", "#FFE8EEF4");
+                WriteStyle(writer, CategoryIdRootBranch, "Root Branch", "#FF0071BC");
+                WriteStyle(writer, CategoryIdChildBranch, "Child Branch", "#FF00A600");
+                WriteStyle(writer, CategoryIdLeafBranch, "Leaf Branch", "#FFE9EC16");
+                WriteStyle(writer, CategoryIdOrphanBranch, "Orphan Branch", "#FFFF8A00");
                 writer.WriteEndElement(); // </Styles>
 
                 // Write the (static) properties.

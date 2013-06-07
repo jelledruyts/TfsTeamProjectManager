@@ -25,18 +25,5 @@ namespace TeamProjectManager.Modules.SourceControl
                 this.DataContext = value;
             }
         }
-
-        private void changesetsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            this.ViewModel.SelectedChangesets = this.changesetsDataGrid.SelectedItems.Cast<ChangesetInfo>().ToList();
-        }
-
-        private void changesetsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (this.ViewModel.ViewChangesetDetailsCommand.CanExecute(null))
-            {
-                this.ViewModel.ViewChangesetDetailsCommand.Execute(null);
-            }
-        }
     }
 }

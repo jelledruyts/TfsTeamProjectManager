@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:l="clr-namespace:TeamProjectManager.Modules.SourceControl"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <l:BranchInfoToolTipConverter x:Key="branchInfoToolTipConverter" />
+    </UserControl.Resources>
     <Grid>
-        
+
         <TabControl>
 
             <TabItem Header="View Settings" i:HelpProvider.HelpContent="Allows you to get an overview of the source control settings for each Team Project: whether or not &amp;multiple check-out&amp; and &amp;get latest on check-out&amp; are enabled, and which check-in notes are configured. Note that viewing the configured check-in policies is not supported at this time.">
@@ -39,7 +43,7 @@
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0" Content="Load From Team Project" Command="{Binding Path=LoadSourceControlSettingsCommand}" />
-                    
+
                     <Grid Grid.Row="1" Margin="0,5,0,0" DataContext="{Binding Path=SelectedSourceControlSettings}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -54,7 +58,7 @@
                         <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Enable multiple check-out" IsChecked="{Binding Path=EnableMultipleCheckout}" />
 
                         <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" Content="Enable get latest on check-out" IsChecked="{Binding Path=EnableGetLatestOnCheckout}" />
-                        
+
                         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" Content="Check-in Notes" />
                         <DataGrid Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" ItemsSource="{Binding Path=CheckinNoteFields}" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" RowHeaderWidth="20">
                             <DataGrid.Columns>
@@ -70,7 +74,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="View Latest Changesets" i:HelpProvider.HelpContent="Allows you to retrieve the latest changesets across Team Projects, optionally excluding changesets with specific comments. This can be useful if you want to see which projects are still actively being worked on, for example.">
+            <TabItem Header="View Branch Hierarchies" i:HelpProvider.HelpContent="Allows you to get an overview of the branches across multiple Team Projects.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -78,42 +82,32 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0" Content="Number Of Changesets" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=NumberOfChangesets, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <Label Grid.Row="1" Grid.Column="0" Content="Exclude When Comment Contains" Margin="0,5,0,0" />
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Exclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" />
-
-                        <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Get Latest Changesets" Command="{Binding Path=GetLatestChangesetsCommand}" Margin="0,5,0,0" />
-                    </Grid>
-
-                    <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Changesets}" AutoGenerateColumns="False" IsReadOnly="True" x:Name="changesetsDataGrid" SelectionChanged="changesetsDataGrid_SelectionChanged" MouseDoubleClick="changesetsDataGrid_MouseDoubleClick">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
-                            <DataGridTextColumn Header="Changeset ID" Binding="{Binding Path=Id}" />
-                            <DataGridTextColumn Header="Committer" Binding="{Binding Path=Committer}" />
-                            <DataGridTextColumn Header="Time" Binding="{Binding Path=CreationTime}" />
-                            <DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment, Converter={StaticResource singleLineConverter}}" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-
-                    <Button Grid.Row="2" Content="View Changeset Details" Command="{Binding Path=ViewChangesetDetailsCommand}" Margin="0,5,0,0" />
-
+                    <Button Grid.Row="0" Content="Get Branch Hierarchies" Command="{Binding Path=ViewBranchHierarchiesCommand}" />
+                    <TreeView Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=BranchHierarchies}">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                <TextBlock Text="{Binding Path=Path}" ToolTip="{Binding Path=., Converter={StaticResource branchInfoToolTipConverter}}" />
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Export" Command="{Binding Path=ExportBranchHierarchiesCommand}" />
+                        <Label Content="As" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        <ComboBox Margin="5,0,0,0">
+                            <ComboBoxItem Content="DGML" ToolTip="Directed Graph Markup Language (DGML) is a graph format that can be opened in Visual Studio 2010 or later" IsSelected="{Binding Path=ExportFormat, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Dgml}" />
+                            <ComboBoxItem Content="XML" IsSelected="{Binding Path=ExportFormat, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Xml}" />
+                        </ComboBox>
+                        <CheckBox Margin="5,0,0,0" VerticalAlignment="Center" Content="Create one file per Team Project" ToolTip="Creates a file per Team Project instead of one file containing the full hierarchy" IsChecked="{Binding Path=ExportBranchHierarchiesPerTeamProject}" />
+                    </WrapPanel>
                 </Grid>
             </TabItem>
-            
+
         </TabControl>
-        
+
     </Grid>
 </UserControl>

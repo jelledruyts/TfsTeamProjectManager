@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.VersionControl.Client;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.TeamFoundation.VersionControl.Controls;
-using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -24,47 +22,15 @@ namespace TeamProjectManager.Modules.SourceControl
     {
         #region Properties
 
-        public RelayCommand GetLatestChangesetsCommand { get; private set; }
-        public RelayCommand ViewChangesetDetailsCommand { get; private set; }
         public RelayCommand GetSourceControlSettingsCommand { get; private set; }
         public RelayCommand LoadSourceControlSettingsCommand { get; private set; }
         public RelayCommand UpdateSourceControlSettingsCommand { get; private set; }
+        public RelayCommand ViewBranchHierarchiesCommand { get; private set; }
+        public RelayCommand ExportBranchHierarchiesCommand { get; private set; }
 
         #endregion
 
         #region Observable Properties
-
-        public ICollection<ChangesetInfo> Changesets
-        {
-            get { return this.GetValue(ChangesetsProperty); }
-            set { this.SetValue(ChangesetsProperty, value); }
-        }
-
-        public static ObservableProperty<ICollection<ChangesetInfo>> ChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, SourceControlViewModel>(o => o.Changesets);
-
-        public ICollection<ChangesetInfo> SelectedChangesets
-        {
-            get { return this.GetValue(SelectedChangesetsProperty); }
-            set { this.SetValue(SelectedChangesetsProperty, value); }
-        }
-
-        public static ObservableProperty<ICollection<ChangesetInfo>> SelectedChangesetsProperty = new ObservableProperty<ICollection<ChangesetInfo>, SourceControlViewModel>(o => o.SelectedChangesets);
-
-        public int NumberOfChangesets
-        {
-            get { return this.GetValue(NumberOfChangesetsProperty); }
-            set { this.SetValue(NumberOfChangesetsProperty, value); }
-        }
-
-        public static ObservableProperty<int> NumberOfChangesetsProperty = new ObservableProperty<int, SourceControlViewModel>(o => o.NumberOfChangesets, 1);
-
-        public string Exclusions
-        {
-            get { return this.GetValue(ExclusionsProperty); }
-            set { this.SetValue(ExclusionsProperty, value); }
-        }
-
-        public static ObservableProperty<string> ExclusionsProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.Exclusions, Constants.DefaultSourceControlHistoryExclusions);
 
         public ObservableCollection<SourceControlSettings> SourceControlSettings
         {
@@ -82,134 +48,48 @@ namespace TeamProjectManager.Modules.SourceControl
 
         public static ObservableProperty<SourceControlSettings> SelectedSourceControlSettingsProperty = new ObservableProperty<SourceControlSettings, SourceControlViewModel>(o => o.SelectedSourceControlSettings, new SourceControlSettings());
 
+        public IList<BranchInfo> BranchHierarchies
+        {
+            get { return this.GetValue(BranchHierarchiesProperty); }
+            set { this.SetValue(BranchHierarchiesProperty, value); }
+        }
+
+        public static readonly ObservableProperty<IList<BranchInfo>> BranchHierarchiesProperty = new ObservableProperty<IList<BranchInfo>, SourceControlViewModel>(o => o.BranchHierarchies);
+
+        public BranchHierarchyExportFormat ExportFormat
+        {
+            get { return this.GetValue(ExportFormatProperty); }
+            set { this.SetValue(ExportFormatProperty, value); }
+        }
+
+        public static readonly ObservableProperty<BranchHierarchyExportFormat> ExportFormatProperty = new ObservableProperty<BranchHierarchyExportFormat, SourceControlViewModel>(o => o.ExportFormat);
+        
+        public bool ExportBranchHierarchiesPerTeamProject
+        {
+            get { return this.GetValue(ExportBranchHierarchiesPerTeamProjectProperty); }
+            set { this.SetValue(ExportBranchHierarchiesPerTeamProjectProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> ExportBranchHierarchiesPerTeamProjectProperty = new ObservableProperty<bool, SourceControlViewModel>(o => o.ExportBranchHierarchiesPerTeamProject);
+        
         #endregion
 
         #region Constructors
 
         [ImportingConstructor]
         public SourceControlViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Source Control", "Allows you to manage Source Control settings for Team Projects.")
+            : base(eventAggregator, logger, "Source Control", "Allows you to manage Source Control settings for Team Projects and see branch hierarchies.")
         {
-            this.GetLatestChangesetsCommand = new RelayCommand(GetLatestChangesets, CanGetLatestChangesets);
-            this.ViewChangesetDetailsCommand = new RelayCommand(ViewChangesetDetails, CanViewChangesetDetails);
             this.GetSourceControlSettingsCommand = new RelayCommand(GetSourceControlSettings, CanGetSourceControlSettings);
             this.LoadSourceControlSettingsCommand = new RelayCommand(LoadSourceControlSettings, CanLoadSourceControlSettings);
             this.UpdateSourceControlSettingsCommand = new RelayCommand(UpdateSourceControlSettings, CanUpdateSourceControlSettings);
+            this.ViewBranchHierarchiesCommand = new RelayCommand(ViewBranchHierarchies, CanViewBranchHierarchies);
+            this.ExportBranchHierarchiesCommand = new RelayCommand(ExportBranchHierarchies, CanExportBranchHierarchies);
         }
 
         #endregion
 
         #region Commands
-
-        private bool CanGetLatestChangesets(object argument)
-        {
-            return IsAnyTeamProjectSelected() && this.NumberOfChangesets > 0;
-        }
-
-        private void GetLatestChangesets(object argument)
-        {
-            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
-            var numberOfChangesetsForProject = this.NumberOfChangesets;
-            var exclusions = (string.IsNullOrEmpty(this.Exclusions) ? new string[0] : this.Exclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            var task = new ApplicationTask("Retrieving latest changesets", teamProjectNames.Count, true);
-            this.PublishStatus(new StatusEventArgs(task));
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sender, e) =>
-            {
-                var changesets = new List<ChangesetInfo>();
-                var step = 0;
-                var tfs = GetSelectedTfsTeamProjectCollection();
-                var vcs = tfs.GetService<VersionControlServer>();
-                foreach (var teamProjectName in teamProjectNames)
-                {
-                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProjectName));
-                    try
-                    {
-                        var foundChangesetsForProject = 0;
-                        VersionSpec versionTo = null;
-                        while (foundChangesetsForProject < numberOfChangesetsForProject && !task.IsCanceled)
-                        {
-                            const int pageCount = 10;
-                            var history = vcs.QueryHistory("$/" + teamProjectName, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
-                            foreach (Changeset changeset in history)
-                            {
-                                if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
-                                {
-                                    foundChangesetsForProject++;
-                                    task.SetProgressForCurrentStep((double)foundChangesetsForProject / (double)numberOfChangesetsForProject);
-                                    changesets.Add(new ChangesetInfo(teamProjectName, changeset.ChangesetId, changeset.Committer, changeset.CreationDate, changeset.Comment));
-                                    if (foundChangesetsForProject == numberOfChangesetsForProject)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (history.Count == pageCount)
-                            {
-                                versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    catch (Exception exc)
-                    {
-                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while processing Team Project \"{0}\"", teamProjectName), exc);
-                    }
-                    if (task.IsCanceled)
-                    {
-                        task.Status = "Canceled";
-                        break;
-                    }
-                }
-                e.Result = changesets;
-            };
-            worker.RunWorkerCompleted += (sender, e) =>
-            {
-                if (e.Error != null)
-                {
-                    Logger.Log("An unexpected exception occurred while retrieving latest changesets", e.Error);
-                    task.SetError(e.Error);
-                    task.SetComplete("An unexpected exception occurred");
-                }
-                else
-                {
-                    this.Changesets = (ICollection<ChangesetInfo>)e.Result;
-                    task.SetComplete("Retrieved " + this.Changesets.Count.ToCountString("changeset"));
-                }
-            };
-            worker.RunWorkerAsync();
-        }
-
-        private bool CanViewChangesetDetails(object argument)
-        {
-            return this.SelectedChangesets != null && this.SelectedChangesets.Count == 1;
-        }
-
-        private void ViewChangesetDetails(object argument)
-        {
-            try
-            {
-                var tfs = GetSelectedTfsTeamProjectCollection();
-                var vcs = tfs.GetService<VersionControlServer>();
-                var changesetId = this.SelectedChangesets.First().Id;
-                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-                var args = new object[] { vcs, vcs.GetChangeset(changesetId), false };
-                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChangesetDetails", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
-                {
-                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                    dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
-                }
-            }
-            catch (Exception exc)
-            {
-                var message = "There was a problem showing the internal TFS changeset details dialog.";
-                Logger.Log(message, exc, TraceEventType.Warning);
-                MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
 
         private bool CanGetSourceControlSettings(object argument)
         {
@@ -372,6 +252,113 @@ namespace TeamProjectManager.Modules.SourceControl
                     }
                 };
                 worker.RunWorkerAsync();
+            }
+        }
+
+        private bool CanViewBranchHierarchies(object argument)
+        {
+            return this.IsAnyTeamProjectSelected();
+        }
+
+        private void ViewBranchHierarchies(object argument)
+        {
+            var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
+            var task = new ApplicationTask("Retrieving branch hierarchies", null, true);
+            this.PublishStatus(new StatusEventArgs(task));
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender, e) =>
+            {
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var vcs = tfs.GetService<VersionControlServer>();
+                var teamProjectRootPaths = teamProjectNames.Select(t => string.Concat("$/", t, "/")).ToArray();
+                var branchHierarchies = new List<BranchInfo>();
+                foreach (var rootBranch in vcs.QueryRootBranchObjects(RecursionType.OneLevel).Where(b => !teamProjectRootPaths.Any() || teamProjectRootPaths.Any(t => (b.Properties.RootItem.Item + "/").StartsWith(t, StringComparison.OrdinalIgnoreCase))).OrderBy(b => b.Properties.RootItem.Item))
+                {
+                    branchHierarchies.Add(GetBranchInfo(rootBranch, null, vcs, task));
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+                e.Result = branchHierarchies;
+            };
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Logger.Log("An unexpected exception occurred while retrieving branch hierarchies", e.Error);
+                    task.SetError(e.Error);
+                    task.SetComplete("An unexpected exception occurred");
+                }
+                else
+                {
+                    this.BranchHierarchies = (IList<BranchInfo>)e.Result;
+                    task.SetComplete("Retrieved " + this.BranchHierarchies.Count.ToCountString("branch hierarchies"));
+                }
+            };
+            worker.RunWorkerAsync();
+        }
+
+        private static BranchInfo GetBranchInfo(BranchObject branch, BranchInfo parent, VersionControlServer vcs, ApplicationTask task)
+        {
+            var branchPath = branch.Properties.RootItem.Item;
+            task.Status = "Processing " + branchPath;
+            var current = new BranchInfo(parent, branchPath, branch.Properties.Description, branch.DateCreated, branch.Properties.Owner);
+            var children = new List<BranchInfo>();
+            foreach (var childBranch in vcs.QueryBranchObjects(branch.Properties.RootItem, RecursionType.OneLevel).Where(c => c.Properties.RootItem.Item != branchPath).OrderBy(c => c.Properties.RootItem.Item))
+            {
+                if (task.IsCanceled)
+                {
+                    task.Status = "Canceled";
+                    break;
+                }
+                children.Add(GetBranchInfo(childBranch, current, vcs, task));
+            }
+            current.Children = children.ToArray();
+            return current;
+        }
+
+        private bool CanExportBranchHierarchies(object argument)
+        {
+            return this.BranchHierarchies != null && this.BranchHierarchies.Any();
+        }
+
+        private void ExportBranchHierarchies(object argument)
+        {
+            if (!this.ExportBranchHierarchiesPerTeamProject)
+            {
+                var dialog = new SaveFileDialog();
+                dialog.Title = "Please select the branch hierarchy {0} file to save.".FormatCurrent(this.ExportFormat.ToString().ToUpperInvariant());
+                dialog.Filter = (this.ExportFormat == BranchHierarchyExportFormat.Dgml ? "DGML Files (*.dgml)|*.dgml" : "XML Files (*.xml)|*.xml");
+                var result = dialog.ShowDialog(Application.Current.MainWindow);
+                if (result == true)
+                {
+                    try
+                    {
+                        BranchHierarchyExporter.Export(this.BranchHierarchies, dialog.FileName, this.ExportFormat);
+                    }
+                    catch (Exception exc)
+                    {
+                        this.Logger.Log(string.Format(CultureInfo.CurrentCulture, "An error occurred while saving the branch hierarchies to \"{0}\"", dialog.FileName), exc);
+                        MessageBox.Show("An error occurred while saving the branch hierarchies. See the log file for details", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+            else
+            {
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                dialog.Description = "Please select the path where to save the branch hierarchy {0} files. They will be stored in a file per Team Project.".FormatCurrent(this.ExportFormat.ToString().ToUpperInvariant());
+                var result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var rootFolder = dialog.SelectedPath;
+                    foreach (var teamProjectWithBranchHierarchies in this.BranchHierarchies.GroupBy(h => h.TeamProjectName))
+                    {
+                        var fileName = Path.Combine(rootFolder, teamProjectWithBranchHierarchies.Key + "." + this.ExportFormat.ToString().ToLower());
+                        BranchHierarchyExporter.Export(teamProjectWithBranchHierarchies, fileName, this.ExportFormat);
+                    }
+                }
             }
         }
 

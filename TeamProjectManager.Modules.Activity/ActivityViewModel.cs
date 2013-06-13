@@ -8,8 +8,8 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Windows;
-using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -19,6 +19,15 @@ namespace TeamProjectManager.Modules.Activity
     [Export]
     public class ActivityViewModel : ViewModelBase
     {
+        #region Constants
+
+        /// <summary>
+        /// The default substrings of changeset comments to exclude from source control activity.
+        /// </summary>
+        public const string DefaultSourceControlCommentExclusions = "Auto-Build: Version Update;Checked in by server upgrade";
+
+        #endregion
+
         #region Properties
 
         public RelayCommand GetActivityCommand { get; private set; }
@@ -48,13 +57,45 @@ namespace TeamProjectManager.Modules.Activity
 
         public static ObservableProperty<int> NumberOfActivitiesProperty = new ObservableProperty<int, ActivityViewModel>(o => o.NumberOfActivities, 10);
 
-        public string SourceControlExclusions
+        public bool SourceControlComponentEnabled
         {
-            get { return this.GetValue(SourceControlExclusionsProperty); }
-            set { this.SetValue(SourceControlExclusionsProperty, value); }
+            get { return this.GetValue(SourceControlComponentEnabledProperty); }
+            set { this.SetValue(SourceControlComponentEnabledProperty, value); }
         }
 
-        public static ObservableProperty<string> SourceControlExclusionsProperty = new ObservableProperty<string, ActivityViewModel>(o => o.SourceControlExclusions, Constants.DefaultSourceControlHistoryExclusions);
+        public static readonly ObservableProperty<bool> SourceControlComponentEnabledProperty = new ObservableProperty<bool, ActivityViewModel>(o => o.SourceControlComponentEnabled, true);
+
+        public bool WorkItemTrackingComponentEnabled
+        {
+            get { return this.GetValue(WorkItemTrackingComponentEnabledProperty); }
+            set { this.SetValue(WorkItemTrackingComponentEnabledProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> WorkItemTrackingComponentEnabledProperty = new ObservableProperty<bool, ActivityViewModel>(o => o.WorkItemTrackingComponentEnabled, true);
+
+        public bool TeamBuildComponentEnabled
+        {
+            get { return this.GetValue(TeamBuildComponentEnabledProperty); }
+            set { this.SetValue(TeamBuildComponentEnabledProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> TeamBuildComponentEnabledProperty = new ObservableProperty<bool, ActivityViewModel>(o => o.TeamBuildComponentEnabled, true);
+
+        public string SourceControlCommentExclusions
+        {
+            get { return this.GetValue(SourceControlCommentExclusionsProperty); }
+            set { this.SetValue(SourceControlCommentExclusionsProperty, value); }
+        }
+
+        public static ObservableProperty<string> SourceControlCommentExclusionsProperty = new ObservableProperty<string, ActivityViewModel>(o => o.SourceControlCommentExclusions, DefaultSourceControlCommentExclusions);
+
+        public string UserExclusions
+        {
+            get { return this.GetValue(UserExclusionsProperty); }
+            set { this.SetValue(UserExclusionsProperty, value); }
+        }
+
+        public static readonly ObservableProperty<string> UserExclusionsProperty = new ObservableProperty<string, ActivityViewModel>(o => o.UserExclusions);
 
         public ICollection<TeamProjectActivityInfo> Activities
         {
@@ -76,15 +117,35 @@ namespace TeamProjectManager.Modules.Activity
 
         #region GetActivity Command
 
+        private ActivityComponentTypes GetComponentTypes()
+        {
+            var componentTypes = ActivityComponentTypes.None;
+            if (this.SourceControlComponentEnabled)
+            {
+                componentTypes |= ActivityComponentTypes.SourceControl;
+            }
+            if (this.WorkItemTrackingComponentEnabled)
+            {
+                componentTypes |= ActivityComponentTypes.WorkItemTracking;
+            }
+            if (this.TeamBuildComponentEnabled)
+            {
+                componentTypes |= ActivityComponentTypes.TeamBuild;
+            }
+            return componentTypes;
+        }
+
         private bool CanGetActivity(object argument)
         {
-            return IsAnyTeamProjectSelected();
+            return IsAnyTeamProjectSelected() && this.NumberOfActivities > 0 && GetComponentTypes() != ActivityComponentTypes.None;
         }
 
         private void GetActivity(object argument)
         {
+            var componentTypes = GetComponentTypes();
             var numberOfActivities = this.NumberOfActivities;
-            var exclusions = (string.IsNullOrEmpty(this.SourceControlExclusions) ? new string[0] : this.SourceControlExclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+            var commentExclusions = (string.IsNullOrEmpty(this.SourceControlCommentExclusions) ? new string[0] : this.SourceControlCommentExclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+            var userExclusions = (string.IsNullOrEmpty(this.UserExclusions) ? new string[0] : this.UserExclusions.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
 
             var teamProjects = this.SelectedTeamProjects.ToList();
             var task = new ApplicationTask("Retrieving activity", teamProjects.Count, true);
@@ -104,60 +165,90 @@ namespace TeamProjectManager.Modules.Activity
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
                     try
                     {
-                        // Get the latest source control activity.
                         var sourceControlActivities = new List<ComponentActivityInfo>();
-                        var foundChangesetsForProject = 0;
-                        VersionSpec versionTo = null;
-                        while (foundChangesetsForProject < numberOfActivities && !task.IsCanceled)
+                        if (!task.IsCanceled && componentTypes.HasFlag(ActivityComponentTypes.SourceControl))
                         {
-                            const int pageCount = 10;
-                            var history = vcs.QueryHistory("$/" + teamProject.Name, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
-                            foreach (Changeset changeset in history)
+                            // Get the latest source control activity.
+                            var foundChangesetsForProject = 0;
+                            VersionSpec versionTo = null;
+                            while (foundChangesetsForProject < numberOfActivities && !task.IsCanceled)
                             {
-                                if (string.IsNullOrEmpty(changeset.Comment) || !exclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                                const int pageCount = 10;
+                                var history = vcs.QueryHistory("$/" + teamProject.Name, VersionSpec.Latest, 0, RecursionType.Full, null, null, versionTo, pageCount, false, false, false).Cast<Changeset>().ToList();
+                                foreach (Changeset changeset in history)
                                 {
-                                    foundChangesetsForProject++;
-                                    var commentSuffix = string.IsNullOrEmpty(changeset.Comment) ? null : ": " + changeset.Comment.Trim();
-                                    sourceControlActivities.Add(new ComponentActivityInfo("Source Control", changeset.CreationDate, changeset.CommitterDisplayName, string.Format(CultureInfo.CurrentCulture, "Changeset {0}{1}", changeset.ChangesetId, commentSuffix)));
-                                    if (foundChangesetsForProject == numberOfActivities)
+                                    if ((string.IsNullOrEmpty(changeset.Comment) || !commentExclusions.Any(x => changeset.Comment.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) && !userExclusions.Any(x => changeset.Owner.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0 || changeset.OwnerDisplayName.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
                                     {
-                                        break;
+                                        foundChangesetsForProject++;
+                                        var commentSuffix = string.IsNullOrEmpty(changeset.Comment) ? null : ": " + changeset.Comment.Trim();
+                                        sourceControlActivities.Add(new ComponentActivityInfo("Source Control", changeset.CreationDate, changeset.CommitterDisplayName, string.Format(CultureInfo.CurrentCulture, "Changeset {0}{1}", changeset.ChangesetId, commentSuffix)));
+                                        if (foundChangesetsForProject == numberOfActivities)
+                                        {
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            if (history.Count == pageCount)
-                            {
-                                versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
-                            }
-                            else
-                            {
-                                break;
+                                if (history.Count == pageCount)
+                                {
+                                    versionTo = new ChangesetVersionSpec(history.Last().ChangesetId - 1);
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                         }
 
                         // Get the latest work item tracking activity.
                         IEnumerable<ComponentActivityInfo> workItemActivities = null;
-                        if (!task.IsCanceled)
+                        if (!task.IsCanceled && componentTypes.HasFlag(ActivityComponentTypes.WorkItemTracking))
                         {
                             var parameters = new Dictionary<string, object>() {
                                 { "TeamProject", teamProject.Name}
                             };
-                            var workItemsQuery = wit.Query("SELECT [System.Id], [System.ChangedDate], [System.Title] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] DESC", parameters);
+                            var queryBuilder = new StringBuilder();
+                            queryBuilder.Append("SELECT [System.Id], [System.ChangedDate], [System.Title] FROM WorkItems WHERE [System.TeamProject] = @TeamProject");
+                            for (var userExclusionIndex = 0; userExclusionIndex < userExclusions.Length; userExclusionIndex++)
+                            {
+                                var userParameterName = "User" + userExclusionIndex;
+                                queryBuilder.AppendFormat(" AND [System.ChangedBy] NOT CONTAINS @{0}", userParameterName);
+                                parameters.Add(userParameterName, userExclusions[userExclusionIndex]);
+                            }
+                            queryBuilder.Append(" ORDER BY [System.ChangedDate] DESC");
+                            var workItemsQuery = wit.Query(queryBuilder.ToString(), parameters);
                             var workItems = workItemsQuery.Cast<WorkItem>().Take(numberOfActivities).ToList();
                             workItemActivities = workItems.Select(w => new ComponentActivityInfo("Work Item Tracking", w.ChangedDate, w.ChangedBy, string.Format(CultureInfo.CurrentCulture, "{0} {1}: {2}", w.Type.Name, w.Id, w.Title))).ToList();
                         }
 
                         // Get the latest builds.
-                        IEnumerable<ComponentActivityInfo> teamBuildActivities = null;
-                        if (!task.IsCanceled)
+                        var teamBuildActivities = new List<ComponentActivityInfo>();
+                        if (!task.IsCanceled && componentTypes.HasFlag(ActivityComponentTypes.TeamBuild))
                         {
-                            var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
-                            spec.QueryOptions = QueryOptions.Definitions | QueryOptions.BatchedRequests;
-                            spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
-                            spec.MaxBuildsPerDefinition = numberOfActivities;
-                            spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
-                            var builds = buildServer.QueryBuilds(spec).Builds;
-                            teamBuildActivities = builds.OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, b.RequestedFor, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name)));
+                            // Retrieve at least 2 builds to get the "manual paging" system working.
+                            var pageSize = Math.Max(2, numberOfActivities);
+                            IBuildDetail lastRetrievedBuild = null;
+                            while (true)
+                            {
+                                var spec = buildServer.CreateBuildDetailSpec(teamProject.Name);
+                                spec.QueryOptions = QueryOptions.Definitions | QueryOptions.BatchedRequests;
+                                spec.QueryOrder = BuildQueryOrder.StartTimeDescending;
+                                spec.MaxBuildsPerDefinition = pageSize;
+                                spec.QueryDeletedOption = QueryDeletedOption.IncludeDeleted;
+                                if (lastRetrievedBuild != null)
+                                {
+                                    // There is no paging API for build queries, so we page the results manually by
+                                    // limiting on the max finish time as being the finish time of the last returned result.
+                                    // This will yield an overlap of 1 build per page which we can filter out.
+                                    spec.MaxFinishTime = lastRetrievedBuild.FinishTime;
+                                }
+                                var pagedBuilds = buildServer.QueryBuilds(spec).Builds.Where(b => lastRetrievedBuild == null || b.Uri != lastRetrievedBuild.Uri).ToArray();
+                                lastRetrievedBuild = pagedBuilds.LastOrDefault();
+                                teamBuildActivities.AddRange(pagedBuilds.Where(b => string.IsNullOrEmpty(b.RequestedFor) || !userExclusions.Any(x => b.RequestedFor.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)).OrderByDescending(b => b.StartTime).Take(numberOfActivities).Select(b => new ComponentActivityInfo("Team Build", b.StartTime, b.RequestedFor, string.Format(CultureInfo.CurrentCulture, "Build Number \"{0}\" from Build Definition \"{1}\"", b.BuildNumber, b.BuildDefinition.Name))));
+                                if (!pagedBuilds.Any() || teamBuildActivities.Count >= numberOfActivities)
+                                {
+                                    break;
+                                }
+                            }
                         }
 
                         // Assemble the complete activity details.

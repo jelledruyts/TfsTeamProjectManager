@@ -72,6 +72,10 @@ namespace TeamProjectManager.Common.Infrastructure
                 {
                     return singular.Substring(0, singular.Length - 1) + "ies";
                 }
+                else if (singular.EndsWith("ch", StringComparison.OrdinalIgnoreCase))
+                {
+                    return singular + "es";
+                }
                 else
                 {
                     return singular + "s";

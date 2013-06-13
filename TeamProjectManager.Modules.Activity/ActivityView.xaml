@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="600" d:DesignWidth="800">
     <Grid>
         <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
 
@@ -25,15 +25,27 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Number Of Activities" />
+                <Label Grid.Row="0" Grid.Column="0" Content="Number Of Activities Per Team Project" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=NumberOfActivities, UpdateSourceTrigger=PropertyChanged}" ToolTip="The total number of activities to retrieve for each Team Project" />
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Exclude Source Control Changeset When Comment Contains" Margin="0,5,0,0" />
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=SourceControlExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" />
+                <Label Grid.Row="1" Grid.Column="0" Content="Activity Components" Margin="0,5,0,0" />
+                <WrapPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" VerticalAlignment="Center">
+                    <CheckBox Content="Source Control" VerticalAlignment="Center" IsChecked="{Binding Path=SourceControlComponentEnabled}" />
+                    <CheckBox Content="Work Item Tracking" VerticalAlignment="Center" IsChecked="{Binding Path=WorkItemTrackingComponentEnabled}" Margin="5,0,0,0" />
+                    <CheckBox Content="Team Build" VerticalAlignment="Center" IsChecked="{Binding Path=TeamBuildComponentEnabled}" Margin="5,0,0,0" />
+                </WrapPanel>
 
-                <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Get Activity" Command="{Binding Path=GetActivityCommand}" Margin="0,5,0,0" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Exclude User(s)" Margin="0,5,0,0" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=UserExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="E.g. to exclude Team Build service accounts. Separate multiple entries with a semicolon (;)" />
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Source Control: Exclude When Comment Contains" Margin="0,5,0,0" IsEnabled="{Binding Path=SourceControlComponentEnabled, Mode=OneWay}" />
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=SourceControlCommentExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" IsEnabled="{Binding Path=SourceControlComponentEnabled, Mode=OneWay}" />
+
+                <Button Grid.Row="4" Grid.ColumnSpan="2" Content="Get Activity" Command="{Binding Path=GetActivityCommand}" Margin="0,5,0,0" />
             </Grid>
             
             <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=Activities}" x:Name="activitiesDataGrid" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" SelectedItem="{Binding Path=SelectedActivity}" MouseDoubleClick="activitiesDataGrid_MouseDoubleClick">

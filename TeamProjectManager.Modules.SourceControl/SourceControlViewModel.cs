@@ -294,7 +294,9 @@ namespace TeamProjectManager.Modules.SourceControl
                 else
                 {
                     this.BranchHierarchies = (IList<BranchInfo>)e.Result;
-                    task.SetComplete("Retrieved " + this.BranchHierarchies.Count.ToCountString("branch hierarchies"));
+                    var totalBranchCount = this.BranchHierarchies.Count + this.BranchHierarchies.Sum(b => b.RecursiveChildCount);
+                    var maxTreeDepth = this.BranchHierarchies.Max(b => b.MaxTreeDepth);
+                    task.SetComplete("Retrieved {0} with a total of {1} and a maximum depth of {2}".FormatCurrent(this.BranchHierarchies.Count.ToCountString("branch hierarchies"), totalBranchCount.ToCountString("branch"), maxTreeDepth));
                 }
             };
             worker.RunWorkerAsync();

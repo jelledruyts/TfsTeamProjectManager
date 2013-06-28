@@ -13,7 +13,7 @@ namespace TeamProjectManager.Modules.SourceControl
             var branch = value as BranchInfo;
             if (branch != null)
             {
-                var tooltip = "Owner: {1}{0}Date Created: {2}{0}Child Branches: {3}{0}Child Branches (Recursive): {4}{0}Max. Tree Depth: {5}".FormatCurrent(Environment.NewLine, branch.Owner, branch.DateCreated, branch.Children.Length, branch.RecursiveChildCount, branch.MaxTreeDepth);
+                var tooltip = "Owner: {1}{0}Date Created: {2}{0}Child Branches: {3}{0}Child Branches (Recursive): {4}{0}Depth: {5}{0}Maximum Tree Depth: {6}".FormatCurrent(Environment.NewLine, branch.Owner, branch.DateCreated, branch.Children.Length, branch.RecursiveChildCount, branch.BranchDepth, branch.MaxTreeDepth);
                 if (!string.IsNullOrEmpty(branch.Description))
                 {
                     tooltip += "{0}Description: {1}".FormatCurrent(Environment.NewLine, branch.Description);

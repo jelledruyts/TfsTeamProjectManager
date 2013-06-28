@@ -78,12 +78,24 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0" Content="Get Branch Hierarchies" Command="{Binding Path=ViewBranchHierarchiesCommand}" />
-                    <TreeView Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=BranchHierarchies}">
+                    <TextBlock Grid.Row="1" Text="{Binding Path=BranchHierarchiesInfoMessage}" Margin="0,5,0,0" TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=BranchHierarchiesInfoMessage}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TreeView Grid.Row="2" Margin="0,5,0,0" ItemsSource="{Binding Path=BranchHierarchies}">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="IsExpanded" Value="True" />
@@ -95,7 +107,7 @@
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
                     </TreeView>
-                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                    <WrapPanel Grid.Row="3" Margin="0,5,0,0">
                         <Button Content="Export" Command="{Binding Path=ExportBranchHierarchiesCommand}" />
                         <Label Content="As" Margin="5,0,0,0" VerticalAlignment="Center" />
                         <ComboBox Margin="5,0,0,0">

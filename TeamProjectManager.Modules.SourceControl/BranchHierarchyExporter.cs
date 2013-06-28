@@ -12,11 +12,21 @@ namespace TeamProjectManager.Modules.SourceControl
     {
         #region Constants
 
-        private const string CategoryIdRootBranch = "RootBranch";
-        private const string CategoryIdChildBranch = "ChildBranch";
-        private const string CategoryIdLeafBranch = "LeafBranch";
-        private const string CategoryIdOrphanBranch = "OrphanBranch";
-        private const string CategoryIdTeamProject = "TeamProject";
+        private const string CategoryIdRootBranch = "Root Branch";
+        private const string CategoryIdChildBranch = "Child Branch";
+        private const string CategoryIdLeafBranch = "Leaf Branch";
+        private const string CategoryIdOrphanBranch = "Orphan Branch";
+        private const string CategoryIdTeamProject = "Team Project";
+        private const string PropertyIdId = "Id";
+        private const string PropertyIdLabel = "Label";
+        private const string PropertyIdCategory = "Category";
+        private const string PropertyIdGroup = "Group";
+        private const string PropertyIdDescription = "Description";
+        private const string PropertyIdDateCreated = "DateCreated";
+        private const string PropertyIdOwner = "Owner";
+        private const string PropertyIdBranchDepth = "BranchDepth";
+        private const string PropertyIdMaxTreeDepth = "MaxTreeDepth";
+        private const string PropertyIdTeamProject = "TeamProject";
 
         #endregion
 
@@ -86,9 +96,12 @@ namespace TeamProjectManager.Modules.SourceControl
 
                 // Write the (static) properties.
                 writer.WriteStartElement("Properties");
-                WriteProperty(writer, "Description", "Description", typeof(string));
-                WriteProperty(writer, "DateCreated", "Date Created", typeof(DateTime));
-                WriteProperty(writer, "Owner", "Owner", typeof(string));
+                WriteProperty(writer, PropertyIdDescription, "Description", typeof(string));
+                WriteProperty(writer, PropertyIdDateCreated, "Date Created", typeof(DateTime));
+                WriteProperty(writer, PropertyIdOwner, "Owner", typeof(string));
+                WriteProperty(writer, PropertyIdTeamProject, "Team Project", typeof(string));
+                WriteProperty(writer, PropertyIdBranchDepth, "Branch Depth", typeof(int));
+                WriteProperty(writer, PropertyIdMaxTreeDepth, "Maximum Tree Depth", typeof(int));
                 writer.WriteEndElement(); // </Properties>
 
                 writer.WriteEndElement(); // </DirectedGraph>
@@ -101,17 +114,17 @@ namespace TeamProjectManager.Modules.SourceControl
             if (!teamProjects.Contains(branch.TeamProjectName))
             {
                 writer.WriteStartElement("Node");
-                writer.WriteAttributeString("Id", branch.TeamProjectName);
-                writer.WriteAttributeString("Label", branch.TeamProjectName);
-                writer.WriteAttributeString("Category", CategoryIdTeamProject);
-                writer.WriteAttributeString("Group", "Collapsed");
+                writer.WriteAttributeString(PropertyIdId, branch.TeamProjectName);
+                writer.WriteAttributeString(PropertyIdLabel, branch.TeamProjectName);
+                writer.WriteAttributeString(PropertyIdCategory, CategoryIdTeamProject);
+                writer.WriteAttributeString(PropertyIdGroup, "Collapsed");
                 writer.WriteEndElement(); // </Node>
                 teamProjects.Add(branch.TeamProjectName);
             }
 
             writer.WriteStartElement("Node");
-            writer.WriteAttributeString("Id", branch.Path);
-            writer.WriteAttributeString("Label", branch.Path);
+            writer.WriteAttributeString(PropertyIdId, branch.Path);
+            writer.WriteAttributeString(PropertyIdLabel, branch.Path);
             string category;
             if (branch.Parent == null && !branch.Children.Any())
             {
@@ -129,16 +142,22 @@ namespace TeamProjectManager.Modules.SourceControl
             {
                 category = CategoryIdChildBranch;
             }
-            writer.WriteAttributeString("Category", category);
+            writer.WriteAttributeString(PropertyIdCategory, category);
             if (!string.IsNullOrEmpty(branch.Description))
             {
-                writer.WriteAttributeString("Description", branch.Description);
+                writer.WriteAttributeString(PropertyIdDescription, branch.Description);
             }
-            writer.WriteAttributeString("DateCreated", branch.DateCreated.ToString("o", CultureInfo.InvariantCulture));
+            writer.WriteAttributeString(PropertyIdDateCreated, branch.DateCreated.ToString("o", CultureInfo.InvariantCulture));
             if (!string.IsNullOrEmpty(branch.Owner))
             {
-                writer.WriteAttributeString("Owner", branch.Owner);
+                writer.WriteAttributeString(PropertyIdOwner, branch.Owner);
             }
+            if (!string.IsNullOrEmpty(branch.TeamProjectName))
+            {
+                writer.WriteAttributeString(PropertyIdTeamProject, branch.TeamProjectName);
+            }
+            writer.WriteAttributeString(PropertyIdBranchDepth, branch.BranchDepth.ToString());
+            writer.WriteAttributeString(PropertyIdMaxTreeDepth, branch.MaxTreeDepth.ToString());
             writer.WriteEndElement(); // </Node>
 
             // Recursively write children.
@@ -194,7 +213,7 @@ namespace TeamProjectManager.Modules.SourceControl
             writer.WriteStartElement("Style");
             writer.WriteAttributeString("TargetType", "Node");
             writer.WriteAttributeString("GroupLabel", label);
-            writer.WriteAttributeString("ValueLabel", "True");
+            writer.WriteAttributeString("ValueLabel", label);
             writer.WriteStartElement("Condition");
             writer.WriteAttributeString("Expression", string.Format(CultureInfo.InvariantCulture, "HasCategory('{0}')", categoryId));
             writer.WriteEndElement(); // </Condition>

@@ -48,6 +48,14 @@ namespace TeamProjectManager.Modules.SourceControl
 
         public static ObservableProperty<SourceControlSettings> SelectedSourceControlSettingsProperty = new ObservableProperty<SourceControlSettings, SourceControlViewModel>(o => o.SelectedSourceControlSettings, new SourceControlSettings());
 
+        public string BranchHierarchiesInfoMessage
+        {
+            get { return this.GetValue(BranchHierarchiesInfoMessageProperty); }
+            set { this.SetValue(BranchHierarchiesInfoMessageProperty, value); }
+        }
+
+        public static readonly ObservableProperty<string> BranchHierarchiesInfoMessageProperty = new ObservableProperty<string, SourceControlViewModel>(o => o.BranchHierarchiesInfoMessage);
+
         public IList<BranchInfo> BranchHierarchies
         {
             get { return this.GetValue(BranchHierarchiesProperty); }
@@ -290,13 +298,16 @@ namespace TeamProjectManager.Modules.SourceControl
                     Logger.Log("An unexpected exception occurred while retrieving branch hierarchies", e.Error);
                     task.SetError(e.Error);
                     task.SetComplete("An unexpected exception occurred");
+                    this.BranchHierarchiesInfoMessage = null;
                 }
                 else
                 {
                     this.BranchHierarchies = (IList<BranchInfo>)e.Result;
                     var totalBranchCount = this.BranchHierarchies.Count + this.BranchHierarchies.Sum(b => b.RecursiveChildCount);
                     var maxTreeDepth = this.BranchHierarchies.Max(b => b.MaxTreeDepth);
-                    task.SetComplete("Retrieved {0} with a total of {1} and a maximum depth of {2}".FormatCurrent(this.BranchHierarchies.Count.ToCountString("branch hierarchies"), totalBranchCount.ToCountString("branch"), maxTreeDepth));
+                    var infoMessage = "Retrieved {0} with a total of {1} and a maximum depth of {2}".FormatCurrent(this.BranchHierarchies.Count.ToCountString("branch hierarchy"), totalBranchCount.ToCountString("branch"), maxTreeDepth);
+                    task.SetComplete(infoMessage);
+                    this.BranchHierarchiesInfoMessage = infoMessage;
                 }
             };
             worker.RunWorkerAsync();

@@ -71,7 +71,7 @@ namespace TeamProjectManager.Modules.SourceControl
         }
 
         public static readonly ObservableProperty<BranchHierarchyExportFormat> ExportFormatProperty = new ObservableProperty<BranchHierarchyExportFormat, SourceControlViewModel>(o => o.ExportFormat);
-        
+
         public bool ExportBranchHierarchiesPerTeamProject
         {
             get { return this.GetValue(ExportBranchHierarchiesPerTeamProjectProperty); }
@@ -79,7 +79,7 @@ namespace TeamProjectManager.Modules.SourceControl
         }
 
         public static readonly ObservableProperty<bool> ExportBranchHierarchiesPerTeamProjectProperty = new ObservableProperty<bool, SourceControlViewModel>(o => o.ExportBranchHierarchiesPerTeamProject);
-        
+
         #endregion
 
         #region Constructors
@@ -304,7 +304,7 @@ namespace TeamProjectManager.Modules.SourceControl
                 {
                     this.BranchHierarchies = (IList<BranchInfo>)e.Result;
                     var totalBranchCount = this.BranchHierarchies.Count + this.BranchHierarchies.Sum(b => b.RecursiveChildCount);
-                    var maxTreeDepth = this.BranchHierarchies.Max(b => b.MaxTreeDepth);
+                    var maxTreeDepth = this.BranchHierarchies.Any() ? this.BranchHierarchies.Max(b => b.MaxTreeDepth) : 0;
                     var infoMessage = "Retrieved {0} with a total of {1} and a maximum depth of {2}".FormatCurrent(this.BranchHierarchies.Count.ToCountString("branch hierarchy"), totalBranchCount.ToCountString("branch"), maxTreeDepth);
                     task.SetComplete(infoMessage);
                     this.BranchHierarchiesInfoMessage = infoMessage;

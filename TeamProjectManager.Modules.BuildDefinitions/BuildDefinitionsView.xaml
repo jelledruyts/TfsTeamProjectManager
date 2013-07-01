@@ -47,6 +47,7 @@
                             <DataGridTextColumn Header="MSBuild Platform" Binding="{Binding Path=MSBuildPlatform}" />
                             <DataGridTextColumn Header="Private Drop Location" Binding="{Binding Path=PrivateDropLocation}" />
                             <DataGridTextColumn Header="Solution Specific Build Outputs" Binding="{Binding Path=SolutionSpecificBuildOutputs}" />
+                            <DataGridTextColumn Header="Max Retention Policy" Binding="{Binding Path=MaxBuildsToKeepByRetentionPolicy}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <WrapPanel Grid.Row="2" Margin="0,5,0,0">

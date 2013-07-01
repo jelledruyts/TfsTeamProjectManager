@@ -66,6 +66,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
         public int ContinuousIntegrationQuietPeriod { get; set; }
         public int BatchSize { get; set; }
         public DateTime? LastBuildStartTime { get; set; }
+        public string MaxBuildsToKeepByRetentionPolicy { get; set; }
 
         // Process Template-Specific Basic Properties
         public string BuildNumberFormat { get; set; }
@@ -112,6 +113,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             if (builds.Any())
             {
                 this.LastBuildStartTime = builds.First().StartTime;
+            }
+            if (buildDefinition.RetentionPolicyList.Any())
+            {
+                var maxNumberToKeep = buildDefinition.RetentionPolicyList.Max(r => r.NumberToKeep);
+                this.MaxBuildsToKeepByRetentionPolicy = "Keep " + (maxNumberToKeep == 0 ? "None" : (maxNumberToKeep == int.MaxValue ? "All" : (maxNumberToKeep == 1 ? "Latest Only" : maxNumberToKeep + " Latest")));
             }
 
             var scheduleDescription = new StringBuilder();

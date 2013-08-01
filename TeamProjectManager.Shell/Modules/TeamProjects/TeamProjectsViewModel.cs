@@ -232,7 +232,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11, "Team Foundation Server 2012", "TFS 2012.0");
                 }
-                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestResultsServiceEx", StringComparison.OrdinalIgnoreCase)))
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService4", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V10SP1, "Team Foundation Server 2010 Service Pack 1", "TFS 2010 SP1");
                 }

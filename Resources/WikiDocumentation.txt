@@ -88,12 +88,15 @@ Note that configuring check-in policies is not supported at this time.
 
 [image:Update Source Control Settings|SourceControl-UpdateSettings.png]
 
-!!! View Latest Changesets
+!!! View Branch Hierarchies
 
-Allows you to retrieve the latest changesets across Team Projects, optionally excluding changesets with specific comments.
-This can be useful if you want to see which projects are still actively being worked on, for example.
+Allows you to get an overview of the branches across multiple Team Projects.
 
-[image:View Latest Changesets|SourceControl-ViewLatestChangesets.png]
+[image:View Branch Hierarchies|SourceControl-ViewBranchHierarchies.png]
+
+You can also export the hierarchy to XML or DGML so it can be visualized and interacted with in Visual Studio.
+
+[image:Export Branch Hierarchies As DGML|SourceControl-ViewBranchHierarchies-ExportedDgml.png]
 
 {anchor:Work Item Configuration - Compare}
 !! Work Item Configuration - Compare

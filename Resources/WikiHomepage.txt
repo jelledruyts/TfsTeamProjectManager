@@ -51,6 +51,10 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v1.6.4968 (August 8th, 2013)
+** Source Control module now allows you to visualize the branch hierarchies across Team Projects and export as XML or DGML.
+** Source Control module no longer has "View Latest Changesets" screen since this functionality is now contained in the Activity module.
+** Activity module now allows user to choose the components to scan for activity.
 * v1.6.4891 (May 23rd, 2013)
 ** Added support for macros (e.g. $$PROJECTNAME$$) to be replaced when editing/transforming work item configurations.
 ** Added support for simulation and saving a copy of any change to the work item configuration files.

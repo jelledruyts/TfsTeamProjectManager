@@ -25,7 +25,7 @@ Team Project Manager can help you...
 * *Manage source control*
 ** Understand which projects have which source control settings (multiple check-out, get latest on check-out, check-in notes)
 ** Update source control settings
-** Retrieve the latest changesets (e.g. to see which projects are still active)
+** Visualize branch hierarchies
 * *Manage work item configuration*
 ** Compare work item configurations (i.e. work item type definitions, categories, process configuration) with various sources, e.g. to determine which Process Template was likely used to create which project
 ** Understand which projects use which work item types and how many work items there are of each
@@ -52,7 +52,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 !! What's New?
 
 * v1.6.4968 (August 8th, 2013)
-** Source Control module now allows you to visualize the branch hierarchies across Team Projects and export as XML or DGML.
+** Source Control module now allows you to visualize the branch hierarchies across Team Projects and export them as XML or DGML.
 ** Source Control module no longer has "View Latest Changesets" screen since this functionality is now contained in the Activity module.
 ** Activity module now allows user to choose the components to scan for activity.
 * v1.6.4891 (May 23rd, 2013)

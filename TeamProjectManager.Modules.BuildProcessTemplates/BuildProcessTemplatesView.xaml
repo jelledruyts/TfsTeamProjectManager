@@ -41,18 +41,26 @@
                             </Grid>
                         </TabItem>
                         <TabItem Header="By Server Path">
-                            <TreeView ItemsSource="{Binding Path=BuildProcessHierarchy}">
-                                <TreeView.ItemContainerStyle>
-                                    <Style TargetType="{x:Type TreeViewItem}">
-                                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
-                                    </Style>
-                                </TreeView.ItemContainerStyle>
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                        <TextBlock Text="{Binding Path=DisplayName}" ToolTip="{Binding Path=Description}" Foreground="{Binding Path=., Converter={StaticResource BuildProcessHierarchyNodeColorConverter}}" />
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <CheckBox Grid.Row="0" IsChecked="{Binding Path=BuildProcessHierarchyHidesUnused}" Content="Hide unused Build Process Templates" />
+                                <TreeView Grid.Row="1" ItemsSource="{Binding Path=BuildProcessHierarchy}" Margin="0,5,0,0">
+                                    <TreeView.ItemContainerStyle>
+                                        <Style TargetType="{x:Type TreeViewItem}">
+                                            <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
+                                        </Style>
+                                    </TreeView.ItemContainerStyle>
+                                    <TreeView.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                            <TextBlock Text="{Binding Path=DisplayName}" ToolTip="{Binding Path=Description}" Foreground="{Binding Path=., Converter={StaticResource BuildProcessHierarchyNodeColorConverter}}" />
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </Grid>

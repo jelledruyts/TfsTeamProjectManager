@@ -220,9 +220,13 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService3", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService6", StringComparison.OrdinalIgnoreCase)))
                 {
-                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11Update2, "Team Foundation Server 2012 Update 2", "TFS 2012.2");
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V12, "Team Foundation Server 2013", "TFS 2013.0");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService3", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V11Update2, "Team Foundation Server 2012 Update 2, 3 or 4", "TFS 2012.2/3/4");
                 }
                 else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "TestManagement", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "TestManagementWebService2", StringComparison.OrdinalIgnoreCase)))
                 {

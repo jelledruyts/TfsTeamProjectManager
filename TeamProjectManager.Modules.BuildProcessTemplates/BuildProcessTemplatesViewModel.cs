@@ -96,6 +96,19 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         public static readonly ObservableProperty<IEnumerable<BuildProcessHierarchyNode>> BuildProcessHierarchyProperty = new ObservableProperty<IEnumerable<BuildProcessHierarchyNode>, BuildProcessTemplatesViewModel>(o => o.BuildProcessHierarchy);
 
+        public bool BuildProcessHierarchyHidesUnused
+        {
+            get { return this.GetValue(BuildProcessHierarchyHidesUnusedProperty); }
+            set { this.SetValue(BuildProcessHierarchyHidesUnusedProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> BuildProcessHierarchyHidesUnusedProperty = new ObservableProperty<bool, BuildProcessTemplatesViewModel>(o => o.BuildProcessHierarchyHidesUnused, OnBuildProcessHierarchyHidesUnused);
+
+        private static void OnBuildProcessHierarchyHidesUnused(object sender, ObservablePropertyChangedEventArgs e)
+        {
+            ((BuildProcessTemplatesViewModel)sender).RefreshBuildProcessHierarchy();
+        }
+
         #endregion
 
         #region Constructors
@@ -179,22 +192,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
                 {
                     var buildProcessTemplates = (IList<BuildProcessTemplateInfo>)e.Result;
                     this.BuildProcessTemplates = buildProcessTemplates;
-                    var serverPathNodes = new List<BuildProcessHierarchyNode>();
-                    foreach (var buildProcessTemplatesByServerPath in buildProcessTemplates.GroupBy(b => b.ProcessTemplate.ServerPath).OrderBy(g => g.Key))
-                    {
-                        var buildProcessTemplatesForServerPath = buildProcessTemplatesByServerPath.ToList();
-                        var teamProjectNodes = new List<BuildProcessHierarchyNode>();
-                        foreach (var buildProcessTemplatesByTeamProject in buildProcessTemplatesForServerPath.GroupBy(b => b.ProcessTemplate.TeamProject).OrderBy(g => g.Key))
-                        {
-                            var buildProcessTemplatesForTeamProject = buildProcessTemplatesByTeamProject.ToList();
-                            var buildDefinitionNodes = buildProcessTemplatesForTeamProject.SelectMany(b => b.BuildDefinitions).OrderBy(d => d.Name).Select(d => new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildDefinition, d.Name, null, null)).ToList();
-                            var teamProjectNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.TeamProject, buildProcessTemplatesByTeamProject.Key, buildProcessTemplatesForTeamProject, buildDefinitionNodes);
-                            teamProjectNodes.Add(teamProjectNode);
-                        }
-                        var serverPathNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildProcessTemplateServerPath, buildProcessTemplatesByServerPath.Key, buildProcessTemplatesForServerPath, teamProjectNodes);
-                        serverPathNodes.Add(serverPathNode);
-                    }
-                    this.BuildProcessHierarchy = serverPathNodes;
+                    RefreshBuildProcessHierarchy();
                     task.SetComplete("Retrieved " + buildProcessTemplates.Count().ToCountString("build process template"));
                 }
             };
@@ -287,6 +285,37 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
         protected override bool IsTfsSupported(TeamFoundationServerInfo server)
         {
             return server.MajorVersion >= TfsMajorVersion.V10;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void RefreshBuildProcessHierarchy()
+        {
+            var serverPathNodes = new List<BuildProcessHierarchyNode>();
+            foreach (var buildProcessTemplatesByServerPath in this.BuildProcessTemplates.GroupBy(b => b.ProcessTemplate.ServerPath).OrderBy(g => g.Key))
+            {
+                var buildProcessTemplatesForServerPath = buildProcessTemplatesByServerPath.ToList();
+                var teamProjectNodes = new List<BuildProcessHierarchyNode>();
+                foreach (var buildProcessTemplatesByTeamProject in buildProcessTemplatesForServerPath.GroupBy(b => b.ProcessTemplate.TeamProject).OrderBy(g => g.Key))
+                {
+                    var buildProcessTemplatesForTeamProject = buildProcessTemplatesByTeamProject.ToList();
+                    var buildDefinitionNodes = buildProcessTemplatesForTeamProject.SelectMany(b => b.BuildDefinitions).OrderBy(d => d.Name).Select(d => new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildDefinition, d.Name, null, null)).ToList();
+                    buildDefinitionNodes = buildDefinitionNodes.Where(n => !(this.BuildProcessHierarchyHidesUnused && !n.HasBuildDefinitions)).ToList();
+                    var teamProjectNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.TeamProject, buildProcessTemplatesByTeamProject.Key, buildProcessTemplatesForTeamProject, buildDefinitionNodes);
+                    if (!(this.BuildProcessHierarchyHidesUnused && !teamProjectNode.HasBuildDefinitions))
+                    {
+                        teamProjectNodes.Add(teamProjectNode);
+                    }
+                }
+                var serverPathNode = new BuildProcessHierarchyNode(BuildProcessHierarchyNodeType.BuildProcessTemplateServerPath, buildProcessTemplatesByServerPath.Key, buildProcessTemplatesForServerPath, teamProjectNodes);
+                if (!(this.BuildProcessHierarchyHidesUnused && !serverPathNode.HasBuildDefinitions))
+                {
+                    serverPathNodes.Add(serverPathNode);
+                }
+            }
+            this.BuildProcessHierarchy = serverPathNodes;
         }
 
         #endregion

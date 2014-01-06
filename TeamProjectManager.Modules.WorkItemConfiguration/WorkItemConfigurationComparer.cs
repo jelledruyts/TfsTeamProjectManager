@@ -13,14 +13,42 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             var itemResults = new List<WorkItemConfigurationItemComparisonResult>();
 
-            foreach (var itemOnlyInSource in source.Items.Where(s => !target.Items.Any(t => s.Type == t.Type && string.Equals(s.Name, t.Name, StringComparison.OrdinalIgnoreCase))))
+            var sourceItems = source.Items.ToList();
+            var targetItems = target.Items.ToList();
+
+            // Ignore TFS 2012 agile/common config when both source and target have TFS 2013 process config.
+            if (sourceItems.Any(i => i.Type == WorkItemConfigurationItemType.ProcessConfiguration) && targetItems.Any(i => i.Type == WorkItemConfigurationItemType.ProcessConfiguration))
+            {
+                sourceItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.CommonConfiguration || i.Type == WorkItemConfigurationItemType.AgileConfiguration);
+                targetItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.CommonConfiguration || i.Type == WorkItemConfigurationItemType.AgileConfiguration);
+            }
+
+            // If the source doesn't have categories or agile/common/process config, ignore them in the target as well.
+            if (!sourceItems.Any(i => i.Type == WorkItemConfigurationItemType.Categories))
+            {
+                targetItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.Categories);
+            }
+            if (!sourceItems.Any(i => i.Type == WorkItemConfigurationItemType.AgileConfiguration))
+            {
+                targetItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.AgileConfiguration);
+            }
+            if (!sourceItems.Any(i => i.Type == WorkItemConfigurationItemType.CommonConfiguration))
+            {
+                targetItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.CommonConfiguration);
+            }
+            if (!sourceItems.Any(i => i.Type == WorkItemConfigurationItemType.ProcessConfiguration))
+            {
+                targetItems.RemoveAll(i => i.Type == WorkItemConfigurationItemType.ProcessConfiguration);
+            }
+
+            foreach (var itemOnlyInSource in sourceItems.Where(s => !targetItems.Any(t => s.Type == t.Type && string.Equals(s.Name, t.Name, StringComparison.OrdinalIgnoreCase))))
             {
                 itemResults.Add(new WorkItemConfigurationItemComparisonResult(itemOnlyInSource.XmlDefinition, null, itemOnlyInSource.Name, itemOnlyInSource.Type, ComparisonStatus.ExistsOnlyInSource));
             }
 
-            foreach (var targetItem in target.Items)
+            foreach (var targetItem in targetItems)
             {
-                var sourceItem = source.Items.FirstOrDefault(s => s.Type == targetItem.Type && string.Equals(s.Name, targetItem.Name, StringComparison.OrdinalIgnoreCase));
+                var sourceItem = sourceItems.FirstOrDefault(s => s.Type == targetItem.Type && string.Equals(s.Name, targetItem.Name, StringComparison.OrdinalIgnoreCase));
                 if (sourceItem == null)
                 {
                     itemResults.Add(new WorkItemConfigurationItemComparisonResult(null, targetItem.XmlDefinition, targetItem.Name, targetItem.Type, ComparisonStatus.ExistsOnlyInTarget));

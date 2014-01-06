@@ -1,6 +1,7 @@
 ﻿using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Build.Common;
 using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
@@ -131,8 +132,16 @@ namespace TeamProjectManager.Modules.Security
             if (securityGroup.PermissionChanges.Any(p => p.Action != PermissionChangeAction.None))
             {
                 var projectStructures = css.ListStructures(teamProjectUrl);
-                var rootArea = projectStructures[0];
-                var rootIteration = projectStructures[1];
+                var rootArea = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectModelHierarchy);
+                if (rootArea == null)
+                {
+                    throw new InvalidOperationException("The root area could not be retrieved");
+                }
+                var rootIteration = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectLifecycle);
+                if (rootIteration == null)
+                {
+                    throw new InvalidOperationException("The root iteration could not be retrieved");
+                }
                 ApplyProjectPermission(auth, groupDescriptor, securityGroup.TeamProjectPermissions, PermissionNamespaces.Project + teamProjectUrl);
                 ApplyProjectPermission(auth, groupDescriptor, securityGroup.WorkItemAreasPermissions, rootArea.Uri);
                 ApplyProjectPermission(auth, groupDescriptor, securityGroup.WorkItemIterationsPermissions, rootIteration.Uri);

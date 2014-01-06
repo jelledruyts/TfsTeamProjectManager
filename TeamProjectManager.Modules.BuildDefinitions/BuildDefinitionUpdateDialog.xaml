@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Height="600"
+        Height="275"
+        MinHeight="275"
         Width="640">
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -14,131 +15,56 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
-                <GroupBox Header="General Properties">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Row="0" Header="Properties">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                        <CheckBox Grid.Row="0" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateQueueStatus}" Content="Status" />
-                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateQueueStatus}">
-                            <ComboBoxItem Content="Enabled" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Enabled}" />
-                            <ComboBoxItem Content="Paused" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Paused}" />
-                            <ComboBoxItem Content="Disabled" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Disabled}" />
-                        </ComboBox>
+                <CheckBox Grid.Row="0" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateQueueStatus}" Content="Status" />
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateQueueStatus}">
+                    <ComboBoxItem Content="Enabled" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Enabled}" />
+                    <ComboBoxItem Content="Paused" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Paused}" />
+                    <ComboBoxItem Content="Disabled" IsSelected="{Binding Path=QueueStatus, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Disabled}" />
+                </ComboBox>
 
-                        <CheckBox Grid.Row="1" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateBuildControllerName}" Content="Build Controller" />
-                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateBuildControllerName}" SelectedItem="{Binding BuildControllerName}" x:Name="buildControllerNameComboBox" />
+                <CheckBox Grid.Row="1" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateBuildControllerName}" Content="Build Controller" />
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateBuildControllerName}" SelectedItem="{Binding BuildControllerName}" x:Name="buildControllerNameComboBox" />
 
-                        <CheckBox Grid.Row="2" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateDefaultDropLocation}" Content="Default Drop Location" />
-                        <TextBox Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateDefaultDropLocation}" Text="{Binding DefaultDropLocation}" />
+                <CheckBox Grid.Row="2" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateDefaultDropLocation}" Content="Default Drop Location" />
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateDefaultDropLocation}" Text="{Binding DefaultDropLocation}" />
 
-                        <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateTriggerType}" Content="Trigger" />
-                        <ComboBox Grid.Row="3" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateTriggerType}">
-                            <ComboBoxItem Content="Manual" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=None}" />
-                            <ComboBoxItem Content="Continuous Integration" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ContinuousIntegration}" />
-                            <ComboBoxItem Content="Rolling" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BatchedContinuousIntegration}" />
-                            <ComboBoxItem Content="Gated Check-in" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=GatedCheckIn}" />
-                            <ComboBoxItem Content="Batched Gated Check-in" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BatchedGatedCheckIn}" />
-                            <ComboBoxItem Content="Schedule" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Schedule}" />
-                            <ComboBoxItem Content="Schedule (Forced)" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ScheduleForced}" />
-                        </ComboBox>
+                <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateTriggerType}" Content="Trigger" />
+                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateTriggerType}">
+                    <ComboBoxItem Content="Manual" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=None}" />
+                    <ComboBoxItem Content="Continuous Integration" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ContinuousIntegration}" />
+                    <ComboBoxItem Content="Rolling" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BatchedContinuousIntegration}" />
+                    <ComboBoxItem Content="Gated Check-in" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=GatedCheckIn}" />
+                    <ComboBoxItem Content="Batched Gated Check-in" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BatchedGatedCheckIn}" />
+                    <ComboBoxItem Content="Schedule" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Schedule}" />
+                    <ComboBoxItem Content="Schedule (Forced)" IsSelected="{Binding Path=TriggerType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=ScheduleForced}" />
+                </ComboBox>
 
-                        <CheckBox Grid.Row="4" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateContinuousIntegrationQuietPeriod}" Content="CI Quiet Period" />
-                        <TextBox Grid.Row="4" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateContinuousIntegrationQuietPeriod}" Text="{Binding ContinuousIntegrationQuietPeriod}" />
+                <CheckBox Grid.Row="4" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateContinuousIntegrationQuietPeriod}" Content="CI Quiet Period" />
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateContinuousIntegrationQuietPeriod}" Text="{Binding ContinuousIntegrationQuietPeriod}" />
 
-                        <CheckBox Grid.Row="5" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateBatchSize}" Content="Gated Batch Size" />
-                        <TextBox Grid.Row="5" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateBatchSize}" Text="{Binding BatchSize}" />
+                <CheckBox Grid.Row="5" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateBatchSize}" Content="Gated Batch Size" />
+                <TextBox Grid.Row="5" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateBatchSize}" Text="{Binding BatchSize}" />
 
-                        <CheckBox Grid.Row="6" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateProcessTemplate}" Content="Process Template" />
-                        <TextBox Grid.Row="6" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateProcessTemplate}" Text="{Binding ProcessTemplate}" />
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Process Template-Specific Properties">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <CheckBox Grid.Row="0" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateBuildNumberFormat}" Content="Build Number Format" />
-                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateBuildNumberFormat}" Text="{Binding BuildNumberFormat}" />
-
-                        <CheckBox Grid.Row="1" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateCleanWorkspace}" Content="Clean Workspace" />
-                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateCleanWorkspace}">
-                            <ComboBoxItem Content="All" IsSelected="{Binding Path=CleanWorkspace, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=All}" />
-                            <ComboBoxItem Content="Outputs" IsSelected="{Binding Path=CleanWorkspace, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Outputs}" />
-                            <ComboBoxItem Content="None" IsSelected="{Binding Path=CleanWorkspace, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=None}" />
-                        </ComboBox>
-
-                        <CheckBox Grid.Row="2" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateVerbosity}" Content="Logging Verbosity" />
-                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateVerbosity}">
-                            <ComboBoxItem Content="Minimal" IsSelected="{Binding Path=Verbosity, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Minimal}" />
-                            <ComboBoxItem Content="Normal" IsSelected="{Binding Path=Verbosity, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Normal}" />
-                            <ComboBoxItem Content="Detailed" IsSelected="{Binding Path=Verbosity, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Detailed}" />
-                            <ComboBoxItem Content="Diagnostic" IsSelected="{Binding Path=Verbosity, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Diagnostic}" />
-                        </ComboBox>
-
-                        <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateRunCodeAnalysis}" Content="Code Analysis" />
-                        <ComboBox Grid.Row="3" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateRunCodeAnalysis}">
-                            <ComboBoxItem Content="Never" IsSelected="{Binding Path=RunCodeAnalysis, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Never}" />
-                            <ComboBoxItem Content="As Configured" IsSelected="{Binding Path=RunCodeAnalysis, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=AsConfigured}" />
-                            <ComboBoxItem Content="Always" IsSelected="{Binding Path=RunCodeAnalysis, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Always}" />
-                        </ComboBox>
-
-                        <CheckBox Grid.Row="4" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateSourceServerEnabled}" Content="Source Server Enabled" />
-                        <CheckBox Grid.Row="4" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSourceServerEnabled}" IsChecked="{Binding SourceServerEnabled}" />
-
-                        <CheckBox Grid.Row="5" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateSymbolServerPath}" Content="Symbol Server" />
-                        <TextBox Grid.Row="5" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSymbolServerPath}" Text="{Binding SymbolServerPath}" />
-
-                        <CheckBox Grid.Row="6" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateMSBuildArguments}" Content="MSBuild Arguments" />
-                        <TextBox Grid.Row="6" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateMSBuildArguments}" Text="{Binding MSBuildArguments}" />
-
-                        <CheckBox Grid.Row="7" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateMSBuildMultiProc}" Content="MSBuild Multi-Proc" />
-                        <CheckBox Grid.Row="7" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateMSBuildMultiProc}" IsChecked="{Binding MSBuildMultiProc}" />
-
-                        <CheckBox Grid.Row="8" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateMSBuildPlatform}" Content="MSBuild Platform" />
-                        <ComboBox Grid.Row="8" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateMSBuildPlatform}">
-                            <ComboBoxItem Content="Auto" IsSelected="{Binding Path=MSBuildPlatform, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Auto}" />
-                            <ComboBoxItem Content="X86" IsSelected="{Binding Path=MSBuildPlatform, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=X86}" />
-                        </ComboBox>
-
-                        <CheckBox Grid.Row="9" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdatePrivateDropLocation}" Content="Private Drop Location" />
-                        <TextBox Grid.Row="9" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdatePrivateDropLocation}" Text="{Binding PrivateDropLocation}" />
-
-                        <CheckBox Grid.Row="10" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateSolutionSpecificBuildOutputs}" Content="Solution Specific Build Outputs" />
-                        <CheckBox Grid.Row="10" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateSolutionSpecificBuildOutputs}" IsChecked="{Binding SolutionSpecificBuildOutputs}" />
-
-                    </Grid>
-                </GroupBox>
-            </StackPanel>
-        </ScrollViewer>
+                <CheckBox Grid.Row="6" Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" IsChecked="{Binding UpdateProcessTemplate}" Content="Process Template" />
+                <TextBox Grid.Row="6" Grid.Column="1" Margin="5,5,0,0" IsEnabled="{Binding UpdateProcessTemplate}" Text="{Binding ProcessTemplate}" />
+            </Grid>
+        </GroupBox>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
             <Button Content="OK" Width="75" x:Name="okButton" Click="okButton_Click" />

@@ -36,17 +36,6 @@
                             <DataGridTextColumn Header="CI Quiet Period" Binding="{Binding Path=ContinuousIntegrationQuietPeriod}" />
                             <DataGridTextColumn Header="Gated Batch Size" Binding="{Binding Path=BatchSize}" />
                             <DataGridTextColumn Header="Process Template" Binding="{Binding Path=ProcessTemplate}" />
-                            <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
-                            <DataGridTextColumn Header="Clean Workspace" Binding="{Binding Path=CleanWorkspace}" />
-                            <DataGridTextColumn Header="Logging Verbosity" Binding="{Binding Path=Verbosity}" />
-                            <DataGridTextColumn Header="Code Analysis" Binding="{Binding Path=RunCodeAnalysis}" />
-                            <DataGridCheckBoxColumn Header="Source Server" Binding="{Binding Path=SourceServerEnabled, Mode=OneWay}" />
-                            <DataGridTextColumn Header="Symbol Server" Binding="{Binding Path=SymbolServerPath}" />
-                            <DataGridTextColumn Header="MSBuild Arguments" Binding="{Binding Path=MSBuildArguments}" />
-                            <DataGridTextColumn Header="MSBuild Multi-Proc" Binding="{Binding Path=MSBuildMultiProc}" />
-                            <DataGridTextColumn Header="MSBuild Platform" Binding="{Binding Path=MSBuildPlatform}" />
-                            <DataGridTextColumn Header="Private Drop Location" Binding="{Binding Path=PrivateDropLocation}" />
-                            <DataGridTextColumn Header="Solution Specific Build Outputs" Binding="{Binding Path=SolutionSpecificBuildOutputs}" />
                             <DataGridTextColumn Header="Max Retention Policy" Binding="{Binding Path=MaxBuildsToKeepByRetentionPolicy}" />
                         </DataGrid.Columns>
                     </DataGrid>

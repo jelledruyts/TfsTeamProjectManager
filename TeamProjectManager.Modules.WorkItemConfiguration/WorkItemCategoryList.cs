@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
-    [XmlRoot(Namespace = "http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/categories", ElementName = "CATEGORIES")]
+    [XmlRoot(Namespace = "http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/categories", ElementName = WorkItemConfigurationItem.CategoriesXmlElementName)]
     public class WorkItemCategoryList
     {
         [XmlElement(ElementName = "CATEGORY", Namespace = "")]

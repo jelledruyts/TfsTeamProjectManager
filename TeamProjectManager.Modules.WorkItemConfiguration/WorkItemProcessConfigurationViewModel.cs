@@ -28,6 +28,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public RelayCommand BrowseCommonConfigurationFilePathCommand { get; private set; }
         public RelayCommand BrowseAgileConfigurationFilePathCommand { get; private set; }
+        public RelayCommand BrowseProcessConfigurationFilePathCommand { get; private set; }
         public RelayCommand ImportProcessConfigurationsCommand { get; private set; }
 
         public bool Simulate { get; set; }
@@ -93,6 +94,48 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         /// </summary>
         public static readonly ObservableProperty<string> AgileConfigurationFilePathProperty = new ObservableProperty<string, WorkItemProcessConfigurationViewModel>(o => o.AgileConfigurationFilePath);
 
+        /// <summary>
+        /// Gets or sets the path to the process configuration file.
+        /// </summary>
+        public string ProcessConfigurationFilePath
+        {
+            get { return this.GetValue(ProcessConfigurationFilePathProperty); }
+            set { this.SetValue(ProcessConfigurationFilePathProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition for the <see cref="ProcessConfigurationFilePath"/> observable property.
+        /// </summary>
+        public static readonly ObservableProperty<string> ProcessConfigurationFilePathProperty = new ObservableProperty<string, WorkItemProcessConfigurationViewModel>(o => o.ProcessConfigurationFilePath);
+
+        /// <summary>
+        /// Gets or sets the visibility of the agile/common configuration import fields.
+        /// </summary>
+        public Visibility AgileCommonConfigImportVisibility
+        {
+            get { return this.GetValue(AgileCommonConfigImportVisibilityProperty); }
+            set { this.SetValue(AgileCommonConfigImportVisibilityProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition for the <see cref="AgileCommonConfigImportVisibility"/> observable property.
+        /// </summary>
+        public static readonly ObservableProperty<Visibility> AgileCommonConfigImportVisibilityProperty = new ObservableProperty<Visibility, WorkItemProcessConfigurationViewModel>(o => o.AgileCommonConfigImportVisibility, Visibility.Collapsed);
+
+        /// <summary>
+        /// Gets or sets the visibility of the process configuration import fields.
+        /// </summary>
+        public Visibility ProcessConfigImportVisibility
+        {
+            get { return this.GetValue(ProcessConfigImportVisibilityProperty); }
+            set { this.SetValue(ProcessConfigImportVisibilityProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition for the <see cref="ProcessConfigImportVisibility"/> observable property.
+        /// </summary>
+        public static readonly ObservableProperty<Visibility> ProcessConfigImportVisibilityProperty = new ObservableProperty<Visibility, WorkItemProcessConfigurationViewModel>(o => o.ProcessConfigImportVisibility, Visibility.Visible);
+
         #endregion
 
         #region Constructors
@@ -108,7 +151,17 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
             this.BrowseCommonConfigurationFilePathCommand = new RelayCommand(BrowseCommonConfigurationFilePath, CanBrowseCommonConfigurationFilePath);
             this.BrowseAgileConfigurationFilePathCommand = new RelayCommand(BrowseAgileConfigurationFilePath, CanBrowseAgileConfigurationFilePath);
+            this.BrowseProcessConfigurationFilePathCommand = new RelayCommand(BrowseProcessConfigurationFilePath, CanBrowseProcessConfigurationFilePath);
             this.ImportProcessConfigurationsCommand = new RelayCommand(ImportProcessConfigurations, CanImportProcessConfigurations);
+
+            this.PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == ViewModelBase.SelectedTeamProjectCollectionProperty.Name)
+                {
+                    UpdateProcessConfigurationVisibility();
+                }
+            };
+            UpdateProcessConfigurationVisibility();
         }
 
         #endregion
@@ -139,15 +192,26 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     try
                     {
                         var project = store.Projects[teamProject.Name];
-                        var commonConfiguration = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
-                        if (commonConfiguration != null)
+                        if (this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.V12)
                         {
-                            results.Add(new WorkItemConfigurationItemExport(teamProject, commonConfiguration));
+                            var processConfiguration = WorkItemConfigurationItemImportExport.GetProcessConfiguration(project);
+                            if (processConfiguration != null)
+                            {
+                                results.Add(new WorkItemConfigurationItemExport(teamProject, processConfiguration));
+                            }
                         }
-                        var agileConfiguration = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
-                        if (agileConfiguration != null)
+                        else
                         {
-                            results.Add(new WorkItemConfigurationItemExport(teamProject, agileConfiguration));
+                            var commonConfiguration = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
+                            if (commonConfiguration != null)
+                            {
+                                results.Add(new WorkItemConfigurationItemExport(teamProject, commonConfiguration));
+                            }
+                            var agileConfiguration = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
+                            if (agileConfiguration != null)
+                            {
+                                results.Add(new WorkItemConfigurationItemExport(teamProject, agileConfiguration));
+                            }
                         }
                     }
                     catch (Exception exc)
@@ -349,11 +413,35 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
+        #region BrowseProcessConfigurationFilePath Command
+
+        private bool CanBrowseProcessConfigurationFilePath(object argument)
+        {
+            return true;
+        }
+
+        private void BrowseProcessConfigurationFilePath(object argument)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Please select the Process Configuration XML file to import.";
+            dialog.Filter = "XML Files (*.xml)|*.xml";
+            var result = dialog.ShowDialog(Application.Current.MainWindow);
+            if (result == true)
+            {
+                this.ProcessConfigurationFilePath = dialog.FileName;
+            }
+        }
+
+        #endregion
+
         #region ImportProcessConfigurations Command
 
         private bool CanImportProcessConfigurations(object argument)
         {
-            return IsAnyTeamProjectSelected() && !(string.IsNullOrEmpty(this.CommonConfigurationFilePath) && string.IsNullOrEmpty(this.AgileConfigurationFilePath));
+            return IsAnyTeamProjectSelected() &&
+                this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.V12
+                ? !(string.IsNullOrEmpty(this.ProcessConfigurationFilePath))
+                : !(string.IsNullOrEmpty(this.CommonConfigurationFilePath) && string.IsNullOrEmpty(this.AgileConfigurationFilePath));
         }
 
         private void ImportProcessConfigurations(object argument)
@@ -375,13 +463,23 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             if (result == MessageBoxResult.Yes)
             {
                 var processConfigurations = new List<WorkItemConfigurationItem>();
-                if (File.Exists(this.CommonConfigurationFilePath))
+                if (this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.V12)
                 {
-                    processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.CommonConfigurationFilePath));
+                    if (File.Exists(this.ProcessConfigurationFilePath))
+                    {
+                        processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.ProcessConfigurationFilePath));
+                    }
                 }
-                if (File.Exists(this.AgileConfigurationFilePath))
+                else
                 {
-                    processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.AgileConfigurationFilePath));
+                    if (File.Exists(this.CommonConfigurationFilePath))
+                    {
+                        processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.CommonConfigurationFilePath));
+                    }
+                    if (File.Exists(this.AgileConfigurationFilePath))
+                    {
+                        processConfigurations.Add(WorkItemConfigurationItem.FromFile(this.AgileConfigurationFilePath));
+                    }
                 }
                 var teamProjectsWithProcessConfigurations = this.SelectedTeamProjects.ToDictionary(p => p, p => processConfigurations);
                 PerformImport(teamProjectsWithProcessConfigurations, options);
@@ -391,6 +489,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         #endregion
 
         #region Helper Methods
+
+        private void UpdateProcessConfigurationVisibility()
+        {
+            // Only show process config on TFS 2013 or higher, otherwise show agile/common config.
+            var useProcessConfig = this.SelectedTeamProjectCollection == null || this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion >= TfsMajorVersion.V12;
+            this.AgileCommonConfigImportVisibility = useProcessConfig ? Visibility.Collapsed : Visibility.Visible;
+            this.ProcessConfigImportVisibility = useProcessConfig ? Visibility.Visible : Visibility.Collapsed;
+        }
 
         private void PerformImport(Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithProcessConfigurations, ImportOptions options)
         {

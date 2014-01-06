@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TeamProjectManager.Modules.WorkItemConfiguration</RootNamespace>
     <AssemblyName>TeamProjectManager.Modules.WorkItemConfiguration</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -31,6 +31,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,6 +40,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Practices.Prism">
@@ -50,23 +52,24 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\References\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\References\Microsoft.TeamFoundation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.Build.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.WorkItemTracking.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\References\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Microsoft.VisualStudio.Services.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.XmlTransform">
       <HintPath>..\packages\Microsoft.Web.Xdt.1.0.0-alpha\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
@@ -76,6 +79,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,6 +100,7 @@
     <Compile Include="MacroInformationDialog.xaml.cs">
       <DependentUpon>MacroInformationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ProcessProjectConfigurationPart.cs" />
     <Compile Include="TransformationType.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
@@ -147,6 +152,15 @@
       <DependentUpon>WorkItemProcessConfigurationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorkItemProcessConfigurationViewModel.cs" />
+    <Compile Include="WorkItemQueriesView.xaml.cs">
+      <DependentUpon>WorkItemQueriesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemQueriesViewModel.cs" />
+    <Compile Include="WorkItemQueryEditorDialog.xaml.cs">
+      <DependentUpon>WorkItemQueryEditorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorkItemQueryExport.cs" />
+    <Compile Include="WorkItemQueryInfo.cs" />
     <Compile Include="WorkItemTypeDefinitionPart.cs" />
     <Compile Include="WorkItemConfigurationItemEditorDialog.xaml.cs">
       <DependentUpon>WorkItemConfigurationItemEditorDialog.xaml</DependentUpon>
@@ -213,6 +227,14 @@
     <Page Include="WorkItemConfigurationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkItemQueriesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WorkItemQueryEditorDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WorkItemTypesView.xaml">
       <SubType>Designer</SubType>

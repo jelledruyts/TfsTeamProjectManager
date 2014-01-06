@@ -17,6 +17,10 @@
             <ContentPresenter Content="{Binding Path=WorkItemTypesView, Mode=OneTime}" />
         </TabItem>
 
+        <TabItem Header="Queries">
+            <ContentPresenter Content="{Binding Path=WorkItemQueriesView, Mode=OneTime}" />
+        </TabItem>
+
         <TabItem Header="Categories">
             <ContentPresenter Content="{Binding Path=WorkItemCategoriesView, Mode=OneTime}" />
         </TabItem>

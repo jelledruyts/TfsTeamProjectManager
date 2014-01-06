@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.Composition;
-using Microsoft.Practices.Prism.Events;
+﻿using Microsoft.Practices.Prism.Events;
+using System.ComponentModel.Composition;
 using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
@@ -11,6 +11,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         [Import]
         public WorkItemTypesView WorkItemTypesView { get; set; }
+
+        [Import]
+        public WorkItemQueriesView WorkItemQueriesView { get; set; }
 
         [Import]
         public WorkItemCategoriesView WorkItemCategoriesView { get; set; }

@@ -6,6 +6,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         WorkItemType,
         Categories,
         CommonConfiguration,
-        AgileConfiguration
+        AgileConfiguration,
+        ProcessConfiguration
     }
 }

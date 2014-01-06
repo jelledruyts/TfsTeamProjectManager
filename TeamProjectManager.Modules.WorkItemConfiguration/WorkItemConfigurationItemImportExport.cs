@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.ProcessConfiguration.Client;
+﻿using Microsoft.TeamFoundation;
+using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web.Services.Protocols;
 using System.Xml;
 using System.Xml.Schema;
 using TeamProjectManager.Common;
@@ -114,6 +116,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                 case WorkItemConfigurationItemType.AgileConfiguration:
                                     SetAgileConfiguration(project, configurationItem);
                                     break;
+                                case WorkItemConfigurationItemType.ProcessConfiguration:
+                                    SetProcessConfiguration(project, configurationItem);
+                                    break;
                                 default:
                                     throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + configurationItem.Type.ToString());
                             }
@@ -196,7 +201,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
-        #region Get & Set Common & Agile Configuration
+        #region Get & Set Process Configuration
 
         public static WorkItemConfigurationItem GetCommonConfiguration(Project project)
         {
@@ -216,6 +221,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         public static void SetAgileConfiguration(Project project, WorkItemConfigurationItem agileConfiguration)
         {
             SetProcessConfiguration(project, WorkItemConfigurationItemType.AgileConfiguration, agileConfiguration);
+        }
+
+        public static WorkItemConfigurationItem GetProcessConfiguration(Project project)
+        {
+            return GetProcessConfiguration(project, WorkItemConfigurationItemType.ProcessConfiguration);
+        }
+
+        public static void SetProcessConfiguration(Project project, WorkItemConfigurationItem processConfiguration)
+        {
+            SetProcessConfiguration(project, WorkItemConfigurationItemType.ProcessConfiguration, processConfiguration);
         }
 
         #endregion
@@ -432,7 +447,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var configXml = new StringBuilder();
                     using (var writer = XmlWriter.Create(configXml, new XmlWriterSettings { Indent = true }))
                     {
-                        commonConfig.ToXml(writer, "CommonProjectConfiguration");
+                        commonConfig.ToXml(writer, WorkItemConfigurationItem.CommonConfigurationXmlElementName);
                     }
                     processConfigXml = configXml.ToString();
                 }
@@ -442,18 +457,34 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var configXml = new StringBuilder();
                     using (var writer = XmlWriter.Create(configXml, new XmlWriterSettings { Indent = true }))
                     {
-                        agileConfig.ToXml(writer, "AgileProjectConfiguration");
+                        agileConfig.ToXml(writer, WorkItemConfigurationItem.AgileConfigurationXmlElementName);
+                    }
+                    processConfigXml = configXml.ToString();
+                }
+                else if (type == WorkItemConfigurationItemType.ProcessConfiguration)
+                {
+                    var processConfig = configService.GetProcessConfiguration(project.Uri.ToString());
+                    var configXml = new StringBuilder();
+                    using (var writer = XmlWriter.Create(configXml, new XmlWriterSettings { Indent = true }))
+                    {
+                        processConfig.ToXml(writer, WorkItemConfigurationItem.ProcessConfigurationXmlElementName);
                     }
                     processConfigXml = configXml.ToString();
                 }
                 else
                 {
-                    throw new ArgumentException("The type argument must be either a CommonConfiguration or AgileConfiguration.");
+                    throw new ArgumentException("The type argument must be either a CommonConfiguration, AgileConfiguration or ProcessConfiguration.");
                 }
             }
             catch (NullReferenceException)
             {
                 // Working with the ProjectProcessConfigurationService throws NullReferenceException on TFS 2010 or earlier.
+                return null;
+            }
+            catch (SoapException)
+            {
+                // A Team Project that doesn't have a process configuration yet throws a SOAP exception
+                // "TF400572: The Project Process Settings must be configured for this feature to be used".
                 return null;
             }
             return WorkItemConfigurationItem.FromXml(processConfigXml);
@@ -493,9 +524,23 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     }
                     configService.SetAgileConfiguration(project.Uri.ToString(), agileConfig);
                 }
+                else if (type == WorkItemConfigurationItemType.ProcessConfiguration)
+                {
+                    ProjectProcessConfiguration processConfig;
+                    using (var xmlStringReader = new StringReader(item.XmlDefinition.DocumentElement.OuterXml))
+                    using (var xmlReader = XmlReader.Create(xmlStringReader))
+                    {
+                        while (xmlReader.NodeType != XmlNodeType.Element)
+                        {
+                            xmlReader.Read();
+                        }
+                        processConfig = ProjectProcessConfiguration.FromXml(tfs, xmlReader);
+                    }
+                    configService.SetProcessConfiguration(project.Uri.ToString(), processConfig);
+                }
                 else
                 {
-                    throw new ArgumentException("The type argument must be either a CommonConfiguration or AgileConfiguration.");
+                    throw new ArgumentException("The type argument must be either a CommonConfiguration, AgileConfiguration or ProcessConfiguration.");
                 }
             }
             catch (NullReferenceException exc)

@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.TeamFoundation.ProjectManagement</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.AddPanelConfiguration">
+      <summary>Add panel configuration</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.AddPanelConfiguration.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.AddPanelConfiguration.Fields">
+      <summary>Fields of the add Panel</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.AddPanelConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration">
+      <summary>Project configuration settings for the agile features.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration.IterationBacklog">
+      <summary>Iteration Backlog</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration.ProductBacklog">
+      <summary>Product Backlog configuration</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column">
+      <summary>Used to store information about columns used in the Product Backlog.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column.ColumnWidth">
+      <summary>The width of the column in pixels.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column.FieldName">
+      <summary>The name of the WIT field.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration">
+      <summary>Contains common configuration values that are used to allow for customization of the process template.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.BugWorkItems">
+      <summary>Bug Workitem Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.FeedbackRequestWorkItems">
+      <summary>Feedback Request Workitems Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.FeedbackResponseWorkItems">
+      <summary>Feedback Response Workitems Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.FeedbackWorkItems">
+      <summary>Feedback Workitems Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.RequirementWorkItems">
+      <summary>Parent Workitem Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.TaskWorkItems">
+      <summary>Child Workitem Category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.TypeFields">
+      <summary>Fields Associated with the project configuration</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration.Weekends">
+      <summary>Weekends</summary>
+      <returns>Returns <see cref="T:System.DayOfWeek" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field">
+      <summary>Field information</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field.#ctor"></member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field.m_name"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field.Name">
+      <summary>Reference Name of the field</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.Field.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum">
+      <summary>Field Cateogries</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.Activity">
+      <summary>Activity field.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.ApplicationLaunchInstructions">
+      <summary>Application launch instruction field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.ApplicationStartInformation">
+      <summary>Application start information field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.ApplicationType">
+      <summary>Application Type field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.Effort">
+      <summary>effort field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.FeedbackNotes">
+      <summary>Feedback notes field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.Order">
+      <summary>order field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.RemainingWork">
+      <summary>remaining work field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.Requestor">
+      <summary>Requested By field</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum.Team">
+      <summary>team field</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration"></member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration.Columns">
+      <summary>Columns definitions</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.IterationBacklogConfiguration.WorkItemCountLimit">
+      <summary>A hard limit on the number of work items that will be displayed on the agile boards</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService"></member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.#ctor(Microsoft.TeamFoundation.Client.TfsTeamProjectCollection)"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.CollectionServiceIdentifier">
+      <returns>Returns <see cref="T:System.Guid" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ComponentName">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.GetAgileConfiguration(System.String)">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.GetAgileConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.GetCommonConfiguration(System.String)">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.GetCommonConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ServiceType">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.SetAgileConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration)"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.SetAgileConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.SetCommonConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration)"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.SetCommonConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ValidateAgileConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration)"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ValidateAgileConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ValidateCommonConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration)"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProcessConfigurationService.ValidateCommonConfigurationOperation">
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.Client.Channels.TfsClientOperation" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration">
+      <summary>product backlog configuration</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration.AddPanel">
+      <summary>AddPanel</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.AddPanelConfiguration" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration.Columns">
+      <summary>Columns definitions</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.Column" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProductBacklogConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService">
+      <summary>Public interface for the ProcessConfigurationService Web service. Allows for process configuration items (such as task board/backlog settings) to be set/retrieved/validated.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.GetAgileConfiguration(System.String)">
+      <summary>Retrieves the Agile process configuration for a Team Project</summary>
+      <returns>The agile process configuration settings for the specified team project</returns>
+      <param name="projectUri">The uri of the team project the settings are associated with</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.GetCommonConfiguration(System.String)">
+      <summary>Retrieves the Common process configuration for a Team Project</summary>
+      <returns>The common process configuration settings for the specified team project</returns>
+      <param name="projectUri">The uri of the team project the settings are associated with</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.SetAgileConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration)">
+      <summary>Called to set the Agile process configuration for a Team Project</summary>
+      <param name="projectUri">Name of the project to associate these settings with</param>
+      <param name="agileConfiguration">The agile process configuration for the specified project</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.SetCommonConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration)">
+      <summary>Called to set the Common process configuration for a Team Project</summary>
+      <param name="projectUri">The uri of the project to associate these settings with</param>
+      <param name="commonConfiguration">The common process configuration for the specified project</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.ValidateAgileConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.AgileProjectConfiguration)">
+      <summary>Called to validate that the specified Agile configuration is valid. Performs a deep validation if the projectUri is specified and will verify that specified fields exist, for example. If the project name is not specified it will do a shallow validation.</summary>
+      <param name="projectUri">Name of the project to validate the settings against. May be null</param>
+      <param name="agileConfiguration">The agile process configuration for the specified project</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.ProjectProcessConfigurationService.ValidateCommonConfiguration(System.String,Microsoft.TeamFoundation.ProcessConfiguration.Client.CommonProjectConfiguration)">
+      <summary>Called to validate that the specified Common configuration is valid. Performs a deep validation if the projectUri is specified and will verify that specified fields exist, for example. If the project name is not specified it will do a shallow validation.</summary>
+      <param name="projectUri">The uri of the project to validate the settings against. May be null</param>
+      <param name="commonConfiguration">The common process configuration for the specified project</param>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.State">
+      <summary>Used to store information about states used in both the Product Backlog and the Taskboard.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.State.#ctor"></member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.State.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.State.Type">
+      <summary>Gets or sets the type, or category, of the state.</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.State.Value">
+      <summary>Gets or sets the textual value for the state.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum">
+      <summary>Represents the possible categories available for each taskboard and PBL state.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Complete">
+      <summary>Complete state (that is "done")</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Declined">
+      <summary>Requested or received feedback has been declined.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.InProgress">
+      <summary>In-progress state (that is "inprogress")</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Proposed">
+      <summary>Proposed state (that is "todo")</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Received">
+      <summary>Requested feedback has been received.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Requested">
+      <summary>Feedback has been requested.</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Resolved">
+      <summary>Bug has been resolved</summary>
+    </member>
+    <member name="F:Microsoft.TeamFoundation.ProcessConfiguration.Client.StateTypeEnum.Reviewed">
+      <summary>Received feedback has been reviewed.</summary>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration">
+      <summary>Contains team setting.</summary>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.IsDefaultTeam">
+      <summary>Indicates whether the team is the "default team" for the team project</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.ProjectUri">
+      <summary>The Project Uri of the team project which the team belongs to</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.TeamId">
+      <summary>The identifier for the team</summary>
+      <returns>Returns <see cref="T:System.Guid" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.TeamName">
+      <summary>The team name</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.TeamSettings">
+      <summary>The team settings</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamConfiguration.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue">
+      <summary>Contains the details for a single team field value.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue.IncludeChildren">
+      <summary>Indicates whether children nodes should be included if the team field supports hierarchy</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue.Value">
+      <summary>Value of a string-comparable work item field</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings">
+      <summary>Contains team setting.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.BacklogIterationPath">
+      <summary>Work Item Tracking iteration path for the team's backlog iteration (or null if none is set)</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.CurrentIterationPath">
+      <summary>Work Item Tracking iteration path for the team's current iteration (or null if none is set).</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.IterationPaths">
+      <summary>Team Iterations. The set of Work Item Tracking iteration paths that the team participates in</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.TeamField">
+      <summary>The refname of the "team field". Could be null if the team field has not been set on the project</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.TeamFieldValues">
+      <summary>Team Field values. The value at index 0 is the default value. Could be an empty array</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettingsConfigurationService">
+      <summary>Public interface for the TeamConfigurationService Web service. Allows for team configuration items (such as product backlog path, team fields) to be set and retrieved.</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettingsConfigurationService.GetTeamConfigurations(System.Collections.Generic.IEnumerable{System.Guid})"></member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettingsConfigurationService.GetTeamConfigurationsForUser(System.Collections.Generic.IEnumerable{System.String})">
+      <summary>Get the team settings for teams that the current user/identity is a member of (scoped to a set of team projects)</summary>
+      <returns>A collection of team settings for each team that the user is a member of in the given projects</returns>
+      <param name="projectUris">The project uris that will be used to scope down the teams that are returned.</param>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettingsConfigurationService.SetTeamSettings(System.Guid,Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamSettings)">
+      <summary>Set the team settings for a given team</summary>
+      <param name="teamId">The identifier for the team group</param>
+      <param name="settings">The settings for the team</param>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField">
+      <summary>Field information</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField.Format">
+      <summary>Format for field</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField.Type">
+      <summary>Type of the field</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.FieldTypeEnum" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeField.TypeFieldValues">
+      <summary>Values associated with the field</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue">
+      <summary>TypeField value information</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue.#ctor"></member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue.Type">
+      <summary>Gets or sets the type, or category, of the field's value.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.TypeFieldValue.Value">
+      <summary>Gets or sets the textual value for the field's value.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory">
+      <summary>A Workitem Category</summary>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory.#ctor"></member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory.CategoryName">
+      <summary>Category Name</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory.PluralName">
+      <summary>Plural Name of the category</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory.States">
+      <summary>States associated with Workitem category</summary>
+      <returns>Returns <see cref="T:Microsoft.TeamFoundation.ProcessConfiguration.Client.State" />.</returns>
+    </member>
+    <member name="M:Microsoft.TeamFoundation.ProcessConfiguration.Client.WorkItemCategory.ToString">
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+  </members>
+</doc>

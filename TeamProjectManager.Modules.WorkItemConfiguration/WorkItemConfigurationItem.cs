@@ -11,9 +11,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         #region Constants
 
         public const string AgileConfigurationName = "Agile Configuration";
+        public const string AgileConfigurationXmlElementName = "AgileProjectConfiguration";
         public const string CommonConfigurationName = "Common Configuration";
+        public const string CommonConfigurationXmlElementName = "CommonProjectConfiguration";
+        public const string ProcessConfigurationName = "Process Configuration";
+        public const string ProcessConfigurationXmlElementName = "ProjectProcessConfiguration";
         public const string WorkItemTypeDefinitionName = "Work Item Type Definition";
         public const string CategoriesName = "Work Item Categories";
+        public const string CategoriesXmlElementName = "CATEGORIES";
 
         #endregion
 
@@ -76,15 +81,19 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var name = nameNode == null ? null : nameNode.Value;
                 return new WorkItemTypeDefinition(name, xmlDefinition);
             }
-            else if (typeName.Equals("AgileProjectConfiguration", StringComparison.OrdinalIgnoreCase))
+            else if (typeName.Equals(AgileConfigurationXmlElementName, StringComparison.OrdinalIgnoreCase))
             {
                 return new WorkItemConfigurationItem(WorkItemConfigurationItemType.AgileConfiguration, xmlDefinition);
             }
-            else if (typeName.Equals("CommonProjectConfiguration", StringComparison.OrdinalIgnoreCase))
+            else if (typeName.Equals(CommonConfigurationXmlElementName, StringComparison.OrdinalIgnoreCase))
             {
                 return new WorkItemConfigurationItem(WorkItemConfigurationItemType.CommonConfiguration, xmlDefinition);
             }
-            else if (typeName.Equals("CATEGORIES", StringComparison.OrdinalIgnoreCase))
+            else if (typeName.Equals(ProcessConfigurationXmlElementName, StringComparison.OrdinalIgnoreCase))
+            {
+                return new WorkItemConfigurationItem(WorkItemConfigurationItemType.ProcessConfiguration, xmlDefinition);
+            }
+            else if (typeName.Equals(CategoriesXmlElementName, StringComparison.OrdinalIgnoreCase))
             {
                 return new WorkItemConfigurationItem(WorkItemConfigurationItemType.Categories, xmlDefinition);
             }
@@ -111,6 +120,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     return WorkItemConfigurationItem.AgileConfigurationName;
                 case WorkItemConfigurationItemType.CommonConfiguration:
                     return WorkItemConfigurationItem.CommonConfigurationName;
+                case WorkItemConfigurationItemType.ProcessConfiguration:
+                    return WorkItemConfigurationItem.ProcessConfigurationName;
                 case WorkItemConfigurationItemType.WorkItemType:
                     if (!string.IsNullOrEmpty(workItemTypeName))
                     {
@@ -167,6 +178,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     return Enum.GetValues(typeof(CommonProjectConfigurationPart)).Cast<CommonProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
                 case WorkItemConfigurationItemType.AgileConfiguration:
                     return Enum.GetValues(typeof(AgileProjectConfigurationPart)).Cast<AgileProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
+                case WorkItemConfigurationItemType.ProcessConfiguration:
+                    return Enum.GetValues(typeof(ProcessProjectConfigurationPart)).Cast<ProcessProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
                 case WorkItemConfigurationItemType.Categories:
                     return new WorkItemConfigurationItemPart[] { new WorkItemConfigurationItemPart(CategoriesName, normalizedXmlDefinition.DocumentElement) };
                 default:
@@ -189,6 +202,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, CommonProjectConfigurationPart part)
         {
             var xpath = "/CommonProjectConfiguration/" + part.ToString();
+            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
+        }
+
+        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, ProcessProjectConfigurationPart part)
+        {
+            var xpath = "/ProjectProcessConfiguration/" + part.ToString();
             return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
         }
 

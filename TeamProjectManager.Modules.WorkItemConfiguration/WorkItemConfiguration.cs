@@ -81,7 +81,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #region Static Factory Methods
 
-        public static WorkItemConfiguration FromTeamProject(TfsTeamProjectCollection tfs, Project project, bool includeAgileAndCommonConfiguration)
+        public static WorkItemConfiguration FromTeamProject(TfsTeamProjectCollection tfs, Project project)
         {
             // Export work item type definitions.
             var projectWorkItemTypes = new List<WorkItemConfigurationItem>();
@@ -94,18 +94,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             projectWorkItemTypes.Add(WorkItemConfigurationItemImportExport.GetCategories(project));
 
             // Export process configuration.
-            if (includeAgileAndCommonConfiguration)
+            var commonConfig = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
+            if (commonConfig != null)
             {
-                var commonConfig = WorkItemConfigurationItemImportExport.GetCommonConfiguration(project);
-                if (commonConfig != null)
-                {
-                    projectWorkItemTypes.Add(commonConfig);
-                }
-                var agileConfig = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
-                if (agileConfig != null)
-                {
-                    projectWorkItemTypes.Add(agileConfig);
-                }
+                projectWorkItemTypes.Add(commonConfig);
+            }
+            var agileConfig = WorkItemConfigurationItemImportExport.GetAgileConfiguration(project);
+            if (agileConfig != null)
+            {
+                projectWorkItemTypes.Add(agileConfig);
+            }
+            var processConfig = WorkItemConfigurationItemImportExport.GetProcessConfiguration(project);
+            if (processConfig != null)
+            {
+                projectWorkItemTypes.Add(processConfig);
             }
 
             return new WorkItemConfiguration(project.Name, projectWorkItemTypes);
@@ -179,6 +181,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 {
                     var agileConfigurationFileName = Path.Combine(baseDir, agileConfigurationFileNameAttribute.InnerText);
                     items.Add(WorkItemConfigurationItem.FromFile(agileConfigurationFileName));
+                }
+
+                // Find the process configuration XML file.
+                var processConfigurationFileNameAttribute = workItemConfigurationTemplate.SelectSingleNode("/tasks/task[@id='ProcessConfiguration']/taskXml/PROCESSCONFIGURATION/ProjectConfiguration/@fileName");
+                if (processConfigurationFileNameAttribute != null)
+                {
+                    var processConfigurationFileName = Path.Combine(baseDir, processConfigurationFileNameAttribute.InnerText);
+                    items.Add(WorkItemConfigurationItem.FromFile(processConfigurationFileName));
                 }
             }
 

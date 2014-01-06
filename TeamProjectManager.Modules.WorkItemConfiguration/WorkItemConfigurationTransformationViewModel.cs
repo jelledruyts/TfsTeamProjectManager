@@ -382,6 +382,28 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                                     }
                                 }
                             }
+                            else if (transformation.WorkItemConfigurationItemType == WorkItemConfigurationItemType.ProcessConfiguration)
+                            {
+                                var itemToTransform = transformedItems.FirstOrDefault(w => w.Type == WorkItemConfigurationItemType.ProcessConfiguration);
+                                if (itemToTransform == null)
+                                {
+                                    itemToTransform = WorkItemConfigurationItemImportExport.GetProcessConfiguration(project);
+                                }
+                                if (itemToTransform != null)
+                                {
+                                    task.Status = "Transforming " + itemToTransform.DisplayName;
+                                    var transformed = WorkItemConfigurationTransformer.Transform(transformation.TransformationType, itemToTransform.XmlDefinition, transformation.TransformationXml);
+                                    if (string.Equals(itemToTransform.XmlDefinition.DocumentElement.OuterXml, transformed.DocumentElement.OuterXml))
+                                    {
+                                        task.Status = "The transformation was applied but did not result in any changes, skipping.";
+                                    }
+                                    else
+                                    {
+                                        itemToTransform.XmlDefinition = transformed;
+                                        transformedItems.Add(itemToTransform);
+                                    }
+                                }
+                            }
                             else
                             {
                                 throw new ArgumentException("The Work Item Configuration Item Type is unknown: " + transformation.WorkItemConfigurationItemType.ToString());

@@ -10,56 +10,79 @@
     <UserControl.Resources>
         <w:WorkItemConfigurationItemTypeConverter x:Key="workItemConfigurationItemTypeConverter" />
     </UserControl.Resources>
-    <TabControl>
-        <TabItem Header="View / Export / Edit" i:HelpProvider.HelpContent="Allows you to get an overview of the work item process configurations (i.e. common and agile configurations) across multiple Team Projects. You can also export their definitions to XML files and edit them in-place.">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Button Grid.Row="0" Content="Get Process Configurations" Margin="0,5,0,5" Command="{Binding Path=GetProcessConfigurationsCommand}" />
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=ProcessConfigurations}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="processConfigurationsDataGrid" SelectionChanged="processConfigurationsDataGrid_SelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
-                        <DataGridTextColumn Header="Type" Binding="{Binding Path=Item.Type, Converter={StaticResource workItemConfigurationItemTypeConverter}}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                <WrapPanel Grid.Row="2" Margin="0,5,0,0">
-                    <Button Content="Export" Command="{Binding Path=ExportSelectedProcessConfigurationsCommand}" />
-                    <Button Content="Edit..." Margin="5,0,0,0" Command="{Binding Path=EditSelectedProcessConfigurationsCommand}" />
-                    <Button Content="Transform..." Margin="5,0,0,0" Command="{Binding Path=TransformSelectedProcessConfigurationsCommand}" />
-                </WrapPanel>
-            </Grid>
-        </TabItem>
-        <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import work item process configurations (i.e. common and agile configurations) in existing Team Projects. This can be useful if you want to change the process configurations being used, e.g. to upgrade them from a previous version.">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+    <Grid>
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2012 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Common Configuration File" Margin="0,0,5,0" />
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=CommonConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
-                <Button Grid.Row="0" Grid.Column="2" Content="..." Command="{Binding Path=BrowseCommonConfigurationFilePathCommand}" Padding="5,0,5,0" />
+        <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
+            <TabItem Header="View / Export / Edit" i:HelpProvider.HelpContent="Allows you to get an overview of the work item process configurations (i.e. common and agile configurations) across multiple Team Projects. You can also export their definitions to XML files and edit them in-place.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Get Process Configurations" Margin="0,5,0,5" Command="{Binding Path=GetProcessConfigurationsCommand}" />
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=ProcessConfigurations}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="processConfigurationsDataGrid" SelectionChanged="processConfigurationsDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
+                            <DataGridTextColumn Header="Type" Binding="{Binding Path=Item.Type, Converter={StaticResource workItemConfigurationItemTypeConverter}}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Export" Command="{Binding Path=ExportSelectedProcessConfigurationsCommand}" />
+                        <Button Content="Edit..." Margin="5,0,0,0" Command="{Binding Path=EditSelectedProcessConfigurationsCommand}" />
+                        <Button Content="Transform..." Margin="5,0,0,0" Command="{Binding Path=TransformSelectedProcessConfigurationsCommand}" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import work item process configurations in existing Team Projects. This can be useful if you want to change the process configurations being used, e.g. to upgrade them from a previous version.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Agile Configuration File" Margin="0,5,5,0" />
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=AgileConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,5,0" />
-                <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{Binding Path=BrowseAgileConfigurationFilePathCommand}" Padding="5,0,5,0" Margin="0,5,0,0" />
+                    <!-- TFS 2012 -->
+                    <Grid Grid.Row="0" Visibility="{Binding Path=AgileCommonConfigImportVisibility}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Common Configuration File" Margin="0,0,5,0" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=CommonConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
+                        <Button Grid.Row="0" Grid.Column="2" Content="..." Command="{Binding Path=BrowseCommonConfigurationFilePathCommand}" Padding="5,0,5,0" />
 
-                <WrapPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,0">
-                    <Button Content="Import Process Configuration" Command="{Binding Path=ImportProcessConfigurationsCommand}" />
-                    <TextBlock VerticalAlignment="Center" Margin="5,0,0,0"><Hyperlink x:Name="macroInformationHyperlink" Command="{x:Static w:MacroInformationDialog.ShowInstanceCommand}">About macros</Hyperlink></TextBlock>
-                    <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
-                    <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
-                </WrapPanel>
-            </Grid>
-        </TabItem>
-    </TabControl>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Agile Configuration File" Margin="0,5,5,0" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=AgileConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,5,0" />
+                        <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{Binding Path=BrowseAgileConfigurationFilePathCommand}" Padding="5,0,5,0" Margin="0,5,0,0" />
+                    </Grid>
+
+                    <!-- TFS 2013 or above -->
+                    <Grid Grid.Row="0" Visibility="{Binding Path=ProcessConfigImportVisibility}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Process Configuration File" Margin="0,0,5,0" />
+                        <TextBox Grid.Column="1" Text="{Binding Path=ProcessConfigurationFilePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0" />
+                        <Button Grid.Column="2" Content="..." Command="{Binding Path=BrowseProcessConfigurationFilePathCommand}" Padding="5,0,5,0" />
+                    </Grid>
+
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Import Process Configuration" Command="{Binding Path=ImportProcessConfigurationsCommand}" />
+                        <TextBlock VerticalAlignment="Center" Margin="5,0,0,0"><Hyperlink x:Name="macroInformationHyperlink" Command="{x:Static w:MacroInformationDialog.ShowInstanceCommand}">About macros</Hyperlink></TextBlock>
+                        <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

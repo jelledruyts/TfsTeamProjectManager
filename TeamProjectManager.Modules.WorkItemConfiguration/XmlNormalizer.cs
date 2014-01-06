@@ -100,6 +100,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             {
                 NormalizeCommonConfiguration(normalizedXmlDefinition);
             }
+            else if (item.Type == WorkItemConfigurationItemType.ProcessConfiguration)
+            {
+                NormalizeProcessConfiguration(normalizedXmlDefinition);
+            }
             else if (item.Type == WorkItemConfigurationItemType.Categories)
             {
                 NormalizeCategories(normalizedXmlDefinition);
@@ -192,6 +196,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             foreach (XmlAttribute notFixedAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Not fixed']/@value | //REASON[@value='Not fixed']/@value"))
             {
                 notFixedAttribute.Value = "Not Fixed";
+            }
+            foreach (XmlAttribute reconsideringAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Reconsidering the feature']/@value | //REASON[@value='Reconsidering the feature']/@value"))
+            {
+                reconsideringAttribute.Value = "Reconsidering the Feature";
             }
             foreach (XmlAttribute fieldIdAttribute in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD[@refname='System.Id']/@name"))
             {
@@ -394,6 +402,57 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
             // Sort all states by type.
             SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
+        }
+
+        #endregion
+
+        #region NormalizeProcessConfiguration
+
+        private static void NormalizeProcessConfiguration(XmlDocument normalizedXmlDefinition)
+        {
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort the child nodes of the backlog nodes.
+            foreach (XmlNode portfolioBacklogNode in normalizedXmlDefinition.SelectNodes("/ProjectProcessConfiguration/PortfolioBacklogs/PortfolioBacklog"))
+            {
+                SortChildNodes(portfolioBacklogNode);
+            }
+            var requirementBacklogNode = normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/RequirementBacklog");
+            var taskBacklogNode = normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/TaskBacklog");
+            SortChildNodes(requirementBacklogNode);
+            SortChildNodes(taskBacklogNode);
+
+            // Add the "parent" attribute for well-known backlogs.
+            if (requirementBacklogNode != null && requirementBacklogNode.Attributes["parent"] == null)
+            {
+                var parentAttribute = normalizedXmlDefinition.CreateAttribute("parent");
+                parentAttribute.Value = "Microsoft.FeatureCategory";
+                requirementBacklogNode.Attributes.Append(parentAttribute);
+                SortAttributes(requirementBacklogNode);
+            }
+            if (taskBacklogNode != null && taskBacklogNode.Attributes["parent"] == null)
+            {
+                var parentAttribute = normalizedXmlDefinition.CreateAttribute("parent");
+                parentAttribute.Value = "Microsoft.RequirementCategory";
+                taskBacklogNode.Attributes.Append(parentAttribute);
+                SortAttributes(taskBacklogNode);
+            }
+
+            // Sort all type fields by refname.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/TypeFields"), n => GetValue(n.Attributes["refname"]));
+
+            // Sort all type field values by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/TypeFields/TypeField/TypeFieldValues"), n => GetValue(n.Attributes["type"]));
+
+            // Sort the child nodes of the weekends node.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/Weekends"));
+
+            // Sort all states by type.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
+
+            // Sort all work item colors by name.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/WorkItemColors"), n => GetValue(n.Attributes["name"]));
         }
 
         #endregion

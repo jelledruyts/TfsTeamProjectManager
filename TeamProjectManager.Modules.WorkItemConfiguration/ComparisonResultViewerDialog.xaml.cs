@@ -100,7 +100,19 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 diffTools.Add(new DiffTool("Custom", diffToolCommandOverride, diffToolArgumentsOverride));
             }
 
-            // Visual Studio 2012 has a built-in diff tool, call devenv.exe directly.
+            // Visual Studio 2012 or above have a built-in diff tool, call devenv.exe directly.
+            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\12.0\Setup\VS"))
+            {
+                if (regKey != null)
+                {
+                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
+                    if (File.Exists(devenvPath))
+                    {
+                        diffTools.Add(new DiffTool("Visual Studio 2013", devenvPath, "/diff %1 %2 %6 %7"));
+                    }
+                }
+            }
+
             using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS"))
             {
                 if (regKey != null)

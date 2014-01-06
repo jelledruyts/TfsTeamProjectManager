@@ -100,7 +100,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         var store = tfs.GetService<WorkItemStore>();
                         var project = store.Projects[teamProject.Name];
 
-                        this.Configuration = WorkItemConfiguration.FromTeamProject(tfs, project, true);
+                        this.Configuration = WorkItemConfiguration.FromTeamProject(tfs, project);
                     }
                     finally
                     {

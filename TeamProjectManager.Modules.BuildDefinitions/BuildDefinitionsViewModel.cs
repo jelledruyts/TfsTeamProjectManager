@@ -194,8 +194,9 @@ namespace TeamProjectManager.Modules.BuildDefinitions
 
         private void DeleteSelectedBuildDefinitions(object argument)
         {
-            var result = MessageBox.Show("This will delete the selected build definitions. Are you sure you want to continue?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (result == MessageBoxResult.Yes)
+            var dialog = new BuildDefinitionDeleteDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
             {
                 var buildDefinitionsToDelete = this.SelectedBuildDefinitions;
                 var task = new ApplicationTask("Deleting build definitions", buildDefinitionsToDelete.Count, true);
@@ -213,6 +214,11 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToDelete.Name, buildDefinitionToDelete.TeamProject));
                         try
                         {
+                            if (dialog.DeleteBuilds)
+                            {
+                                DeleteBuildsForDefinition(task, buildServer, step, buildDefinitionToDelete);
+                            }
+
                             // Delete the build definitions one by one to avoid one failure preventing the other build definitions from being deleted.
                             buildServer.DeleteBuildDefinitions(new Uri[] { buildDefinitionToDelete.Uri });
                             count++;
@@ -248,6 +254,27 @@ namespace TeamProjectManager.Modules.BuildDefinitions
                     GetBuildDefinitions(null);
                 };
                 worker.RunWorkerAsync();
+            }
+        }
+
+        private static void DeleteBuildsForDefinition(ApplicationTask task, IBuildServer buildServer, int step, BuildDefinitionInfo buildDefinition)
+        {
+            var buildDetailSpec = buildServer.CreateBuildDetailSpec(new[] { buildDefinition.Uri, });
+            var buildsToDelete = buildServer.QueryBuilds(buildDetailSpec).Builds;
+            if (buildsToDelete.Any())
+            {
+                task.SetProgress(step, string.Format(CultureInfo.CurrentCulture, "Deleting {0} builds for definition \"{1}\" in Team Project \"{2}\"", buildsToDelete.Count(), buildDefinition.Name, buildDefinition.TeamProject));
+                foreach (var buildToDelete in buildsToDelete)
+                {
+                    try
+                    {
+                        buildToDelete.Delete(DeleteOptions.All);
+                    }
+                    catch (Exception exc)
+                    {
+                        task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while deleting build number \"{0}\" for definition \"{1}\" in Team Project \"{2}\"", buildToDelete.BuildNumber, buildDefinition.Name, buildDefinition.TeamProject), exc);
+                    }
+                }
             }
         }
 

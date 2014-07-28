@@ -41,7 +41,7 @@
                     </DataGrid>
                     <WrapPanel Grid.Row="2" Margin="0,5,0,0">
                         <Button Content="Update Selected Build Definitions..." Command="{Binding Path=UpdateSelectedBuildDefinitionsCommand}" />
-                        <Button Content="Delete Selected Build Definitions" Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
+                        <Button Content="Delete Selected Build Definitions..." Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
                     </WrapPanel>
                 </Grid>
             </TabItem>

@@ -247,6 +247,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var store = tfs.GetService<WorkItemStore>();
                 var step = 0;
+                var queryHierarchiesToSave = new List<QueryHierarchy>();
                 foreach (var workItemQuery in workItemQueries)
                 {
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Deleting \"{0}\" from Team Project \"{1}\"", workItemQuery.Name, workItemQuery.TeamProject));
@@ -254,6 +255,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     {
                         var project = store.Projects[workItemQuery.TeamProject];
                         var rootFolder = project.QueryHierarchy;
+                        if (!queryHierarchiesToSave.Contains(rootFolder))
+                        {
+                            queryHierarchiesToSave.Add(rootFolder);
+                        }
                         var query = rootFolder.Find(workItemQuery.Id);
                         if (query == null)
                         {
@@ -276,6 +281,22 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     {
                         task.Status = "Canceled";
                         break;
+                    }
+                }
+                foreach (var queryHierarchyToSave in queryHierarchiesToSave)
+                {
+                    if (!task.IsCanceled)
+                    {
+                        try
+                        {
+                            queryHierarchyToSave.Save();
+                        }
+                        catch (Exception exc)
+                        {
+                            var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while saving changes to \"{0}\"", queryHierarchyToSave.Project.Name);
+                            this.Logger.Log(message, exc);
+                            task.SetError(message, exc);
+                        }
                     }
                 }
             };
@@ -438,7 +459,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 {
                     var teamProject = teamProjectWithQueries.Key;
                     var queries = teamProjectWithQueries.Value;
-                    var project = store.Projects[teamProjectWithQueries.Key];
+                    var project = store.Projects[teamProject];
 
                     foreach (var query in queries)
                     {
@@ -450,6 +471,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         {
                             task.Status = "Canceled";
                             break;
+                        }
+                    }
+
+                    if (!task.IsCanceled)
+                    {
+                        try
+                        {
+                            project.QueryHierarchy.Save();
+                        }
+                        catch (Exception exc)
+                        {
+                            var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while saving changes to \"{0}\"", teamProject);
+                            this.Logger.Log(message, exc);
+                            task.SetError(message, exc);
                         }
                     }
                 }

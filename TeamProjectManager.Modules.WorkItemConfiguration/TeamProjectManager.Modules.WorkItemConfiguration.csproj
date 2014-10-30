@@ -78,6 +78,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
@@ -101,6 +102,9 @@
       <DependentUpon>MacroInformationDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProcessProjectConfigurationPart.cs" />
+    <Compile Include="ProcessTemplatePickerDialog.xaml.cs">
+      <DependentUpon>ProcessTemplatePickerDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TransformationType.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
@@ -189,6 +193,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MacroInformationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProcessTemplatePickerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

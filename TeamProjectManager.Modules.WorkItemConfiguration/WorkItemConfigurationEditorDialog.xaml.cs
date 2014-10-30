@@ -1,7 +1,10 @@
 ﻿using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.Win32;
 using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -125,6 +128,46 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 catch (Exception exc)
                 {
                     MessageBox.Show("An error occurred while loading the process template: " + exc.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void importFromRegisteredProcessTemplateButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new TeamProjectPicker(TeamProjectPickerMode.NoProject, false))
+            {
+                var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var projectCollection = dialog.SelectedTeamProjectCollection;
+                    var processTemplateService = projectCollection.GetService<IProcessTemplates>();
+                    var registeredTemplates = processTemplateService.TemplateHeaders().OrderBy(t => t.Rank).ToArray();
+
+                    var processTemplatePicker = new ProcessTemplatePickerDialog(registeredTemplates);
+                    processTemplatePicker.Owner = this;
+                    if (processTemplatePicker.ShowDialog() == true)
+                    {
+                        var downloadedTemplateZipFileName = processTemplateService.GetTemplateData(processTemplatePicker.SelectedProcessTemplate.TemplateId);
+                        var unzipPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                        try
+                        {
+                            ZipFile.ExtractToDirectory(downloadedTemplateZipFileName, unzipPath);
+                            var processTemplateXmlFile = Path.Combine(unzipPath, "ProcessTemplate.xml");
+                            if (!File.Exists(processTemplateXmlFile))
+                            {
+                                MessageBox.Show("The selected Process Template did not contain a \"ProcessTemplate.xml\" file in its root directory.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            else
+                            {
+                                this.Configuration = WorkItemConfiguration.FromProcessTemplate(processTemplateXmlFile);
+                            }
+                        }
+                        finally
+                        {
+                            File.Delete(downloadedTemplateZipFileName);
+                            Directory.Delete(unzipPath, true);
+                        }
+                    }
                 }
             }
         }

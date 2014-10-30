@@ -18,8 +18,9 @@
 
         <GroupBox Grid.Row="0" Header="Import">
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Button Content="Import From Team Project" Click="importFromTeamProjectButton_Click" />
-                <Button Content="Import From Process Template XML" Click="importFromProcessTemplateButton_Click" Margin="5,0,0,0" />
+                <Button Content="From Team Project..." Click="importFromTeamProjectButton_Click" />
+                <Button Content="From Process Template XML..." Click="importFromProcessTemplateButton_Click" Margin="5,0,0,0" />
+                <Button Content="From Registered Process Template..." Click="importFromRegisteredProcessTemplateButton_Click" Margin="5,0,0,0" />
             </StackPanel>
         </GroupBox>
 

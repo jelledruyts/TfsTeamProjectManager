@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using TeamProjectManager.Common;
 
-[assembly: AssemblyVersion("1.6.*")] // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
+[assembly: AssemblyVersion("1.7.*")] // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
 [assembly: AssemblyInformationalVersion("1.0.0.0")] // Keep this constant as long as possible to avoid the user's settings getting lost (it is used for the LocalUserAppDataPath where the configuration file is stored).
 [assembly: Guid("70d06212-76d7-492c-8957-9f0b59d1bb2c")]
 

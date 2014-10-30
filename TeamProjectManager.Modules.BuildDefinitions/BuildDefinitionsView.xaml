@@ -6,9 +6,12 @@
              xmlns:b="clr-namespace:TeamProjectManager.Modules.BuildDefinitions"
              xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
         <b:TriggerTypeConverter x:Key="triggerTypeConverter" />
+        <CollectionViewSource x:Key="cvsTasks" Source="{Binding Path=BuildDefinitions}"  
+                              Filter="CollectionViewSource_Filter">
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
@@ -22,8 +25,85 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Content="Get Build Definitions" Margin="0,5,0,5" Command="{Binding Path=GetBuildDefinitionsCommand}" />
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildDefinitions}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildDefinitionsDataGrid" SelectionChanged="buildDefinitionsDataGrid_SelectionChanged">
+                    <Grid Grid.Row="0" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Get Build Definitions" Margin="0,5,0,5" Command="{Binding Path=GetBuildDefinitionsCommand}" />
+                        <TextBox Grid.Column="1" x:Name="_filterTextBox" Margin="5,5,0,5" TextChanged="OnFilterTextBoxTextChanged">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush Stretch="None" AutoLayoutContent="True" AlignmentX="Left">
+                                                        <VisualBrush.Visual>
+                                                            <TextBox BorderThickness="0" Text="Name Filter..." HorizontalContentAlignment="Left" VerticalAlignment="Center" Foreground="Gray" FontStyle="Italic"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsFocused}" Value="True">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush Stretch="None"></VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </Grid>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Source={StaticResource cvsTasks}}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildDefinitionsDataGrid" SelectionChanged="buildDefinitionsDataGrid_SelectionChanged">
+                        <DataGrid.Resources>
+                            <ContextMenu x:Key="DataGridColumnHeaderContextMenu" IsOpen="True">
+                                <MenuItem Header="Group/Ungroup" Click="ContextMenu_OnGroupBy"/>
+                            </ContextMenu>
+
+                            <Style TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="ContextMenu" Value="{StaticResource DataGridColumnHeaderContextMenu}" />
+                                <EventSetter Event="MouseRightButtonDown" Handler="EventSetter_OnHandler" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Path=Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                                <GroupStyle.ContainerStyle>
+                                    <Style TargetType="{x:Type GroupItem}">
+                                        <Setter Property="Margin" Value="0,0,0,5"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                    <Expander>
+                                                        <Expander.Header>
+                                                            <TextBlock>
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding StringFormat=" {0} ({1})">
+                                                                        <Binding Path="Name" />
+                                                                        <Binding Path="ItemCount" />
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                        </Expander.Header>
+                                                        <ItemsPresenter />
+                                                    </Expander>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </GroupStyle.ContainerStyle>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
                             <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
@@ -36,6 +116,17 @@
                             <DataGridTextColumn Header="CI Quiet Period" Binding="{Binding Path=ContinuousIntegrationQuietPeriod}" />
                             <DataGridTextColumn Header="Gated Batch Size" Binding="{Binding Path=BatchSize}" />
                             <DataGridTextColumn Header="Process Template" Binding="{Binding Path=ProcessTemplate}" />
+                            <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
+                            <DataGridTextColumn Header="Clean Workspace" Binding="{Binding Path=CleanWorkspace}" />
+                            <DataGridTextColumn Header="Logging Verbosity" Binding="{Binding Path=Verbosity}" />
+                            <DataGridTextColumn Header="Code Analysis" Binding="{Binding Path=RunCodeAnalysis}" />
+                            <DataGridCheckBoxColumn Header="Source Server" Binding="{Binding Path=SourceServerEnabled, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Symbol Server" Binding="{Binding Path=SymbolServerPath}" />
+                            <DataGridTextColumn Header="MSBuild Arguments" Binding="{Binding Path=MSBuildArguments}" />
+                            <DataGridTextColumn Header="MSBuild Multi-Proc" Binding="{Binding Path=MSBuildMultiProc}" />
+                            <DataGridTextColumn Header="MSBuild Platform" Binding="{Binding Path=MSBuildPlatform}" />
+                            <DataGridTextColumn Header="Private Drop Location" Binding="{Binding Path=PrivateDropLocation}" />
+                            <DataGridTextColumn Header="Solution Specific Build Outputs" Binding="{Binding Path=SolutionSpecificBuildOutputs}" />
                             <DataGridTextColumn Header="Max Retention Policy" Binding="{Binding Path=MaxBuildsToKeepByRetentionPolicy}" />
                         </DataGrid.Columns>
                     </DataGrid>

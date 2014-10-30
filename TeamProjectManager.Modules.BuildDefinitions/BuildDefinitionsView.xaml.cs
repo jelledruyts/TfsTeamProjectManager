@@ -58,7 +58,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
             {
                 e.Accepted = true;
             }
-            else if (Regex.IsMatch(buildDefinitionInfo.Name, _filterText))
+            else if (Regex.IsMatch(buildDefinitionInfo.Name, _filterText, RegexOptions.IgnoreCase))
             {
                 e.Accepted = true;
             }

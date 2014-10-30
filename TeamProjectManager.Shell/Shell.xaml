@@ -6,8 +6,8 @@
         xmlns:s="clr-namespace:TeamProjectManager.Shell"
         Title="{Binding Path=WindowTitle}"
         WindowStartupLocation="CenterScreen"
-        Height="600"
-        Width="800"
+        Height="768"
+        Width="1024"
         Icon="/App.ico"
         TaskbarItemInfo="{Binding TaskbarItemInfo}">
     <Grid Margin="5">

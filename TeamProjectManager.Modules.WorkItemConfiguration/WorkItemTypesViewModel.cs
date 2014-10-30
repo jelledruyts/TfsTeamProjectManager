@@ -528,7 +528,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             var result = dialog.ShowDialog(Application.Current.MainWindow);
             if (result == true)
             {
-                this.WorkItemTypeFiles.Clear();
                 foreach (var workItemTypeFileName in dialog.FileNames)
                 {
                     this.WorkItemTypeFiles.Add(workItemTypeFileName);

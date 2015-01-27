@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Shell;
@@ -35,7 +36,7 @@ namespace TeamProjectManager.Shell
             // Unblock any files that were blocked by Windows because they were downloaded.
             try
             {
-                logger.Log("Program - Unblocking files in " + applicationDirectory, TraceEventType.Verbose);
+                this.logger.Log("Program - Unblocking files in " + applicationDirectory, TraceEventType.Verbose);
                 foreach (var fileName in Directory.GetFiles(applicationDirectory))
                 {
                     FileSystem.UnblockFile(fileName);
@@ -43,7 +44,7 @@ namespace TeamProjectManager.Shell
             }
             catch (Exception exc)
             {
-                logger.Log("An exception occurred while attempting to unblock any files blocked by Windows.", exc, TraceEventType.Warning);
+                this.logger.Log("An exception occurred while attempting to unblock any files blocked by Windows", exc, TraceEventType.Warning);
             }
 
             // Set up the Windows jump list.
@@ -54,7 +55,29 @@ namespace TeamProjectManager.Shell
             JumpList.SetJumpList(this, jumpList);
 
             // Launch the PRISM bootstrapper.
-            new Bootstrapper(this.logger).Run();
+            try
+            {
+                new Bootstrapper(this.logger).Run();
+            }
+            catch (Exception exc)
+            {
+                var rtle = exc as ReflectionTypeLoadException;
+                this.logger.Log("An exception occurred while starting the application", exc);
+                var message = "We're sorry, the application couldn't be started :-(";
+                if (rtle != null)
+                {
+                    var loaderExceptionLogs = new StringBuilder();
+                    loaderExceptionLogs.Append("Loader Exceptions:").AppendLine();
+                    foreach (var loaderException in rtle.LoaderExceptions)
+                    {
+                        loaderExceptionLogs.Append(loaderException.ToString()).AppendLine();
+                    }
+                    this.logger.Log(loaderExceptionLogs.ToString(), TraceEventType.Error);
+                    message += Environment.NewLine + "Please make sure you have {0} installed.".FormatCurrent(InternalConstants.TeamExplorerName);
+                }
+                message += Environment.NewLine + Environment.NewLine + "If you keep experiencing this issue, please report it and include the contents of the log file (\"{0}\").".FormatCurrent(this.logger.LogFilePath);
+                MessageBox.Show(message, "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

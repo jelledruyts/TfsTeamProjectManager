@@ -101,6 +101,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Visual Studio 2012 or above have a built-in diff tool, call devenv.exe directly.
+            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS"))
+            {
+                if (regKey != null)
+                {
+                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
+                    if (File.Exists(devenvPath))
+                    {
+                        diffTools.Add(new DiffTool("Visual Studio 2015", devenvPath, "/diff %1 %2 %6 %7"));
+                    }
+                }
+            }
+
             using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\12.0\Setup\VS"))
             {
                 if (regKey != null)

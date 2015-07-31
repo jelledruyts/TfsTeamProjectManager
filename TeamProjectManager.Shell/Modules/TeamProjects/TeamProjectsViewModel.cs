@@ -215,6 +215,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             try
             {
+                // TODO-H: Add logic to detect TFS 2015
                 // Determine the version of TFS based on the service interfaces that are available.
                 var registrationService = (IRegistration)tfs.GetService(typeof(IRegistration));
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)

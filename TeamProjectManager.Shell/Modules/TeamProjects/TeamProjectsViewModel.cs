@@ -215,13 +215,16 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             try
             {
-                // TODO-H: Add logic to detect TFS 2015
                 // Determine the version of TFS based on the service interfaces that are available.
                 var registrationService = (IRegistration)tfs.GetService(typeof(IRegistration));
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService6", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "hooks", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V14, "Team Foundation Server 2015", "TFS 2015");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService6", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V12, "Team Foundation Server 2013", "TFS 2013");
                 }

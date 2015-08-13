@@ -25,18 +25,17 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             // Replace any macros.
             if (!task.IsCanceled)
             {
-                foreach (var teamProjectWithConfigurationItems in teamProjectsWithConfigurationItems)
+                foreach (var teamProject in teamProjectsWithConfigurationItems.Keys.ToArray())
                 {
-                    var teamProject = teamProjectWithConfigurationItems.Key;
-                    var workItemConfigurationItemList = teamProjectWithConfigurationItems.Value;
-                    foreach (var workItemConfigurationItem in workItemConfigurationItemList.ToArray())
+                    var transformedList = new List<WorkItemConfigurationItem>();
+                    foreach (var workItemConfigurationItem in teamProjectsWithConfigurationItems[teamProject])
                     {
                         // Clone the item so that any callers aren't affected by a changed XML definitions.
                         var clone = workItemConfigurationItem.Clone();
                         ReplaceTeamProjectMacros(clone.XmlDefinition, teamProject);
-                        workItemConfigurationItemList.Remove(workItemConfigurationItem);
-                        workItemConfigurationItemList.Add(clone);
+                        transformedList.Add(clone);
                     }
+                    teamProjectsWithConfigurationItems[teamProject] = transformedList;
                 }
             }
 

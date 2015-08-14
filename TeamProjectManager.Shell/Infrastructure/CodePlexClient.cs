@@ -30,7 +30,7 @@ namespace TeamProjectManager.Shell.Infrastructure
 
         #region GetLatestReleasedVersion
 
-        public static ApplicationVersion GetLatestReleasedVersion(string projectName, string editionName, ILogger logger)
+        public static ApplicationVersion GetLatestReleasedVersion(string projectName, ILogger logger)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace TeamProjectManager.Shell.Infrastructure
                     {
                         // For each release item in the feed, check if the title contains the edition name (if given) and one or more version numbers.
                         var title = item.Title.Text;
-                        if (!string.IsNullOrEmpty(title) && (string.IsNullOrEmpty(editionName) || title.IndexOf(editionName, StringComparison.OrdinalIgnoreCase) >= 0))
+                        if (!string.IsNullOrEmpty(title))
                         {
                             var versionMatches = VersionExpression.Matches(title);
                             foreach (Match versionMatch in versionMatches)

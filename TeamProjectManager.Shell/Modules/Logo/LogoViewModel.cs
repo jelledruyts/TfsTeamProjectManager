@@ -92,7 +92,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
             : base(eventAggregator, logger, "Logo")
         {
             this.HeaderTitle = InternalConstants.DefaultWindowTitle;
-            this.HeaderSubtitle = string.Format(CultureInfo.CurrentCulture, "v{0} - {1}", App.ApplicationVersion.ToString(3), InternalConstants.EditionName);
+            this.HeaderSubtitle = string.Format(CultureInfo.CurrentCulture, "v{0}", App.ApplicationVersion.ToString(3));
             this.OpenLogFileCommand = new RelayCommand(OpenLogFile, CanOpenLogFile);
             this.OpenHomepageCommand = new RelayCommand(OpenHomepage, CanOpenHomepage);
             CheckForUpdates();
@@ -134,7 +134,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
-                    e.Result = CodePlexClient.GetLatestReleasedVersion(InternalConstants.CodePlexProjectName, InternalConstants.CodePlexEditionName, this.Logger);
+                    e.Result = CodePlexClient.GetLatestReleasedVersion(InternalConstants.CodePlexProjectName, this.Logger);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
                 {

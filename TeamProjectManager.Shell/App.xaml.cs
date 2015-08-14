@@ -25,7 +25,7 @@ namespace TeamProjectManager.Shell
 
             // Create the logger.
             this.logger = new Logger();
-            this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0} - {1})", ApplicationVersion.ToString(), InternalConstants.EditionName), TraceEventType.Information);
+            this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0})", ApplicationVersion.ToString()), TraceEventType.Information);
             App.LogFilePath = this.logger.LogFilePath;
 
             // Ensure that the current culture is used for all controls (see http://www.west-wind.com/Weblog/posts/796725.aspx).
@@ -73,7 +73,6 @@ namespace TeamProjectManager.Shell
                         loaderExceptionLogs.Append(loaderException.ToString()).AppendLine();
                     }
                     this.logger.Log(loaderExceptionLogs.ToString(), TraceEventType.Error);
-                    message += Environment.NewLine + "Please make sure you have {0} installed.".FormatCurrent(InternalConstants.TeamExplorerName);
                 }
                 message += Environment.NewLine + Environment.NewLine + "If you keep experiencing this issue, please report it and include the contents of the log file (\"{0}\").".FormatCurrent(this.logger.LogFilePath);
                 MessageBox.Show(message, "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);

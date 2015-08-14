@@ -32,6 +32,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.Close();
         }
 
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
         private void Apply()
         {
             foreach (var originalWithClone in this.OriginalItemsWithClones)

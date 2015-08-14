@@ -54,6 +54,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.Close();
         }
 
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
         private void loadTransformationXmlButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();

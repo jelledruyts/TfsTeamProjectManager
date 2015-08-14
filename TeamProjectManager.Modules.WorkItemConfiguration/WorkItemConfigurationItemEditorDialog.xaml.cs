@@ -46,5 +46,11 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.DialogResult = true;
             this.Close();
         }
+
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
     }
 }

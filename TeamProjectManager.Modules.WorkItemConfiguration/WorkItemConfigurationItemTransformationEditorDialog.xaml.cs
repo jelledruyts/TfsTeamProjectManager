@@ -72,6 +72,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
         }
 
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
         private void inputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             PreviewTransformation();

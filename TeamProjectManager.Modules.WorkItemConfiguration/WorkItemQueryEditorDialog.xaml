@@ -42,8 +42,8 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-            <Button Content="OK" IsDefault="True" Width="75" x:Name="okButton" Click="okButton_Click" />
-            <Button Content="Cancel" IsCancel="True" Width="75" Margin="5,0,0,0" />
+            <Button Content="OK" Width="75" x:Name="okButton" Click="okButton_Click" />
+            <Button Content="Cancel" x:Name="cancelButton" Click="cancelButton_Click" Width="75" Margin="5,0,0,0" />
         </StackPanel>
     </Grid>
 </Window>

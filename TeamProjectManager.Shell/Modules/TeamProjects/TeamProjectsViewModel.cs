@@ -220,7 +220,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "hooks", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "ReleaseManagement", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V14, "Team Foundation Server 2015", "TFS 2015");
                 }

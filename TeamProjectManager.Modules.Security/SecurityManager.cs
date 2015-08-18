@@ -28,6 +28,8 @@ namespace TeamProjectManager.Modules.Security
             Permissions = new List<Permission>()
             {
                 // Team Project
+                // NOTE from https://msdn.microsoft.com/en-us/library/ms252587.aspx: Although the "Create tag definition" permission appears in the security settings at the team project level, tagging permissions are actually collection-level permissions that are scoped at the project level when they appear in the user interface. To scope tagging permissions to a single team project when using the TFSSecurity command, you must provide the GUID for the project as part of the command syntax. Otherwise, your change will apply to the entire team project collection. Keep this in mind when changing or setting these permissions.
+                new Permission(PermissionScope.TeamProject, PermissionScope.Tagging, "Create tag definition", string.Empty, TaggingPermissions.Create),
                 new Permission(PermissionScope.TeamProject, "Create test runs", PermissionActionIdConstants.PublishTestResults, AuthorizationProjectPermissions.PublishTestResults),
                 new Permission(PermissionScope.TeamProject, "Delete team project", PermissionActionIdConstants.Delete, AuthorizationProjectPermissions.Delete),
                 new Permission(PermissionScope.TeamProject, "Delete test runs", PermissionActionIdConstants.DeleteTestResults, AuthorizationProjectPermissions.DeleteTestResults),
@@ -60,6 +62,7 @@ namespace TeamProjectManager.Modules.Security
                 new Permission(PermissionScope.WorkItemAreas, "Edit this node", PermissionActionIdConstants.GenericWrite, AuthorizationCssNodePermissions.GenericWrite),
                 new Permission(PermissionScope.WorkItemAreas, "Edit work items in this node", PermissionActionIdConstants.WorkItemWrite, AuthorizationCssNodePermissions.WorkItemWrite),
                 new Permission(PermissionScope.WorkItemAreas, "Manage test plans", PermissionActionIdConstants.ManageTestPlans, AuthorizationCssNodePermissions.ManageTestPlans),
+                new Permission(PermissionScope.WorkItemAreas, "Manage test suites", PermissionActionIdConstants.ManageTestSuites, AuthorizationCssNodePermissions.ManageTestSuites),
                 new Permission(PermissionScope.WorkItemAreas, "View permissions for this node", PermissionActionIdConstants.GenericRead, AuthorizationCssNodePermissions.GenericRead),
                 new Permission(PermissionScope.WorkItemAreas, "View work items in this node", PermissionActionIdConstants.WorkItemRead, AuthorizationCssNodePermissions.WorkItemRead),
 
@@ -92,8 +95,9 @@ namespace TeamProjectManager.Modules.Security
 
         public static void Apply(ApplicationTask task, TfsTeamProjectCollection tfs, string teamProjectName, SecurityGroupChange securityGroup)
         {
-            var ss = tfs.GetService<ISecurityService>();
-            var buildSecurityNamespace = ss.GetSecurityNamespace(BuildSecurity.BuildNamespaceId);
+            var securityNamespaces = tfs.GetService<ISecurityService>().GetSecurityNamespaces();
+            var taggingSecurityNamespace = securityNamespaces.FirstOrDefault(n => n.Description.NamespaceId == FrameworkSecurity.TaggingNamespaceId);
+            var buildSecurityNamespace = securityNamespaces.FirstOrDefault(n => n.Description.NamespaceId == BuildSecurity.BuildNamespaceId);
             var ims = tfs.GetService<IIdentityManagementService>();
             var css = tfs.GetService<ICommonStructureService>();
             var vcs = tfs.GetService<VersionControlServer>();
@@ -142,11 +146,12 @@ namespace TeamProjectManager.Modules.Security
                 {
                     throw new InvalidOperationException("The root iteration could not be retrieved");
                 }
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.TeamProjectPermissions, PermissionNamespaces.Project + teamProjectUrl);
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.WorkItemAreasPermissions, rootArea.Uri);
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.WorkItemIterationsPermissions, rootIteration.Uri);
-                ApplyTeamBuildPermissions(teamProject, groupDescriptor, buildSecurityNamespace, securityGroup.TeamBuildPermissions);
-                ApplySourceControlPermissions(teamProject, groupIdentityName, vcs, securityGroup.SourceControlPermissions);
+                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.TeamProject), PermissionNamespaces.Project + teamProjectUrl);
+                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.WorkItemAreas), rootArea.Uri);
+                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.WorkItemIterations), rootIteration.Uri);
+                ApplyTeamBuildPermissions(teamProject, groupDescriptor, buildSecurityNamespace, securityGroup.GetFunctionalChanges(PermissionScope.TeamBuild));
+                ApplySourceControlPermissions(teamProject, groupIdentityName, vcs, securityGroup.GetFunctionalChanges(PermissionScope.SourceControl));
+                ApplyTaggingPermissions(teamProject, groupDescriptor, taggingSecurityNamespace, securityGroup.GetFunctionalChanges(PermissionScope.Tagging));
                 task.Status = "Applied security permissions";
             }
 
@@ -204,22 +209,36 @@ namespace TeamProjectManager.Modules.Security
 
         private static void ApplyTeamBuildPermissions(ProjectInfo teamProject, IdentityDescriptor groupDescriptor, SecurityNamespace buildSecurityNamespace, IEnumerable<PermissionChange> teamBuildPermissions)
         {
-            if (teamBuildPermissions.Where(p => p.Action != PermissionChangeAction.None).Any())
+            var teamProjectToken = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+            ApplySecurityNamespacePermissions(teamProjectToken, groupDescriptor, buildSecurityNamespace, teamBuildPermissions);
+        }
+
+        private static void ApplyTaggingPermissions(ProjectInfo teamProject, IdentityDescriptor groupDescriptor, SecurityNamespace taggingSecurityNamespace, IEnumerable<PermissionChange> taggingPermissions)
+        {
+            var teamProjectToken = taggingSecurityNamespace.Description.SeparatorValue + LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+            ApplySecurityNamespacePermissions(teamProjectToken, groupDescriptor, taggingSecurityNamespace, taggingPermissions);
+        }
+
+        private static void ApplySecurityNamespacePermissions(string token, IdentityDescriptor identity, SecurityNamespace securityNamespace, IEnumerable<PermissionChange> permissions)
+        {
+            if (permissions.Where(p => p.Action != PermissionChangeAction.None).Any())
             {
-                var allows = teamBuildPermissions.Where(p => p.Action == PermissionChangeAction.Allow).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
-                var denies = teamBuildPermissions.Where(p => p.Action == PermissionChangeAction.Deny).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
-                var inherits = teamBuildPermissions.Where(p => p.Action == PermissionChangeAction.Inherit).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
+                var allows = permissions.Where(p => p.Action == PermissionChangeAction.Allow).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
+                var denies = permissions.Where(p => p.Action == PermissionChangeAction.Deny).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
+                var inherits = permissions.Where(p => p.Action == PermissionChangeAction.Inherit).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
                 if (allows > 0 || denies > 0 || inherits > 0)
                 {
-                    // See http://blogs.msdn.com/b/jpricket/archive/2010/07/19/tfs-2010-build-security-api.aspx
-                    var teamProjectToken = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+                    if (securityNamespace == null)
+                    {
+                        throw new InvalidOperationException("Permissions are being modified but the security namespace is not available in the current Team Project Collection.");
+                    }
                     if (inherits > 0)
                     {
-                        buildSecurityNamespace.RemovePermissions(teamProjectToken, groupDescriptor, inherits);
+                        securityNamespace.RemovePermissions(token, identity, inherits);
                     }
                     if (allows > 0 || denies > 0)
                     {
-                        buildSecurityNamespace.SetPermissions(teamProjectToken, groupDescriptor, allows, denies, true);
+                        securityNamespace.SetPermissions(token, identity, allows, denies, true);
                     }
                 }
             }

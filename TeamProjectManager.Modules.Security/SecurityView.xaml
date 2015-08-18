@@ -130,7 +130,7 @@
                                     <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.TeamBuildPermissions}" />
                                 </ScrollViewer>
                             </TabItem>
-                            <TabItem Header="Source Control">
+                            <TabItem Header="TFVC">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                                     <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.SourceControlPermissions}" />
                                 </ScrollViewer>

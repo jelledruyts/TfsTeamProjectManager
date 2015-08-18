@@ -263,7 +263,7 @@ namespace TeamProjectManager.Modules.Security
                     this.SecurityGroupChange.ResetPermissionChanges();
                     foreach (var persistedPermission in persistedPermissions)
                     {
-                        var permission = this.SecurityGroupChange.PermissionChanges.FirstOrDefault(p => p.Permission.Scope == persistedPermission.Scope && string.Equals(p.Permission.PermissionConstant, persistedPermission.Name, StringComparison.OrdinalIgnoreCase));
+                        var permission = this.SecurityGroupChange.PermissionChanges.FirstOrDefault(p => p.Permission.DisplayScope == persistedPermission.Scope && string.Equals(p.Permission.PermissionConstant, persistedPermission.Name, StringComparison.OrdinalIgnoreCase));
                         if (permission != null)
                         {
                             permission.Action = persistedPermission.Action;

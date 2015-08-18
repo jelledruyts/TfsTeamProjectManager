@@ -16,15 +16,17 @@ namespace TeamProjectManager.Modules.Security
         public IList<PermissionChange> WorkItemAreasPermissions { get; private set; }
         public IList<PermissionChange> WorkItemIterationsPermissions { get; private set; }
         public IList<PermissionChange> SourceControlPermissions { get; private set; }
+        public IList<PermissionChange> TaggingPermissions { get; private set; }
 
         public SecurityGroupChange()
         {
             this.PermissionChanges = SecurityManager.Permissions.Select(p => new PermissionChange(p)).ToList();
-            this.TeamProjectPermissions = this.PermissionChanges.Where(p => p.Permission.Scope == PermissionScope.TeamProject).ToList();
-            this.TeamBuildPermissions = this.PermissionChanges.Where(p => p.Permission.Scope == PermissionScope.TeamBuild).ToList();
-            this.WorkItemAreasPermissions = this.PermissionChanges.Where(p => p.Permission.Scope == PermissionScope.WorkItemAreas).ToList();
-            this.WorkItemIterationsPermissions = this.PermissionChanges.Where(p => p.Permission.Scope == PermissionScope.WorkItemIterations).ToList();
-            this.SourceControlPermissions = this.PermissionChanges.Where(p => p.Permission.Scope == PermissionScope.SourceControl).ToList();
+            this.TeamProjectPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.TeamProject).ToList();
+            this.TeamBuildPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.TeamBuild).ToList();
+            this.WorkItemAreasPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.WorkItemAreas).ToList();
+            this.WorkItemIterationsPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.WorkItemIterations).ToList();
+            this.SourceControlPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.SourceControl).ToList();
+            this.TaggingPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.Tagging).ToList();
         }
 
         public void ResetPermissionChanges()
@@ -33,6 +35,11 @@ namespace TeamProjectManager.Modules.Security
             {
                 permissionChange.Action = PermissionChangeAction.None;
             }
+        }
+
+        public IList<PermissionChange> GetFunctionalChanges(PermissionScope scope)
+        {
+            return this.PermissionChanges.Where(p => p.Permission.FunctionalScope == scope).ToArray();
         }
     }
 }

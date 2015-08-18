@@ -19,7 +19,7 @@ namespace TeamProjectManager.Modules.Security
         }
 
         public PermissionChangePersistenceData(PermissionChange permissionChange)
-            : this(permissionChange.Permission.Scope, permissionChange.Permission.PermissionConstant, permissionChange.Action)
+            : this(permissionChange.Permission.DisplayScope, permissionChange.Permission.PermissionConstant, permissionChange.Action)
         {
         }
 

@@ -7,6 +7,7 @@ namespace TeamProjectManager.Modules.Security
         TeamBuild,
         WorkItemAreas,
         WorkItemIterations,
-        SourceControl
+        SourceControl,
+        Tagging
     }
 }

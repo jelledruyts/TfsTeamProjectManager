@@ -50,7 +50,7 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
-* v2.0.5715 (August 25, 2015)
+* v2.0.5716 (August 25, 2015)
 ** Added support for TFS 2015
 ** Added support for managing security permissions on Tagging, Git and Work Item Queries
 ** Added support for exporting permissions of existing security groups

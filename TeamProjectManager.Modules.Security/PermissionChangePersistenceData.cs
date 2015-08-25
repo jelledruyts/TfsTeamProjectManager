@@ -1,10 +1,15 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.Security
 {
     [DataContract(Namespace = "http://schemas.teamprojectmanager.codeplex.com/permissionchange/2013/04")]
     public class PermissionChangePersistenceData
     {
+        #region Properties
+
         [DataMember]
         public PermissionScope Scope { get; set; }
 
@@ -13,6 +18,10 @@ namespace TeamProjectManager.Modules.Security
 
         [DataMember]
         public PermissionChangeAction Action { get; set; }
+
+        #endregion
+
+        #region Constructors
 
         public PermissionChangePersistenceData()
         {
@@ -29,5 +38,21 @@ namespace TeamProjectManager.Modules.Security
             this.Name = name;
             this.Action = action;
         }
+
+        #endregion
+
+        #region Static Load & Save
+
+        public static IList<PermissionChangePersistenceData> Load(string fileName)
+        {
+            return SerializationProvider.Read<PermissionChangePersistenceData[]>(fileName);
+        }
+
+        public static void Save(string fileName, IList<PermissionChangePersistenceData> data)
+        {
+            SerializationProvider.Write<PermissionChangePersistenceData[]>(data.ToArray(), fileName);
+        }
+
+        #endregion
     }
 }

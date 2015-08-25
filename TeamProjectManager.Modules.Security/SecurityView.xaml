@@ -11,7 +11,7 @@
 
         <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
 
-            <TabItem Header="View / Delete Groups" i:HelpProvider.HelpContent="Allows you to view and delete the security groups that are defined for each Team Project. This can be useful when you want to get an overview of all the security groups being used.">
+            <TabItem Header="View / Export / Delete Groups" i:HelpProvider.HelpContent="Allows you to view and delete the security groups that are defined for each Team Project. This can be useful when you want to get an overview of all the security groups being used. You can also export the permissions to a file which can be used when adding or updating groups.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -43,7 +43,10 @@
                             <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="2" Content="Delete Selected Security Groups" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedSecurityGroupsCommand}" />
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Delete Selected Security Groups" Command="{Binding Path=DeleteSelectedSecurityGroupsCommand}" />
+                        <Button Content="Export Permissions" Command="{Binding Path=ExportSelectedSecurityGroupPermissionsCommand}" ToolTip="Exports the security permissions for the selected groups to a file that can be used when adding or updating groups." Margin="5,0,0,0" />
+                    </WrapPanel>
                 </Grid>
             </TabItem>
 

@@ -349,27 +349,30 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 }
             }
 
-            var task = new ApplicationTask("Exporting " + workItemTypesToExport.Count.ToCountString("work item type"), workItemTypesToExport.Count, true);
-            PublishStatus(new StatusEventArgs(task));
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sender, e) =>
+            if (workItemTypesToExport.Any())
             {
-                WorkItemConfigurationItemImportExport.Export(this.Logger, task, workItemTypesToExport);
-            };
-            worker.RunWorkerCompleted += (sender, e) =>
-            {
-                if (e.Error != null)
+                var task = new ApplicationTask("Exporting " + workItemTypesToExport.Count.ToCountString("work item type"), workItemTypesToExport.Count, true);
+                PublishStatus(new StatusEventArgs(task));
+                var worker = new BackgroundWorker();
+                worker.DoWork += (sender, e) =>
                 {
-                    Logger.Log("An unexpected exception occurred while exporting work item types", e.Error);
-                    task.SetError(e.Error);
-                    task.SetComplete("An unexpected exception occurred");
-                }
-                else
+                    WorkItemConfigurationItemImportExport.Export(this.Logger, task, workItemTypesToExport);
+                };
+                worker.RunWorkerCompleted += (sender, e) =>
                 {
-                    task.SetComplete("Exported " + workItemTypesToExport.Count.ToCountString("work item type"));
-                }
-            };
-            worker.RunWorkerAsync();
+                    if (e.Error != null)
+                    {
+                        Logger.Log("An unexpected exception occurred while exporting work item types", e.Error);
+                        task.SetError(e.Error);
+                        task.SetComplete("An unexpected exception occurred");
+                    }
+                    else
+                    {
+                        task.SetComplete("Exported " + workItemTypesToExport.Count.ToCountString("work item type"));
+                    }
+                };
+                worker.RunWorkerAsync();
+            }
         }
 
         private bool CanEditSelectedWorkItemTypes(object argument)

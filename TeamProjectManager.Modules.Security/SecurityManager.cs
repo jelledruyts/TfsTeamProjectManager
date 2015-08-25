@@ -12,7 +12,9 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
@@ -29,12 +31,12 @@ namespace TeamProjectManager.Modules.Security
         {
             permissionGroupFactories = new[]
             {
-                new PermissionGroupFactory(PermissionScope.TeamProject, FrameworkSecurity.TeamProjectNamespaceId, "Team Project", new [] { "ADMINISTER_BUILD", "START_BUILD", "EDIT_BUILD_STATUS", "UPDATE_BUILD" }, (tpc, tfsVersion, teamProject) => PermissionNamespaces.Project + teamProject.Uri.ToString()),
-                new PermissionGroupFactory(PermissionScope.Tagging, FrameworkSecurity.TaggingNamespaceId, "Tagging", (tpc, tfsVersion, teamProject) => "/" + LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId),
-                new PermissionGroupFactory(PermissionScope.WorkItemAreas, AuthorizationSecurityConstants.CommonStructureNodeSecurityGuid, "Areas", (tpc, tfsVersion, teamProject) =>
+                new PermissionGroupFactory(PermissionScope.TeamProject, FrameworkSecurity.TeamProjectNamespaceId, "Team Project", new [] { "ADMINISTER_BUILD", "START_BUILD", "EDIT_BUILD_STATUS", "UPDATE_BUILD" }, (tpc, tfsVersion, teamProjectName, teamProjectUri) => PermissionNamespaces.Project + teamProjectUri),
+                new PermissionGroupFactory(PermissionScope.Tagging, FrameworkSecurity.TaggingNamespaceId, "Tagging", (tpc, tfsVersion, teamProjectName, teamProjectUri) => "/" + LinkingUtilities.DecodeUri(teamProjectUri).ToolSpecificId),
+                new PermissionGroupFactory(PermissionScope.WorkItemAreas, AuthorizationSecurityConstants.CommonStructureNodeSecurityGuid, "Areas", (tpc, tfsVersion, teamProjectName, teamProjectUri) =>
                 {
                     var css = tpc.GetService<ICommonStructureService>();
-                    var projectStructures = css.ListStructures(teamProject.Uri);
+                    var projectStructures = css.ListStructures(teamProjectUri);
                     var rootArea = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectModelHierarchy);
                     if (rootArea == null)
                     {
@@ -42,10 +44,10 @@ namespace TeamProjectManager.Modules.Security
                     }
                     return rootArea.Uri;
                 }),
-                new PermissionGroupFactory(PermissionScope.WorkItemIterations, AuthorizationSecurityConstants.IterationNodeSecurityGuid, "Iterations", (tpc, tfsVersion, teamProject) =>
+                new PermissionGroupFactory(PermissionScope.WorkItemIterations, AuthorizationSecurityConstants.IterationNodeSecurityGuid, "Iterations", (tpc, tfsVersion, teamProjectName, teamProjectUri) =>
                 {
                     var css = tpc.GetService<ICommonStructureService>();
-                    var projectStructures = css.ListStructures(teamProject.Uri);
+                    var projectStructures = css.ListStructures(teamProjectUri);
                     var rootIteration = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectLifecycle);
                     if (rootIteration == null)
                     {
@@ -53,31 +55,32 @@ namespace TeamProjectManager.Modules.Security
                     }
                     return rootIteration.Uri;
                 }),
-                new PermissionGroupFactory(PermissionScope.WorkItemQueryFolders, QueryItemSecurityConstants.NamespaceGuid, "Queries", new [] { "FullControl" }, (tpc, tfsVersion, teamProject) =>
+                new PermissionGroupFactory(PermissionScope.WorkItemQueryFolders, QueryItemSecurityConstants.NamespaceGuid, "Queries", new [] { "FullControl" }, (tpc, tfsVersion, teamProjectName, teamProjectUri) =>
                 {
                     var store = tpc.GetService<WorkItemStore>();
-                    var project = store.Projects[teamProject.Name];
+                    var project = store.Projects[teamProjectName];
                     foreach (var item in project.QueryHierarchy)
                     {
                         if (!item.IsPersonal && item is QueryFolder)
                         {
-                            var teamProjectGuid = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+                            var teamProjectGuid = LinkingUtilities.DecodeUri(teamProjectUri).ToolSpecificId;
                             return "$/{0}/{1}".FormatInvariant(teamProjectGuid, item.Id.ToString());
                         }
                     }
                     throw new InvalidOperationException("The shared queries folder could not be retrieved");
                 }),
-                new PermissionGroupFactory(PermissionScope.TeamBuild, BuildSecurity.BuildNamespaceId, "Team Build", (tpc, tfsVersion, teamProject) => LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId),
-                new PermissionGroupFactory(PermissionScope.SourceControl, SecurityConstants.RepositorySecurityNamespaceGuid, "TFVC", (tpc, tfsVersion, teamProject) =>
+                new PermissionGroupFactory(PermissionScope.TeamBuild, BuildSecurity.BuildNamespaceId, "Team Build", (tpc, tfsVersion, teamProjectName, teamProjectUri) => LinkingUtilities.DecodeUri(teamProjectUri).ToolSpecificId),
+                new PermissionGroupFactory(PermissionScope.SourceControl, SecurityConstants.RepositorySecurityNamespaceGuid, "TFVC", (tpc, tfsVersion, teamProjectName, teamProjectUri) =>
                 {
                     var vcs = tpc.GetService<VersionControlServer>();
-                    return vcs.GetTeamProject(teamProject.Name).ServerItem;
+                    var teamProject = vcs.TryGetTeamProject(teamProjectName);
+                    return teamProject == null ? null: vcs.GetTeamProject(teamProjectName).ServerItem;
                 }),
-                new PermissionGroupFactory(PermissionScope.GitRepositories, GitConstants.GitSecurityNamespaceId, "Git", (tpc, tfsVersion, teamProject) =>
+                new PermissionGroupFactory(PermissionScope.GitRepositories, GitConstants.GitSecurityNamespaceId, "Git", (tpc, tfsVersion, teamProjectName, teamProjectUri) =>
                 {
                     // For pre-TFS 2015 this is "repositories/<guid>", otherwise it's "repoV2/<guid>".
                     var prefix = tfsVersion >= TfsMajorVersion.V14 ? "repoV2" : "repositories";
-                    var teamProjectGuid = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+                    var teamProjectGuid = LinkingUtilities.DecodeUri(teamProjectUri).ToolSpecificId;
                     return "{0}/{1}".FormatInvariant(prefix, teamProjectGuid);
                 }),
             };
@@ -102,6 +105,83 @@ namespace TeamProjectManager.Modules.Security
                 }
             }
             return groups;
+        }
+
+        #endregion
+
+        #region ExportPermissions
+
+        public static void ExportPermissions(ILogger logger, ApplicationTask task, TfsTeamProjectCollection tfs, TfsMajorVersion tfsVersion, IList<SecurityGroupPermissionExportRequest> exportRequests)
+        {
+            if (exportRequests.Any())
+            {
+                var step = 0;
+                var securityNamespaces = tfs.GetService<ISecurityService>().GetSecurityNamespaces();
+                var ims = tfs.GetService<IIdentityManagementService>();
+                foreach (var exportRequest in exportRequests)
+                {
+                    task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Exporting \"{0}\" permissions from Team Project \"{1}\"", exportRequest.SecurityGroup.Name, exportRequest.SecurityGroup.TeamProject.Name));
+                    try
+                    {
+                        var identity = ims.ReadIdentity(IdentitySearchFactor.Identifier, exportRequest.SecurityGroup.Sid, MembershipQuery.None, ReadIdentityOptions.None);
+                        if (identity == null)
+                        {
+                            var message = "The security group \"{0}\" could not be retrieved.".FormatCurrent(exportRequest.SecurityGroup.FullName);
+                            logger.Log(message, TraceEventType.Warning);
+                            task.SetWarning(message);
+                        }
+                        else
+                        {
+                            var permissions = new List<PermissionChangePersistenceData>();
+                            foreach (var securityNamespace in securityNamespaces)
+                            {
+                                foreach (var factory in permissionGroupFactories)
+                                {
+                                    if (factory.AppliesTo(securityNamespace.Description.NamespaceId))
+                                    {
+                                        var token = factory.GetObjectToken(tfs, tfsVersion, exportRequest.SecurityGroup.TeamProject.Name, exportRequest.SecurityGroup.TeamProject.Uri.ToString());
+                                        if (token != null)
+                                        {
+                                            var permissionGroup = factory.GetPermissionGroup(securityNamespace);
+                                            var acl = securityNamespace.QueryAccessControlList(token, new[] { identity.Descriptor }, false);
+                                            foreach (var ace in acl.AccessControlEntries)
+                                            {
+                                                foreach (var permission in permissionGroup.Permissions)
+                                                {
+                                                    var action = PermissionChangeAction.Inherit;
+                                                    if ((permission.PermissionBit & ace.Allow) == permission.PermissionBit)
+                                                    {
+                                                        action = PermissionChangeAction.Allow;
+                                                    }
+                                                    else if ((permission.PermissionBit & ace.Deny) == permission.PermissionBit)
+                                                    {
+                                                        action = PermissionChangeAction.Deny;
+                                                    }
+                                                    permissions.Add(new PermissionChangePersistenceData(permission.Scope, permission.PermissionConstant, action));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(exportRequest.FileName));
+                            PermissionChangePersistenceData.Save(exportRequest.FileName, permissions);
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        var message = string.Format(CultureInfo.CurrentCulture, "An error occurred while exporting \"{0}\" permissions from Team Project \"{1}\"", exportRequest.SecurityGroup.Name, exportRequest.SecurityGroup.TeamProject.Name);
+                        logger.Log(message, exc);
+                        task.SetError(message, exc);
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -152,8 +232,11 @@ namespace TeamProjectManager.Modules.Security
                         var factory = permissionGroupFactories.FirstOrDefault(f => f.AppliesTo(securityNamespace.Description.NamespaceId, groupChange.PermissionGroup.Scope));
                         if (factory != null)
                         {
-                            var token = factory.GetObjectToken(tfs, tfsVersion, teamProject);
-                            ApplySecurityNamespacePermissions(token, groupDescriptor, securityNamespace, groupChange.PermissionChanges);
+                            var token = factory.GetObjectToken(tfs, tfsVersion, teamProject.Name, teamProject.Uri);
+                            if (token != null)
+                            {
+                                ApplySecurityNamespacePermissions(token, groupDescriptor, securityNamespace, groupChange.PermissionChanges);
+                            }
                         }
                     }
                 }
@@ -276,14 +359,14 @@ namespace TeamProjectManager.Modules.Security
             private PermissionScope scope;
             private string displayName;
             private IEnumerable<string> excludedActions;
-            private Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory;
+            private Func<TfsTeamProjectCollection, TfsMajorVersion, string, string, string> objectTokenFactory;
 
-            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory)
+            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, Func<TfsTeamProjectCollection, TfsMajorVersion, string, string, string> objectTokenFactory)
                 : this(scope, securityNamespaceId, displayName, null, objectTokenFactory)
             {
             }
 
-            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, IEnumerable<string> excludedActions, Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory)
+            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, IEnumerable<string> excludedActions, Func<TfsTeamProjectCollection, TfsMajorVersion, string, string, string> objectTokenFactory)
             {
                 this.scope = scope;
                 this.securityNamespaceId = securityNamespaceId;
@@ -315,9 +398,9 @@ namespace TeamProjectManager.Modules.Security
                 return new PermissionGroup(this.scope, this.displayName, permissions);
             }
 
-            public string GetObjectToken(TfsTeamProjectCollection tpc, TfsMajorVersion tfsVersion, ProjectInfo teamProject)
+            public string GetObjectToken(TfsTeamProjectCollection tpc, TfsMajorVersion tfsVersion, string teamProjectName, string teamProjectUri)
             {
-                return this.objectTokenFactory(tpc, tfsVersion, teamProject);
+                return this.objectTokenFactory(tpc, tfsVersion, teamProjectName, teamProjectUri);
             }
         }
 

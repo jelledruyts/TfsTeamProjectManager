@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using TeamProjectManager.Common.Events;
@@ -22,6 +23,7 @@ namespace TeamProjectManager.Modules.Security
 
         public RelayCommand GetSecurityGroupsCommand { get; private set; }
         public RelayCommand DeleteSelectedSecurityGroupsCommand { get; private set; }
+        public RelayCommand ExportSelectedSecurityGroupPermissionsCommand { get; private set; }
         public RelayCommand AddOrUpdateSecurityGroupCommand { get; private set; }
         public RelayCommand ResetSecurityPermissionsCommand { get; private set; }
         public RelayCommand LoadSecurityPermissionsCommand { get; private set; }
@@ -73,6 +75,7 @@ namespace TeamProjectManager.Modules.Security
         {
             this.GetSecurityGroupsCommand = new RelayCommand(GetSecurityGroups, CanGetSecurityGroups);
             this.DeleteSelectedSecurityGroupsCommand = new RelayCommand(DeleteSelectedSecurityGroups, CanDeleteSelectedSecurityGroups);
+            this.ExportSelectedSecurityGroupPermissionsCommand = new RelayCommand(ExportSelectedSecurityGroupPermissions, CanExportSelectedSecurityGroupPermissions);
             this.AddOrUpdateSecurityGroupCommand = new RelayCommand(AddOrUpdateSecurityGroup, CanAddOrUpdateSecurityGroup);
             this.ResetSecurityPermissionsCommand = new RelayCommand(ResetSecurityPermissions, CanResetSecurityPermissions);
             this.LoadSecurityPermissionsCommand = new RelayCommand(LoadSecurityPermissions, CanLoadSecurityPermissions);
@@ -245,6 +248,75 @@ namespace TeamProjectManager.Modules.Security
 
         #endregion
 
+        #region ExportSelectedSecurityGroupPermissions Command
+
+        private bool CanExportSelectedSecurityGroupPermissions(object argument)
+        {
+            return this.SelectedSecurityGroups != null && this.SelectedSecurityGroups.Any();
+        }
+
+        private void ExportSelectedSecurityGroupPermissions(object argument)
+        {
+            var exportRequests = new List<SecurityGroupPermissionExportRequest>();
+            var securityGroups = this.SelectedSecurityGroups;
+            if (securityGroups.Count == 1)
+            {
+                // Export to a single file.
+                var securityGroup = securityGroups.Single();
+                var dialog = new SaveFileDialog();
+                dialog.FileName = securityGroup.Name + ".xml";
+                dialog.Filter = "XML Files (*.xml)|*.xml";
+                var result = dialog.ShowDialog(Application.Current.MainWindow);
+                if (result == true)
+                {
+                    exportRequests.Add(new SecurityGroupPermissionExportRequest(securityGroup, dialog.FileName));
+                }
+            }
+            else
+            {
+                // Export to a directory structure.
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                dialog.Description = "Please select the path where to export the permission files (*.xml). They will be stored in a folder per Team Project.";
+                var result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var rootFolder = dialog.SelectedPath;
+                    foreach (var securityGroup in securityGroups)
+                    {
+                        var fileName = Path.Combine(rootFolder, securityGroup.TeamProject.Name, securityGroup.Name + ".xml");
+                        exportRequests.Add(new SecurityGroupPermissionExportRequest(securityGroup, fileName));
+                    }
+                }
+            }
+
+            if (exportRequests.Any())
+            {
+                var task = new ApplicationTask("Exporting " + exportRequests.Count.ToCountString("security group permission"), exportRequests.Count, true);
+                PublishStatus(new StatusEventArgs(task));
+                var worker = new BackgroundWorker();
+                worker.DoWork += (sender, e) =>
+                {
+                    SecurityManager.ExportPermissions(this.Logger, task, this.GetSelectedTfsTeamProjectCollection(), this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, exportRequests);
+                };
+                worker.RunWorkerCompleted += (sender, e) =>
+                {
+                    if (e.Error != null)
+                    {
+                        Logger.Log("An unexpected exception occurred while exporting security group permission", e.Error);
+                        task.SetError(e.Error);
+                        task.SetComplete("An unexpected exception occurred");
+                    }
+                    else
+                    {
+                        task.SetComplete("Exported " + exportRequests.Count.ToCountString("security group permission"));
+                    }
+                };
+                worker.RunWorkerAsync();
+            }
+        }
+
+        #endregion
+
         #region ResetSecurityPermissions Command
 
         private bool CanResetSecurityPermissions(object argument)
@@ -276,7 +348,7 @@ namespace TeamProjectManager.Modules.Security
             {
                 try
                 {
-                    var persistedPermissions = SerializationProvider.Read<PermissionChangePersistenceData[]>(dialog.FileName);
+                    var persistedPermissions = PermissionChangePersistenceData.Load(dialog.FileName);
                     this.SecurityGroupChange.ResetPermissionChanges();
                     foreach (var persistedPermission in persistedPermissions)
                     {
@@ -290,11 +362,6 @@ namespace TeamProjectManager.Modules.Security
                             }
                         }
                     }
-
-                    // A PermissionChange is not observable, force a UI binding refresh by removing and re-adding the entire instance.
-                    var change = this.SecurityGroupChange;
-                    this.SecurityGroupChange = null;
-                    this.SecurityGroupChange = change;
                 }
                 catch (Exception exc)
                 {
@@ -323,7 +390,7 @@ namespace TeamProjectManager.Modules.Security
             {
                 try
                 {
-                    SerializationProvider.Write<PermissionChangePersistenceData[]>(this.SecurityGroupChange.PermissionGroupChanges.SelectMany(g => g.PermissionChanges).Select(p => new PermissionChangePersistenceData(p)).ToArray(), dialog.FileName);
+                    PermissionChangePersistenceData.Save(dialog.FileName, this.SecurityGroupChange.PermissionGroupChanges.SelectMany(g => g.PermissionChanges).Select(p => new PermissionChangePersistenceData(p)).ToArray());
                 }
                 catch (Exception exc)
                 {

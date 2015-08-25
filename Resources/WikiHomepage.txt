@@ -20,6 +20,7 @@ Team Project Manager can help you...
 * *Manage security*
 ** Understand which security groups have which members
 ** Delete security groups
+** Export permissions from existing security groups
 ** Add or update security groups
 ** Manage members and permissions for security groups
 * *Manage source control*
@@ -39,9 +40,7 @@ If you can think of other great features, please let us know through the discuss
 
 !! Compatibility
 
-TFS Team Project Manager works against TFS 2005, 2008, 2010 and 2012.
-
-On the machine where you run the tool, you need to have Team Explorer installed; use the edition of TFS Team Project Manager that matches your version of Team Explorer.
+TFS Team Project Manager works against any version of Team Foundation Server, including Visual Studio Online (even though not all features are always supported there).
 
 !! Free Software
 
@@ -51,6 +50,21 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v2.0.5715 (August 25, 2015)
+** Added support for TFS 2015
+** Added support for managing security permissions on Tagging, Git and Work Item Queries
+** Added support for exporting permissions of existing security groups
+** Fixed an issue that macros weren't correctly replaced when importing work item types to multiple team projects
+* v1.8.5416 (October 30, 2014)
+** Added support for filtering and grouping the build definition list (patch submitted by user "AMainka")
+** Added support for deleting existing builds when deleting a build definition (patch submitted by user "xdaDaveShaw")
+** Added support for importing a work item "comparison source" from a Process Template registered on a Team Project Collection
+** Fixed an issue that Work Item Query changes didn't persist after closing Team Project Manager
+** Fixed an issue where adding files to the "work item types / import" list removed all existing files from the list
+* v1.7.5119 (January 6th, 2014)
+** Added support for managing Work Item Queries
+** Fixed issue "TF50609: MANAGE_TEST_PLANS does not exist." when setting permissions in the Security Module
+** Fixed issue where comparing work item configuration for a Team Project that doesn't have process settings configured would throw TF400572
 * v1.6.4968 (August 8th, 2013)
 ** Source Control module now allows you to visualize the branch hierarchies across Team Projects and export them as XML or DGML.
 ** Source Control module no longer has "View Latest Changesets" screen since this functionality is now contained in the Activity module.

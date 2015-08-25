@@ -3,7 +3,7 @@
 If you want to contribute any code (features or bug fixes) to this project, then you're awesome. You can do so either by submitting a patch or by requesting to become a project member.
 
 !! Submitting A Patch
-Submitting a patch is as easy as uploading the files you've changed and providing a desciption. You can do so on the "Source Code" tab by clicking "Upload Patch".
+Submitting a patch is as easy as uploading the files you've changed and providing a description. You can do so on the "Source Code" tab by clicking "Upload Patch".
 
 Although not strictly required, we would appreciate that you associate a work item (issue) with your patch so it's very obvious what your patch is supposed to do. If a work item doesn't exist yet, please don't hesitate to create one. This helps us understand the scope and impact of your patch and allow us to more easily integrate it into the main code base.
 
@@ -16,11 +16,8 @@ Here are some base rules for contributors:
 ** It's mostly the "across Team Projects" part that's important here: there are many tools (command-line or other) that you can use to automate certain tasks, but the big benefit here is that you can do them in bulk for a lot of projects at once.
 ** If your feature doesn't fit in with the mindset that it's an operation to be performed on many Team Projects, or on the Team Project Collection above it, it's probably not a good candidate.
 * Create a work item for every feature or bug so that it’s clear what you’re working on and what is in each release.
-** Use the "Release" field in the work item to indicate which version and edition it's intended for, e.g. "TFS Team Project Manager 2012 Edition v1.4".
-** If you have a feature or bug fix that supports multiple editions, please create a work item for each edition (this ensures that each release page shows all the features and bug fixes it contains).
+** Use the "Release" field in the work item to indicate which version it's intended for, e.g. "TFS Team Project Manager v2.0".
 * Check in your changes in the *Main* branch.
-** I create the releases from the different “Editions” branches, so if you put your changes in Main then I will merge them to the appropriate branch(es) depending on which Team Explorer version they support.
-** If you want to manage the merges and the different branches yourself, that’s ok too but make sure everything is merged correctly and that you don't accidentally sneak something into a branch that doesn't support it (e.g. a TFS 2012 only feature ending up in the TFS 2010 branch). Make sure to build and test your merge into an edition branch before checking in.
 * Do not create / upload / replace releases.
 ** At least for now, I prefer to manage this myself because there are some things to consider, e.g. around versioning and automatic updates.
 ** It also allows me to keep an eye on the quality before actually releasing a new version (by code reviewing, building and testing).

@@ -2,15 +2,15 @@
 
 *Features*
 * [Activity|#Activity]
-* [Build Definitions|#Build Definitions]
-* [Build Process Templates|#Build Process Templates]
+* [Build Definitions|#BuildDefinitions]
+* [Build Process Templates|#BuildProcessTemplates]
 * [Security|#Security]
-* [Source Control|#Source Control]
-* [Work Item Configuration - Compare|#Work Item Configuration - Compare]
-* [Work Item Configuration - Work Item Types|#Work Item Configuration - Work Item Types]
-* [Work Item Configuration - Categories|#Work Item Configuration - Categories]
-* [Work Item Configuration - Process Configuration|#Work Item Configuration - Process Configuration]
-* [Work Item Configuration - Transform|#Work Item Configuration - Transform]
+* [Source Control|#SourceControl]
+* [Work Item Configuration - Compare|#WorkItemConfigurationCompare]
+* [Work Item Configuration - Work Item Types|#WorkItemConfigurationWorkItemTypes]
+* [Work Item Configuration - Categories|#WorkItemConfigurationCategories]
+* [Work Item Configuration - Process Configuration|#WorkItemConfigurationProcessConfiguration]
+* [Work Item Configuration - Transform|#WorkItemConfigurationTransform]
 *Contributing to the project*
 * [How To Contribute|How To Contribute]
 
@@ -26,7 +26,7 @@ This can be useful if you want to see which projects are still actively being wo
 
 [image:View Activity Details|Activity-ActivityDetails.png]
 
-{anchor:Build Definitions}
+{anchor:BuildDefinitions}
 !! Build Definitions
 
 Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions.
@@ -36,7 +36,7 @@ This can be useful when you want to get an overview of all the builds or want to
 
 [image:Update Build Definitions|BuildDefinitions-Update.png]
 
-{anchor:Build Process Templates}
+{anchor:BuildProcessTemplates}
 !! Build Process Templates
 
 !!! View / Unregister
@@ -58,10 +58,11 @@ This can be useful when you want to standardize on a single build process templa
 {anchor:Security}
 !! Security
 
-!!! View / Delete Groups
+!!! View / Export / Delete Groups
 
 Allows you to view and delete the security groups that are defined for each Team Project.
 This can be useful when you want to get an overview of all the security groups being used.
+You can also export the permissions to a file which can be used when adding or updating groups.
 
 [image:View / Delete Groups|Security-ViewDeleteGroups.png]
 
@@ -72,7 +73,7 @@ This can be useful when you want to have consistent security groups or when you 
 
 [image:Add Group|Security-AddUpdateGroup.png]
 
-{anchor:Source Control}
+{anchor:SourceControl}
 !! Source Control
 
 !!! View Settings
@@ -98,7 +99,7 @@ You can also export the hierarchy to XML or DGML so it can be visualized and int
 
 [image:Export Branch Hierarchies As DGML|SourceControl-ViewBranchHierarchies-ExportedDgml.png]
 
-{anchor:Work Item Configuration - Compare}
+{anchor:WorkItemConfigurationCompare}
 !! Work Item Configuration - Compare
 
 Allows you to compare the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects.
@@ -110,7 +111,7 @@ This can be useful to determine which Team Projects have been created with which
 
 [image:Comparison Details|WorkItemConfiguration-CompareDetails.png]
 
-{anchor:Work Item Configuration - Work Item Types}
+{anchor:WorkItemConfigurationWorkItemTypes}
 !! Work Item Configuration - Work Item Types
 
 !!! View / Export / Delete / Edit
@@ -138,7 +139,7 @@ This can be useful if you want to know if certain work items or fields are prese
 
 [image:Search Work Item Types|WorkItemConfiguration-WorkItemTypes-Search.png]
 
-{anchor:Work Item Configuration - Categories}
+{anchor:WorkItemConfigurationCategories}
 !! Work Item Configuration - Categories
 
 !!! Export / Edit
@@ -165,7 +166,7 @@ This can be useful if you want to change work item categories or if you want to 
 
 [image:Update / Import Work Item Categories|WorkItemConfiguration-Categories-UpdateImport.png]
 
-{anchor:workitemconfigurationprocessconfiguration}
+{anchor:WorkItemConfigurationProcessConfiguration}
 !! Work Item Configuration - Process Configuration
 
 !!! View / Export / Edit
@@ -185,7 +186,7 @@ This can be useful if you want to change the process configurations being used, 
 
 [image:Import Process Configuration|WorkItemConfiguration-ProcessConfiguration-Import.png]
 
-{anchor:Work Item Configuration - Transform}
+{anchor:WorkItemConfigurationTransform}
 !! Transform
 
 Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration).

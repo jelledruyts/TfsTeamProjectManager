@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace TeamProjectManager.Modules.Security
 {
@@ -7,39 +7,33 @@ namespace TeamProjectManager.Modules.Security
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public IList<PermissionChange> PermissionChanges { get; private set; }
+        public IList<PermissionGroup> PermissionGroups { get; private set; }
+        public ObservableCollection<PermissionGroupChange> PermissionGroupChanges { get; private set; }
         public string UsersToAdd { get; set; }
         public string UsersToRemove { get; set; }
         public bool RemoveAllUsers { get; set; }
-        public IList<PermissionChange> TeamProjectPermissions { get; private set; }
-        public IList<PermissionChange> TeamBuildPermissions { get; private set; }
-        public IList<PermissionChange> WorkItemAreasPermissions { get; private set; }
-        public IList<PermissionChange> WorkItemIterationsPermissions { get; private set; }
-        public IList<PermissionChange> SourceControlPermissions { get; private set; }
-        public IList<PermissionChange> TaggingPermissions { get; private set; }
 
         public SecurityGroupChange()
         {
-            this.PermissionChanges = SecurityManager.Permissions.Select(p => new PermissionChange(p)).ToList();
-            this.TeamProjectPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.TeamProject).ToList();
-            this.TeamBuildPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.TeamBuild).ToList();
-            this.WorkItemAreasPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.WorkItemAreas).ToList();
-            this.WorkItemIterationsPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.WorkItemIterations).ToList();
-            this.SourceControlPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.SourceControl).ToList();
-            this.TaggingPermissions = this.PermissionChanges.Where(p => p.Permission.DisplayScope == PermissionScope.Tagging).ToList();
+            this.PermissionGroupChanges = new ObservableCollection<PermissionGroupChange>();
+        }
+
+        public void SetPermissionGroups(IList<PermissionGroup> permissionGroups)
+        {
+            this.PermissionGroups = permissionGroups;
+            ResetPermissionChanges();
         }
 
         public void ResetPermissionChanges()
         {
-            foreach (var permissionChange in this.PermissionChanges)
+            this.PermissionGroupChanges.Clear();
+            if (this.PermissionGroups != null)
             {
-                permissionChange.Action = PermissionChangeAction.None;
+                foreach (var permissionGroup in this.PermissionGroups)
+                {
+                    this.PermissionGroupChanges.Add(new PermissionGroupChange(permissionGroup));
+                }
             }
-        }
-
-        public IList<PermissionChange> GetFunctionalChanges(PermissionScope scope)
-        {
-            return this.PermissionChanges.Where(p => p.Permission.FunctionalScope == scope).ToArray();
         }
     }
 }

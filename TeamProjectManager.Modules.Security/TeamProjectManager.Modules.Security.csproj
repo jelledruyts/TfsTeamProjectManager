@@ -254,6 +254,8 @@
     <Compile Include="PermissionChange.cs" />
     <Compile Include="PermissionChangeAction.cs" />
     <Compile Include="PermissionChangePersistenceData.cs" />
+    <Compile Include="PermissionGroup.cs" />
+    <Compile Include="PermissionGroupChange.cs" />
     <Compile Include="PermissionScope.cs" />
     <Compile Include="SecurityGroupChange.cs" />
     <Compile Include="SecurityGroupInfo.cs" />

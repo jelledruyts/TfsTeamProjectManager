@@ -84,14 +84,23 @@
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Path=SecurityGroupChange.UsersToRemove}" IsEnabled="{Binding Path=SecurityGroupChange.RemoveAllUsers, Converter={StaticResource inverseBooleanConverter}}" ToolTip="Enter the full name of the member, e.g. &quot;DOMAIN\user&quot;, &quot;[MyProject]\MyGroup&quot;, &quot;[MyCollection]\MyGroup&quot;, &quot;[TEAM FOUNDATION]\MyGroup&quot;. Separate multiple entries with a semicolon (;)." />
                         <CheckBox Grid.Row="1" Grid.Column="2" Margin="5,0,0,0" Content="Remove all existing users" VerticalAlignment="Center" IsChecked="{Binding Path=SecurityGroupChange.RemoveAllUsers}" />
                     </Grid>
-                    
+
                     <Label Grid.Row="3" Grid.Column="0" Content="Permissions" Margin="0,5,0,0" />
                     <Grid Grid.Row="3" Grid.Column="1" Margin="5,5,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TabControl Grid.Row="0" Grid.IsSharedSizeScope="True">
+                        <TabControl Grid.Row="0" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Path=SecurityGroupChange.PermissionGroupChanges}" SelectedIndex="0">
+                            <TabControl.Style>
+                                <Style TargetType="TabControl">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=SecurityGroupChange.PermissionGroupChanges.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TabControl.Style>
                             <TabControl.Resources>
                                 <DataTemplate DataType="{x:Type local:PermissionChange}">
                                     <Grid>
@@ -110,31 +119,13 @@
                                     </Grid>
                                 </DataTemplate>
                             </TabControl.Resources>
-                            <TabItem Header="Team Project">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.TeamProjectPermissions}" />
-                                </ScrollViewer>
-                            </TabItem>
-                            <TabItem Header="Areas">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.WorkItemAreasPermissions}" />
-                                </ScrollViewer>
-                            </TabItem>
-                            <TabItem Header="Iterations">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.WorkItemIterationsPermissions}" />
-                                </ScrollViewer>
-                            </TabItem>
-                            <TabItem Header="Build">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.TeamBuildPermissions}" />
-                                </ScrollViewer>
-                            </TabItem>
-                            <TabItem Header="TFVC">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding Path=SecurityGroupChange.SourceControlPermissions}" />
-                                </ScrollViewer>
-                            </TabItem>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding Path=PermissionChanges}" />
+                                    </ScrollViewer>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
                         </TabControl>
                         <WrapPanel Grid.Row="1" Margin="0,5,0,0">
                             <TextBlock><Hyperlink Command="{Binding Path=ResetSecurityPermissionsCommand}" ToolTip="Rest the permissions">reset</Hyperlink></TextBlock>

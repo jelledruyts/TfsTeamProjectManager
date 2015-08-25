@@ -8,6 +8,8 @@ namespace TeamProjectManager.Modules.Security
         WorkItemAreas,
         WorkItemIterations,
         SourceControl,
-        Tagging
+        Tagging,
+        WorkItemQueryFolders,
+        GitRepositories
     }
 }

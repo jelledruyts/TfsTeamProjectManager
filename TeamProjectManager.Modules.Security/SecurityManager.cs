@@ -5,15 +5,17 @@ using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
+using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Common;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
-using TfsAccessControlEntry = Microsoft.TeamFoundation.Server.AccessControlEntry;
-using VCPermissionChange = Microsoft.TeamFoundation.VersionControl.Client.PermissionChange;
 
 namespace TeamProjectManager.Modules.Security
 {
@@ -21,100 +23,107 @@ namespace TeamProjectManager.Modules.Security
     {
         #region Static Properties & Constructor
 
-        public static IList<Permission> Permissions { get; private set; }
+        private static IList<PermissionGroupFactory> permissionGroupFactories;
 
         static SecurityManager()
         {
-            Permissions = new List<Permission>()
+            permissionGroupFactories = new[]
             {
-                // Team Project
-                // NOTE from https://msdn.microsoft.com/en-us/library/ms252587.aspx: Although the "Create tag definition" permission appears in the security settings at the team project level, tagging permissions are actually collection-level permissions that are scoped at the project level when they appear in the user interface. To scope tagging permissions to a single team project when using the TFSSecurity command, you must provide the GUID for the project as part of the command syntax. Otherwise, your change will apply to the entire team project collection. Keep this in mind when changing or setting these permissions.
-                new Permission(PermissionScope.TeamProject, PermissionScope.Tagging, "Create tag definition", string.Empty, TaggingPermissions.Create),
-                new Permission(PermissionScope.TeamProject, "Create test runs", PermissionActionIdConstants.PublishTestResults, AuthorizationProjectPermissions.PublishTestResults),
-                new Permission(PermissionScope.TeamProject, "Delete team project", PermissionActionIdConstants.Delete, AuthorizationProjectPermissions.Delete),
-                new Permission(PermissionScope.TeamProject, "Delete test runs", PermissionActionIdConstants.DeleteTestResults, AuthorizationProjectPermissions.DeleteTestResults),
-                new Permission(PermissionScope.TeamProject, "Edit project-level information", PermissionActionIdConstants.GenericWrite, AuthorizationProjectPermissions.GenericWrite),
-                new Permission(PermissionScope.TeamProject, "Manage test configurations", PermissionActionIdConstants.ManageTestConfigurations, AuthorizationProjectPermissions.ManageTestConfigurations),
-                new Permission(PermissionScope.TeamProject, "Manage test environments", PermissionActionIdConstants.ManageTestEnvironments, AuthorizationProjectPermissions.ManageTestEnvironments),
-                new Permission(PermissionScope.TeamProject, "View project-level information", PermissionActionIdConstants.GenericRead, AuthorizationProjectPermissions.GenericRead),
-                new Permission(PermissionScope.TeamProject, "View test runs", PermissionActionIdConstants.ViewTestResults, AuthorizationProjectPermissions.ViewTestResults),
-
-                // Team Build
-                new Permission(PermissionScope.TeamBuild, "Administer build permissions", PermissionStringConstants.AdministerBuildPermissions, BuildPermissions.AdministerBuildPermissions),
-                new Permission(PermissionScope.TeamBuild, "Delete build definition", PermissionStringConstants.DeleteBuildDefinition, BuildPermissions.DeleteBuildDefinition),
-                new Permission(PermissionScope.TeamBuild, "Delete builds", PermissionStringConstants.DeleteBuilds, BuildPermissions.DeleteBuilds),
-                new Permission(PermissionScope.TeamBuild, "Destroy builds", PermissionStringConstants.DestroyBuilds, BuildPermissions.DestroyBuilds),
-                new Permission(PermissionScope.TeamBuild, "Edit build definition", PermissionStringConstants.EditBuildDefinition, BuildPermissions.EditBuildDefinition),
-                new Permission(PermissionScope.TeamBuild, "Edit build quality", PermissionStringConstants.EditBuildQuality, BuildPermissions.EditBuildQuality),
-                new Permission(PermissionScope.TeamBuild, "Manage build qualities", PermissionStringConstants.ManageBuildQualities, BuildPermissions.ManageBuildQualities),
-                new Permission(PermissionScope.TeamBuild, "Manage build queue", PermissionStringConstants.ManageBuildQueue, BuildPermissions.ManageBuildQueue),
-                new Permission(PermissionScope.TeamBuild, "Override check-in validation by build", PermissionStringConstants.OverrideBuildCheckInValidation, BuildPermissions.OverrideBuildCheckInValidation),
-                new Permission(PermissionScope.TeamBuild, "Queue builds", PermissionStringConstants.QueueBuilds, BuildPermissions.QueueBuilds),
-                new Permission(PermissionScope.TeamBuild, "Retain indefinitely", PermissionStringConstants.RetainIndefinitely, BuildPermissions.RetainIndefinitely),
-                new Permission(PermissionScope.TeamBuild, "Stop builds", PermissionStringConstants.StopBuilds, BuildPermissions.StopBuilds),
-                new Permission(PermissionScope.TeamBuild, "Update build information", PermissionStringConstants.UpdateBuildInformation, BuildPermissions.UpdateBuildInformation),
-                new Permission(PermissionScope.TeamBuild, "View build definition", PermissionStringConstants.ViewBuildDefinition, BuildPermissions.ViewBuildDefinition),
-                new Permission(PermissionScope.TeamBuild, "View builds", PermissionStringConstants.ViewBuilds, BuildPermissions.ViewBuilds),
-
-                // Work Item Areas
-                new Permission(PermissionScope.WorkItemAreas, "Create child nodes", PermissionActionIdConstants.CreateChildren, AuthorizationCssNodePermissions.CreateChildren),
-                new Permission(PermissionScope.WorkItemAreas, "Delete this node", PermissionActionIdConstants.Delete, AuthorizationCssNodePermissions.Delete),
-                new Permission(PermissionScope.WorkItemAreas, "Edit this node", PermissionActionIdConstants.GenericWrite, AuthorizationCssNodePermissions.GenericWrite),
-                new Permission(PermissionScope.WorkItemAreas, "Edit work items in this node", PermissionActionIdConstants.WorkItemWrite, AuthorizationCssNodePermissions.WorkItemWrite),
-                new Permission(PermissionScope.WorkItemAreas, "Manage test plans", PermissionActionIdConstants.ManageTestPlans, AuthorizationCssNodePermissions.ManageTestPlans),
-                new Permission(PermissionScope.WorkItemAreas, "Manage test suites", PermissionActionIdConstants.ManageTestSuites, AuthorizationCssNodePermissions.ManageTestSuites),
-                new Permission(PermissionScope.WorkItemAreas, "View permissions for this node", PermissionActionIdConstants.GenericRead, AuthorizationCssNodePermissions.GenericRead),
-                new Permission(PermissionScope.WorkItemAreas, "View work items in this node", PermissionActionIdConstants.WorkItemRead, AuthorizationCssNodePermissions.WorkItemRead),
-
-                // Work Item Iterations
-                new Permission(PermissionScope.WorkItemIterations, "Create child nodes", PermissionActionIdConstants.CreateChildren, AuthorizationIterationNodePermissions.CreateChildren),
-                new Permission(PermissionScope.WorkItemIterations, "Delete this node", PermissionActionIdConstants.Delete, AuthorizationIterationNodePermissions.Delete),
-                new Permission(PermissionScope.WorkItemIterations, "Edit this node", PermissionActionIdConstants.GenericWrite, AuthorizationIterationNodePermissions.GenericWrite),
-                new Permission(PermissionScope.WorkItemIterations, "View permissions for this node", PermissionActionIdConstants.GenericRead, AuthorizationIterationNodePermissions.GenericRead),
-
-                // Source Control
-                new Permission(PermissionScope.SourceControl, "Administer labels", VCPermissionChange.ItemPermissionLabelOther, (int)VersionedItemPermissions.LabelOther),
-                new Permission(PermissionScope.SourceControl, "Check in", VCPermissionChange.ItemPermissionCheckin, (int)VersionedItemPermissions.Checkin),
-                new Permission(PermissionScope.SourceControl, "Check in other users' changes", VCPermissionChange.ItemPermissionCheckinOther, (int)VersionedItemPermissions.CheckinOther),
-                new Permission(PermissionScope.SourceControl, "Check out", VCPermissionChange.ItemPermissionPendChange, (int)VersionedItemPermissions.PendChange),
-                new Permission(PermissionScope.SourceControl, "Label", VCPermissionChange.ItemPermissionLabel, (int)VersionedItemPermissions.Label),
-                new Permission(PermissionScope.SourceControl, "Lock", VCPermissionChange.ItemPermissionLock, (int)VersionedItemPermissions.Lock),
-                new Permission(PermissionScope.SourceControl, "Manage branch", VCPermissionChange.ItemPermissionManageBranch, (int)VersionedItemPermissions.ManageBranch),
-                new Permission(PermissionScope.SourceControl, "Manage permissions", VCPermissionChange.ItemPermissionAdminProjectRights, (int)VersionedItemPermissions.AdminProjectRights),
-                new Permission(PermissionScope.SourceControl, "Merge", VCPermissionChange.ItemPermissionMerge, (int)VersionedItemPermissions.Merge),
-                new Permission(PermissionScope.SourceControl, "Read", VCPermissionChange.ItemPermissionRead, (int)VersionedItemPermissions.Read),
-                new Permission(PermissionScope.SourceControl, "Revise other users' changes", VCPermissionChange.ItemPermissionReviseOther, (int)VersionedItemPermissions.ReviseOther),
-                new Permission(PermissionScope.SourceControl, "Undo other users' changes", VCPermissionChange.ItemPermissionUndoOther, (int)VersionedItemPermissions.UndoOther),
-                new Permission(PermissionScope.SourceControl, "Unlock other users' changes", VCPermissionChange.ItemPermissionUnlockOther, (int)VersionedItemPermissions.UnlockOther),
+                new PermissionGroupFactory(PermissionScope.TeamProject, FrameworkSecurity.TeamProjectNamespaceId, "Team Project", new [] { "ADMINISTER_BUILD", "START_BUILD", "EDIT_BUILD_STATUS", "UPDATE_BUILD" }, (tpc, tfsVersion, teamProject) => PermissionNamespaces.Project + teamProject.Uri.ToString()),
+                new PermissionGroupFactory(PermissionScope.Tagging, FrameworkSecurity.TaggingNamespaceId, "Tagging", (tpc, tfsVersion, teamProject) => "/" + LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId),
+                new PermissionGroupFactory(PermissionScope.WorkItemAreas, AuthorizationSecurityConstants.CommonStructureNodeSecurityGuid, "Areas", (tpc, tfsVersion, teamProject) =>
+                {
+                    var css = tpc.GetService<ICommonStructureService>();
+                    var projectStructures = css.ListStructures(teamProject.Uri);
+                    var rootArea = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectModelHierarchy);
+                    if (rootArea == null)
+                    {
+                        throw new InvalidOperationException("The root area could not be retrieved");
+                    }
+                    return rootArea.Uri;
+                }),
+                new PermissionGroupFactory(PermissionScope.WorkItemIterations, AuthorizationSecurityConstants.IterationNodeSecurityGuid, "Iterations", (tpc, tfsVersion, teamProject) =>
+                {
+                    var css = tpc.GetService<ICommonStructureService>();
+                    var projectStructures = css.ListStructures(teamProject.Uri);
+                    var rootIteration = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectLifecycle);
+                    if (rootIteration == null)
+                    {
+                        throw new InvalidOperationException("The root iteration could not be retrieved");
+                    }
+                    return rootIteration.Uri;
+                }),
+                new PermissionGroupFactory(PermissionScope.WorkItemQueryFolders, QueryItemSecurityConstants.NamespaceGuid, "Queries", new [] { "FullControl" }, (tpc, tfsVersion, teamProject) =>
+                {
+                    var store = tpc.GetService<WorkItemStore>();
+                    var project = store.Projects[teamProject.Name];
+                    foreach (var item in project.QueryHierarchy)
+                    {
+                        if (!item.IsPersonal && item is QueryFolder)
+                        {
+                            var teamProjectGuid = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+                            return "$/{0}/{1}".FormatInvariant(teamProjectGuid, item.Id.ToString());
+                        }
+                    }
+                    throw new InvalidOperationException("The shared queries folder could not be retrieved");
+                }),
+                new PermissionGroupFactory(PermissionScope.TeamBuild, BuildSecurity.BuildNamespaceId, "Team Build", (tpc, tfsVersion, teamProject) => LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId),
+                new PermissionGroupFactory(PermissionScope.SourceControl, SecurityConstants.RepositorySecurityNamespaceGuid, "TFVC", (tpc, tfsVersion, teamProject) =>
+                {
+                    var vcs = tpc.GetService<VersionControlServer>();
+                    return vcs.GetTeamProject(teamProject.Name).ServerItem;
+                }),
+                new PermissionGroupFactory(PermissionScope.GitRepositories, GitConstants.GitSecurityNamespaceId, "Git", (tpc, tfsVersion, teamProject) =>
+                {
+                    // For pre-TFS 2015 this is "repositories/<guid>", otherwise it's "repoV2/<guid>".
+                    var prefix = tfsVersion >= TfsMajorVersion.V14 ? "repoV2" : "repositories";
+                    var teamProjectGuid = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
+                    return "{0}/{1}".FormatInvariant(prefix, teamProjectGuid);
+                }),
             };
+        }
+
+        #endregion
+
+        #region GetPermissionGroups
+
+        public static IList<PermissionGroup> GetPermissionGroups(TfsTeamProjectCollection tfs)
+        {
+            var groups = new List<PermissionGroup>();
+            var securityNamespaces = tfs.GetService<ISecurityService>().GetSecurityNamespaces();
+            foreach (var factory in permissionGroupFactories)
+            {
+                foreach (var securityNamespace in securityNamespaces)
+                {
+                    if (factory.AppliesTo(securityNamespace.Description.NamespaceId))
+                    {
+                        groups.Add(factory.GetPermissionGroup(securityNamespace));
+                    }
+                }
+            }
+            return groups;
         }
 
         #endregion
 
         #region Apply
 
-        public static void Apply(ApplicationTask task, TfsTeamProjectCollection tfs, string teamProjectName, SecurityGroupChange securityGroup)
+        public static void Apply(ApplicationTask task, TfsTeamProjectCollection tfs, TfsMajorVersion tfsVersion, string teamProjectName, SecurityGroupChange securityGroup)
         {
-            var securityNamespaces = tfs.GetService<ISecurityService>().GetSecurityNamespaces();
-            var taggingSecurityNamespace = securityNamespaces.FirstOrDefault(n => n.Description.NamespaceId == FrameworkSecurity.TaggingNamespaceId);
-            var buildSecurityNamespace = securityNamespaces.FirstOrDefault(n => n.Description.NamespaceId == BuildSecurity.BuildNamespaceId);
             var ims = tfs.GetService<IIdentityManagementService>();
             var css = tfs.GetService<ICommonStructureService>();
-            var vcs = tfs.GetService<VersionControlServer>();
-            var auth = tfs.GetService<IAuthorizationService>();
             var teamProject = css.GetProjectFromName(teamProjectName);
-            var teamProjectUrl = teamProject.Uri;
             var groupIdentityName = string.Format(CultureInfo.InvariantCulture, @"[{0}]\{1}", teamProjectName, securityGroup.Name);
 
             // Create the group if needed.
-            var existingGroup = ims.ListApplicationGroups(teamProjectUrl, ReadIdentityOptions.IncludeReadFromSource).FirstOrDefault(g => string.Equals(g.DisplayName, groupIdentityName, StringComparison.OrdinalIgnoreCase));
+            var existingGroup = ims.ListApplicationGroups(teamProject.Uri, ReadIdentityOptions.IncludeReadFromSource).FirstOrDefault(g => string.Equals(g.DisplayName, groupIdentityName, StringComparison.OrdinalIgnoreCase));
             var members = new List<TeamFoundationIdentity>();
             IdentityDescriptor groupDescriptor;
             if (existingGroup == null)
             {
                 // There is no existing group with the same name, create one.
                 task.Status = "Creating new \"{0}\" security group".FormatCurrent(groupIdentityName);
-                groupDescriptor = ims.CreateApplicationGroup(teamProjectUrl, securityGroup.Name, securityGroup.Description);
+                groupDescriptor = ims.CreateApplicationGroup(teamProject.Uri, securityGroup.Name, securityGroup.Description);
             }
             else
             {
@@ -133,25 +142,21 @@ namespace TeamProjectManager.Modules.Security
             }
 
             // Set permissions.
-            if (securityGroup.PermissionChanges.Any(p => p.Action != PermissionChangeAction.None))
+            if (securityGroup.PermissionGroupChanges.SelectMany(g => g.PermissionChanges).Any(p => p.Action != PermissionChangeAction.None))
             {
-                var projectStructures = css.ListStructures(teamProjectUrl);
-                var rootArea = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectModelHierarchy);
-                if (rootArea == null)
+                var securityNamespaces = tfs.GetService<ISecurityService>().GetSecurityNamespaces();
+                foreach (var groupChange in securityGroup.PermissionGroupChanges.Where(g => g.PermissionChanges.Any(c => c.Action != PermissionChangeAction.None)))
                 {
-                    throw new InvalidOperationException("The root area could not be retrieved");
+                    foreach (var securityNamespace in securityNamespaces)
+                    {
+                        var factory = permissionGroupFactories.FirstOrDefault(f => f.AppliesTo(securityNamespace.Description.NamespaceId, groupChange.PermissionGroup.Scope));
+                        if (factory != null)
+                        {
+                            var token = factory.GetObjectToken(tfs, tfsVersion, teamProject);
+                            ApplySecurityNamespacePermissions(token, groupDescriptor, securityNamespace, groupChange.PermissionChanges);
+                        }
+                    }
                 }
-                var rootIteration = projectStructures.SingleOrDefault(n => n.StructureType == StructureType.ProjectLifecycle);
-                if (rootIteration == null)
-                {
-                    throw new InvalidOperationException("The root iteration could not be retrieved");
-                }
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.TeamProject), PermissionNamespaces.Project + teamProjectUrl);
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.WorkItemAreas), rootArea.Uri);
-                ApplyProjectPermission(auth, groupDescriptor, securityGroup.GetFunctionalChanges(PermissionScope.WorkItemIterations), rootIteration.Uri);
-                ApplyTeamBuildPermissions(teamProject, groupDescriptor, buildSecurityNamespace, securityGroup.GetFunctionalChanges(PermissionScope.TeamBuild));
-                ApplySourceControlPermissions(teamProject, groupIdentityName, vcs, securityGroup.GetFunctionalChanges(PermissionScope.SourceControl));
-                ApplyTaggingPermissions(teamProject, groupDescriptor, taggingSecurityNamespace, securityGroup.GetFunctionalChanges(PermissionScope.Tagging));
                 task.Status = "Applied security permissions";
             }
 
@@ -167,65 +172,13 @@ namespace TeamProjectManager.Modules.Security
 
         #region Helper Methods
 
-        private static void ApplyProjectPermission(IAuthorizationService auth, IdentityDescriptor groupDescriptor, IEnumerable<PermissionChange> permissionChanges, string objectId)
-        {
-            if (permissionChanges.Where(p => p.Action != PermissionChangeAction.None).Any())
-            {
-                foreach (var permissionChange in permissionChanges.Where(p => p.Action != PermissionChangeAction.None))
-                {
-                    if (permissionChange.Action == PermissionChangeAction.Inherit)
-                    {
-                        // Remove both the allow and deny setting to make sure inheritance is in effect.
-                        auth.RemoveAccessControlEntry(objectId, new TfsAccessControlEntry(permissionChange.Permission.PermissionConstant, groupDescriptor.Identifier, true));
-                        auth.RemoveAccessControlEntry(objectId, new TfsAccessControlEntry(permissionChange.Permission.PermissionConstant, groupDescriptor.Identifier, false));
-                    }
-                    else
-                    {
-                        var deny = permissionChange.Action == PermissionChangeAction.Deny;
-                        auth.AddAccessControlEntry(objectId, new TfsAccessControlEntry(permissionChange.Permission.PermissionConstant, groupDescriptor.Identifier, deny));
-                    }
-                }
-            }
-        }
-
-        private static void ApplySourceControlPermissions(ProjectInfo teamProject, string groupIdentity, VersionControlServer vcs, IEnumerable<PermissionChange> sourceControlPermissions)
-        {
-            if (sourceControlPermissions.Where(p => p.Action != PermissionChangeAction.None).Any())
-            {
-                var allows = sourceControlPermissions.Where(p => p.Action == PermissionChangeAction.Allow).Select(p => p.Permission.PermissionConstant).ToArray();
-                var denies = sourceControlPermissions.Where(p => p.Action == PermissionChangeAction.Deny).Select(p => p.Permission.PermissionConstant).ToArray();
-                var inherits = sourceControlPermissions.Where(p => p.Action == PermissionChangeAction.Inherit).Select(p => p.Permission.PermissionConstant).ToArray();
-                if (allows.Any() || denies.Any() || inherits.Any())
-                {
-                    var permissionChange = new VCPermissionChange(vcs.GetTeamProject(teamProject.Name).ServerItem, groupIdentity, allows, denies, inherits);
-                    var successfulChanges = vcs.SetPermissions(new SecurityChange[] { permissionChange });
-                    if (successfulChanges.Length != 1)
-                    {
-                        throw new ApplicationException("The Source Control permissions were not applied successfully for Team Project \"{0}\"".FormatCurrent(teamProject.Name));
-                    }
-                }
-            }
-        }
-
-        private static void ApplyTeamBuildPermissions(ProjectInfo teamProject, IdentityDescriptor groupDescriptor, SecurityNamespace buildSecurityNamespace, IEnumerable<PermissionChange> teamBuildPermissions)
-        {
-            var teamProjectToken = LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
-            ApplySecurityNamespacePermissions(teamProjectToken, groupDescriptor, buildSecurityNamespace, teamBuildPermissions);
-        }
-
-        private static void ApplyTaggingPermissions(ProjectInfo teamProject, IdentityDescriptor groupDescriptor, SecurityNamespace taggingSecurityNamespace, IEnumerable<PermissionChange> taggingPermissions)
-        {
-            var teamProjectToken = taggingSecurityNamespace.Description.SeparatorValue + LinkingUtilities.DecodeUri(teamProject.Uri).ToolSpecificId;
-            ApplySecurityNamespacePermissions(teamProjectToken, groupDescriptor, taggingSecurityNamespace, taggingPermissions);
-        }
-
         private static void ApplySecurityNamespacePermissions(string token, IdentityDescriptor identity, SecurityNamespace securityNamespace, IEnumerable<PermissionChange> permissions)
         {
             if (permissions.Where(p => p.Action != PermissionChangeAction.None).Any())
             {
-                var allows = permissions.Where(p => p.Action == PermissionChangeAction.Allow).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
-                var denies = permissions.Where(p => p.Action == PermissionChangeAction.Deny).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
-                var inherits = permissions.Where(p => p.Action == PermissionChangeAction.Inherit).Aggregate(0, (sum, p) => sum += p.Permission.PermissionId);
+                var allows = permissions.Where(p => p.Action == PermissionChangeAction.Allow).Aggregate(0, (sum, p) => sum += p.Permission.PermissionBit);
+                var denies = permissions.Where(p => p.Action == PermissionChangeAction.Deny).Aggregate(0, (sum, p) => sum += p.Permission.PermissionBit);
+                var inherits = permissions.Where(p => p.Action == PermissionChangeAction.Inherit).Aggregate(0, (sum, p) => sum += p.Permission.PermissionBit);
                 if (allows > 0 || denies > 0 || inherits > 0)
                 {
                     if (securityNamespace == null)
@@ -310,6 +263,61 @@ namespace TeamProjectManager.Modules.Security
             else
             {
                 action(userIdentity);
+            }
+        }
+
+        #endregion
+
+        #region PermissionGroupFactory Class
+
+        private class PermissionGroupFactory
+        {
+            private Guid securityNamespaceId;
+            private PermissionScope scope;
+            private string displayName;
+            private IEnumerable<string> excludedActions;
+            private Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory;
+
+            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory)
+                : this(scope, securityNamespaceId, displayName, null, objectTokenFactory)
+            {
+            }
+
+            public PermissionGroupFactory(PermissionScope scope, Guid securityNamespaceId, string displayName, IEnumerable<string> excludedActions, Func<TfsTeamProjectCollection, TfsMajorVersion, ProjectInfo, string> objectTokenFactory)
+            {
+                this.scope = scope;
+                this.securityNamespaceId = securityNamespaceId;
+                this.displayName = displayName;
+                this.excludedActions = excludedActions ?? Enumerable.Empty<string>();
+                this.objectTokenFactory = objectTokenFactory;
+            }
+
+            public bool AppliesTo(Guid securityNamespaceId)
+            {
+                return this.securityNamespaceId == securityNamespaceId;
+            }
+
+            public bool AppliesTo(Guid securityNamespaceId, PermissionScope scope)
+            {
+                return this.AppliesTo(securityNamespaceId) && this.scope == scope;
+            }
+
+            public PermissionGroup GetPermissionGroup(SecurityNamespace securityNamespace)
+            {
+                var permissions = new List<Permission>();
+                foreach (var action in securityNamespace.Description.Actions.OrderBy(a => a.DisplayName))
+                {
+                    if (!this.excludedActions.Any(p => p == action.Name))
+                    {
+                        permissions.Add(new Permission(this.scope, action.DisplayName, action.Name, action.Bit));
+                    }
+                }
+                return new PermissionGroup(this.scope, this.displayName, permissions);
+            }
+
+            public string GetObjectToken(TfsTeamProjectCollection tpc, TfsMajorVersion tfsVersion, ProjectInfo teamProject)
+            {
+                return this.objectTokenFactory(tpc, tfsVersion, teamProject);
             }
         }
 

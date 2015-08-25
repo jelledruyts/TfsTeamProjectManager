@@ -82,6 +82,24 @@ namespace TeamProjectManager.Modules.Security
 
         #endregion
 
+        #region OnSelectedTeamProjectCollectionChanged
+
+        protected override void OnSelectedTeamProjectCollectionChanged()
+        {
+            var tfs = this.GetSelectedTfsTeamProjectCollection();
+            if (tfs == null)
+            {
+                this.SecurityGroupChange.SetPermissionGroups(null);
+            }
+            else
+            {
+                var permissionGroups = SecurityManager.GetPermissionGroups(tfs);
+                this.SecurityGroupChange.SetPermissionGroups(permissionGroups);
+            }
+        }
+
+        #endregion
+
         #region GetSecurityGroups Command
 
         private bool CanGetSecurityGroups(object argument)
@@ -237,7 +255,6 @@ namespace TeamProjectManager.Modules.Security
         private void ResetSecurityPermissions(object argument)
         {
             this.SecurityGroupChange.ResetPermissionChanges();
-            RefreshSecurityGroupChange();
         }
 
         #endregion
@@ -246,7 +263,7 @@ namespace TeamProjectManager.Modules.Security
 
         private bool CanLoadSecurityPermissions(object argument)
         {
-            return true;
+            return this.SecurityGroupChange.PermissionGroupChanges.Any();
         }
 
         private void LoadSecurityPermissions(object argument)
@@ -263,13 +280,21 @@ namespace TeamProjectManager.Modules.Security
                     this.SecurityGroupChange.ResetPermissionChanges();
                     foreach (var persistedPermission in persistedPermissions)
                     {
-                        var permission = this.SecurityGroupChange.PermissionChanges.FirstOrDefault(p => p.Permission.DisplayScope == persistedPermission.Scope && string.Equals(p.Permission.PermissionConstant, persistedPermission.Name, StringComparison.OrdinalIgnoreCase));
-                        if (permission != null)
+                        var group = this.SecurityGroupChange.PermissionGroupChanges.FirstOrDefault(g => g.PermissionGroup.Scope == persistedPermission.Scope);
+                        if (group != null)
                         {
-                            permission.Action = persistedPermission.Action;
+                            var permission = group.PermissionChanges.FirstOrDefault(p => p.Permission.Scope == persistedPermission.Scope && string.Equals(p.Permission.PermissionConstant, persistedPermission.Name, StringComparison.OrdinalIgnoreCase));
+                            if (permission != null)
+                            {
+                                permission.Action = persistedPermission.Action;
+                            }
                         }
                     }
-                    RefreshSecurityGroupChange();
+
+                    // A PermissionChange is not observable, force a UI binding refresh by removing and re-adding the entire instance.
+                    var change = this.SecurityGroupChange;
+                    this.SecurityGroupChange = null;
+                    this.SecurityGroupChange = change;
                 }
                 catch (Exception exc)
                 {
@@ -298,7 +323,7 @@ namespace TeamProjectManager.Modules.Security
             {
                 try
                 {
-                    SerializationProvider.Write<PermissionChangePersistenceData[]>(this.SecurityGroupChange.PermissionChanges.Select(p => new PermissionChangePersistenceData(p)).ToArray(), dialog.FileName);
+                    SerializationProvider.Write<PermissionChangePersistenceData[]>(this.SecurityGroupChange.PermissionGroupChanges.SelectMany(g => g.PermissionChanges).Select(p => new PermissionChangePersistenceData(p)).ToArray(), dialog.FileName);
                 }
                 catch (Exception exc)
                 {
@@ -329,6 +354,7 @@ namespace TeamProjectManager.Modules.Security
                 worker.DoWork += (sender, e) =>
                 {
                     var tfs = GetSelectedTfsTeamProjectCollection();
+                    var tfsVersion = this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion;
 
                     var step = 0;
                     var count = 0;
@@ -337,7 +363,7 @@ namespace TeamProjectManager.Modules.Security
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Adding / updating security group \"{0}\" for Team Project \"{1}\"", this.SecurityGroupChange.Name, teamProject.Name));
                         try
                         {
-                            SecurityManager.Apply(task, tfs, teamProject.Name, this.SecurityGroupChange);
+                            SecurityManager.Apply(task, tfs, tfsVersion, teamProject.Name, this.SecurityGroupChange);
                             count++;
                         }
                         catch (Exception exc)
@@ -369,18 +395,6 @@ namespace TeamProjectManager.Modules.Security
                 };
                 worker.RunWorkerAsync();
             }
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        private void RefreshSecurityGroupChange()
-        {
-            // The SecurityGroupChange is not observable, force a UI binding refresh by removing and re-adding the entire instance.
-            var change = this.SecurityGroupChange;
-            this.SecurityGroupChange = null;
-            this.SecurityGroupChange = change;
         }
 
         #endregion

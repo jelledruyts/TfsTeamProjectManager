@@ -25,6 +25,8 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         public RelayCommand AddTeamProjectCollectionCommand { get; private set; }
         public RelayCommand RefreshTeamProjectsCommand { get; private set; }
+        public RelayCommand ShowAllTeamProjectsCommand { get; private set; }
+        public RelayCommand ShowOnlySelectedTeamProjectsCommand { get; private set; }
 
         #endregion
 
@@ -70,6 +72,14 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         public static ObservableProperty<bool> IsTeamProjectsLoadCompleteProperty = new ObservableProperty<bool, TeamProjectsViewModel>(o => o.IsTeamProjectsLoadComplete, true);
 
+        public ICollection<TeamProjectInfo> AvailableTeamProjects
+        {
+            get { return this.GetValue(AvailableTeamProjectsProperty); }
+            set { this.SetValue(AvailableTeamProjectsProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ICollection<TeamProjectInfo>> AvailableTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectsViewModel>(o => o.AvailableTeamProjects);
+
         #endregion
 
         #region Constructors
@@ -80,6 +90,8 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection, CanAddTeamProjectCollection);
             this.RefreshTeamProjectsCommand = new RelayCommand(RefreshTeamProjects, CanRefreshTeamProjects);
+            this.ShowAllTeamProjectsCommand = new RelayCommand(ShowAllTeamProjects, CanShowAllTeamProjects);
+            this.ShowOnlySelectedTeamProjectsCommand = new RelayCommand(ShowOnlySelectedTeamProjects, CanShowOnlySelectedTeamProjects);
             RefreshTeamProjectCollections(null);
         }
 
@@ -128,6 +140,26 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         private void RefreshTeamProjects(object argument)
         {
             RefreshTeamProjects(true);
+        }
+
+        private bool CanShowAllTeamProjects(object argument)
+        {
+            return this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamProjects != this.AvailableTeamProjects;
+        }
+
+        private void ShowAllTeamProjects(object argument)
+        {
+            this.AvailableTeamProjects = this.SelectedTeamProjectCollection == null ? null : this.SelectedTeamProjectCollection.TeamProjects;
+        }
+
+        private bool CanShowOnlySelectedTeamProjects(object argument)
+        {
+            return this.AvailableTeamProjects != this.SelectedTeamProjects;
+        }
+
+        private void ShowOnlySelectedTeamProjects(object argument)
+        {
+            this.AvailableTeamProjects = this.SelectedTeamProjects;
         }
 
         #endregion
@@ -209,6 +241,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 }
                 this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Publish(new TeamProjectCollectionSelectionChangedEventArgs(this.SelectedTeamProjectCollection));
             }
+            ShowAllTeamProjects(null);
         }
 
         private static TeamFoundationServerInfo GetTeamFoundationServerInfo(TfsTeamProjectCollection tfs, ILogger logger)
@@ -220,7 +253,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "Framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "ReleaseManagement", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService8", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V14, "Team Foundation Server 2015", "TFS 2015");
                 }

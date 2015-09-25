@@ -50,6 +50,9 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v2.0.5746 (September 25, 2015)
+** Fixed issue with Git security when using TFS 2013 Update 5
+** Added support for showing only selected Team Projects
 * v2.0.5716 (August 25, 2015)
 ** Added support for TFS 2015
 ** Added support for managing security permissions on Tagging, Git and Work Item Queries

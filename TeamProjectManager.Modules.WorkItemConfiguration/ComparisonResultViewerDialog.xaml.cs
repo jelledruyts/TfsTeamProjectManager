@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
@@ -101,69 +102,49 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Visual Studio 2012 or above have a built-in diff tool, call devenv.exe directly.
-            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\14.0\Setup\VS"))
-            {
-                if (regKey != null)
-                {
-                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
-                    if (File.Exists(devenvPath))
-                    {
-                        diffTools.Add(new DiffTool("Visual Studio 2015", devenvPath, "/diff %1 %2 %6 %7"));
-                    }
-                }
-            }
-
-            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\12.0\Setup\VS"))
-            {
-                if (regKey != null)
-                {
-                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
-                    if (File.Exists(devenvPath))
-                    {
-                        diffTools.Add(new DiffTool("Visual Studio 2013", devenvPath, "/diff %1 %2 %6 %7"));
-                    }
-                }
-            }
-
-            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS"))
-            {
-                if (regKey != null)
-                {
-                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
-                    if (File.Exists(devenvPath))
-                    {
-                        diffTools.Add(new DiffTool("Visual Studio 2012", devenvPath, "/diff %1 %2 %6 %7"));
-                    }
-                }
-            }
+            TryAddDevenvTool("14.0", "Visual Studio 2015", diffTools);
+            TryAddDevenvTool("12.0", "Visual Studio 2013", diffTools);
+            TryAddDevenvTool("11.0", "Visual Studio 2012", diffTools);
 
             // Older versions should have a diffmerge.exe tool in the IDE path.
-            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"))
-            {
-                if (regKey != null)
-                {
-                    var idePath = (string)regKey.GetValue("EnvironmentDirectory");
-                    var diffmergePath = Path.Combine(idePath, "diffmerge.exe");
-                    if (File.Exists(diffmergePath))
-                    {
-                        diffTools.Add(new DiffTool("Visual Studio 2010", diffmergePath, "%1 %2 %6 %7 /ignorespace"));
-                    }
-                }
-            }
-            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"))
-            {
-                if (regKey != null)
-                {
-                    var idePath = (string)regKey.GetValue("EnvironmentDirectory");
-                    var diffmergePath = Path.Combine(idePath, "diffmerge.exe");
-                    if (File.Exists(diffmergePath))
-                    {
-                        diffTools.Add(new DiffTool("Visual Studio 2008", diffmergePath, "%1 %2 %6 %7 /ignorespace"));
-                    }
-                }
-            }
+            TryAddDiffmergeTool("10.0", "Visual Studio 2010", diffTools);
+            TryAddDiffmergeTool("9.0", "Visual Studio 2008", diffTools);
 
             return diffTools;
+        }
+
+        private static void TryAddDevenvTool(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
+        {
+            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\{0}\Setup\VS".FormatInvariant(visualStudioVersion)))
+            {
+                if (regKey != null)
+                {
+                    var devenvPath = (string)regKey.GetValue("EnvironmentPath");
+                    if (!string.IsNullOrWhiteSpace(devenvPath) && File.Exists(devenvPath))
+                    {
+                        diffTools.Add(new DiffTool(visualStudioName, devenvPath, "/diff %1 %2 %6 %7"));
+                    }
+                }
+            }
+        }
+
+        private static void TryAddDiffmergeTool(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
+        {
+            using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\{0}\Setup\VS".FormatInvariant(visualStudioVersion)))
+            {
+                if (regKey != null)
+                {
+                    var idePath = (string)regKey.GetValue("EnvironmentDirectory");
+                    if (!string.IsNullOrWhiteSpace(idePath))
+                    {
+                        var diffmergePath = Path.Combine(idePath, "diffmerge.exe");
+                        if (File.Exists(diffmergePath))
+                        {
+                            diffTools.Add(new DiffTool(visualStudioName, diffmergePath, "%1 %2 %6 %7 /ignorespace"));
+                        }
+                    }
+                }
+            }
         }
 
         private class DiffTool

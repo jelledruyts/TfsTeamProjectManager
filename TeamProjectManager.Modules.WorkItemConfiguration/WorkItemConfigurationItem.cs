@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 using TeamProjectManager.Common.Infrastructure;
 
@@ -173,13 +172,13 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             switch (this.Type)
             {
                 case WorkItemConfigurationItemType.WorkItemType:
-                    return Enum.GetValues(typeof(WorkItemTypeDefinitionPart)).Cast<WorkItemTypeDefinitionPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
+                    return GetChildNodeParts(normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE"));
                 case WorkItemConfigurationItemType.CommonConfiguration:
-                    return Enum.GetValues(typeof(CommonProjectConfigurationPart)).Cast<CommonProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
+                    return GetChildNodeParts(normalizedXmlDefinition.DocumentElement);
                 case WorkItemConfigurationItemType.AgileConfiguration:
-                    return Enum.GetValues(typeof(AgileProjectConfigurationPart)).Cast<AgileProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
+                    return GetChildNodeParts(normalizedXmlDefinition.DocumentElement);
                 case WorkItemConfigurationItemType.ProcessConfiguration:
-                    return Enum.GetValues(typeof(ProcessProjectConfigurationPart)).Cast<ProcessProjectConfigurationPart>().Select(p => GetPart(normalizedXmlDefinition, p)).ToList();
+                    return GetChildNodeParts(normalizedXmlDefinition.DocumentElement);
                 case WorkItemConfigurationItemType.Categories:
                     return new WorkItemConfigurationItemPart[] { new WorkItemConfigurationItemPart(CategoriesName, normalizedXmlDefinition.DocumentElement) };
                 default:
@@ -187,28 +186,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
         }
 
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, WorkItemTypeDefinitionPart part)
+        private static IList<WorkItemConfigurationItemPart> GetChildNodeParts(XmlNode parentNode)
         {
-            var xpath = "//WORKITEMTYPE/" + part.ToString().ToUpperInvariant();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
-        }
-
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, AgileProjectConfigurationPart part)
-        {
-            var xpath = "/AgileProjectConfiguration/" + part.ToString();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
-        }
-
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, CommonProjectConfigurationPart part)
-        {
-            var xpath = "/CommonProjectConfiguration/" + part.ToString();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
-        }
-
-        private static WorkItemConfigurationItemPart GetPart(XmlDocument xmlDefinition, ProcessProjectConfigurationPart part)
-        {
-            var xpath = "/ProjectProcessConfiguration/" + part.ToString();
-            return new WorkItemConfigurationItemPart(part.ToString(), (XmlElement)xmlDefinition.SelectSingleNode(xpath));
+            var parts = new List<WorkItemConfigurationItemPart>();
+            foreach (XmlElement node in parentNode.ChildNodes)
+            {
+                parts.Add(new WorkItemConfigurationItemPart(node.Name, node));
+            }
+            return parts;
         }
 
         #endregion

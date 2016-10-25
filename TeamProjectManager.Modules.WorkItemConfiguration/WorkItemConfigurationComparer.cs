@@ -9,7 +9,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     {
         #region Compare
 
-        public static WorkItemConfigurationComparisonResult Compare(TfsMajorVersion tfsMajorVersion, WorkItemConfiguration source, WorkItemConfiguration target)
+        public static WorkItemConfigurationComparisonResult Compare(TfsMajorVersion tfsMajorVersion, WorkItemConfiguration source, WorkItemConfiguration target, bool ignoreCase)
         {
             var itemResults = new List<WorkItemConfigurationItemComparisonResult>();
 
@@ -46,6 +46,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 itemResults.Add(new WorkItemConfigurationItemComparisonResult(itemOnlyInSource.XmlDefinition, null, itemOnlyInSource.Name, itemOnlyInSource.Type, ComparisonStatus.ExistsOnlyInSource));
             }
 
+            var comparisonType = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (var targetItem in targetItems)
             {
                 var sourceItem = sourceItems.FirstOrDefault(s => s.Type == targetItem.Type && string.Equals(s.Name, targetItem.Name, StringComparison.OrdinalIgnoreCase));
@@ -66,8 +67,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var totalSize = sourceParts.Sum(p => p.NormalizedXmlDefinition == null ? 0 : p.NormalizedXmlDefinition.OuterXml.Length);
                     foreach (WorkItemConfigurationItemPart sourcePart in sourceParts)
                     {
-                        var targetPart = targetParts.Single(p => p.Name == sourcePart.Name);
-                        var status = string.Equals(XmlNormalizer.GetValue(sourcePart.NormalizedXmlDefinition), XmlNormalizer.GetValue(targetPart.NormalizedXmlDefinition), StringComparison.Ordinal) ? ComparisonStatus.AreEqual : ComparisonStatus.AreDifferent;
+                        var targetPart = targetParts.SingleOrDefault(p => p.Name == sourcePart.Name);
+                        ComparisonStatus status;
+                        if (targetPart == null)
+                        {
+                            status = ComparisonStatus.ExistsOnlyInSource;
+                        }
+                        else
+                        {
+                            status = string.Equals(XmlNormalizer.GetValue(sourcePart.NormalizedXmlDefinition), XmlNormalizer.GetValue(targetPart.NormalizedXmlDefinition), comparisonType) ? ComparisonStatus.AreEqual : ComparisonStatus.AreDifferent;
+                        }
                         var relativeSize = (sourcePart.NormalizedXmlDefinition == null ? 0 : sourcePart.NormalizedXmlDefinition.OuterXml.Length) / (double)totalSize;
                         partResults.Add(new WorkItemConfigurationItemPartComparisonResult(sourcePart.Name, status, relativeSize));
                     }

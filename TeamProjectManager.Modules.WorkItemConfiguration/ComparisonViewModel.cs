@@ -67,6 +67,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public static ObservableProperty<TeamProjectComparisonResult> SelectedComparisonResultProperty = new ObservableProperty<TeamProjectComparisonResult, ComparisonViewModel>(o => o.SelectedComparisonResult);
 
+        public bool IgnoreCase
+        {
+            get { return this.GetValue(IgnoreCaseProperty); }
+            set { this.SetValue(IgnoreCaseProperty, value); }
+        }
+
+        public static readonly ObservableProperty<bool> IgnoreCaseProperty = new ObservableProperty<bool, ComparisonViewModel>(o => o.IgnoreCase);
+
         #endregion
 
         #region Constructors
@@ -236,6 +244,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         {
             var teamProjectNames = this.SelectedTeamProjects.Select(p => p.Name).ToList();
             var sources = this.ComparisonSources.ToList();
+            var ignoreCase = this.IgnoreCase;
             var task = new ApplicationTask("Comparing work item configurations", teamProjectNames.Count, true);
             PublishStatus(new StatusEventArgs(task));
             var step = 0;
@@ -257,7 +266,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                         var sourceComparisonResults = new List<WorkItemConfigurationComparisonResult>();
                         foreach (var source in sources)
                         {
-                            sourceComparisonResults.Add(WorkItemConfigurationComparer.Compare(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, source, target));
+                            sourceComparisonResults.Add(WorkItemConfigurationComparer.Compare(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, source, target, ignoreCase));
                         }
                         results.Add(new TeamProjectComparisonResult(teamProjectName, sourceComparisonResults));
                     }

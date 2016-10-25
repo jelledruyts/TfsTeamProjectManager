@@ -70,21 +70,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var configurationComparisonResult = (WorkItemConfigurationComparisonResult)this.workItemConfigurationResultsDataGrid.SelectedItem;
                     var sourceFile = Path.GetTempFileName();
                     var targetFile = Path.GetTempFileName();
-                    try
-                    {
-                        itemComparisonResult.NormalizedSourceDefinition.Save(sourceFile);
-                        itemComparisonResult.NormalizedTargetDefinition.Save(targetFile);
 
-                        var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", itemComparisonResult.ItemName, configurationComparisonResult.Source.Name);
-                        var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", itemComparisonResult.ItemName, this.comparisonResult.TeamProject);
+                    itemComparisonResult.NormalizedSourceDefinition.Save(sourceFile);
+                    itemComparisonResult.NormalizedTargetDefinition.Save(targetFile);
 
-                        diffTool.Launch(sourceFile, targetFile, sourceLabel, targetLabel);
-                    }
-                    finally
-                    {
-                        File.Delete(sourceFile);
-                        File.Delete(targetFile);
-                    }
+                    var sourceLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Source '{1}'", itemComparisonResult.ItemName, configurationComparisonResult.Source.Name);
+                    var targetLabel = string.Format(CultureInfo.CurrentCulture, "Work Item Type '{0}' in Team Project '{1}'", itemComparisonResult.ItemName, this.comparisonResult.TeamProject);
+
+                    diffTool.Launch(sourceFile, targetFile, sourceLabel, targetLabel);
                 }
             }
         }
@@ -171,7 +164,15 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 arguments = Environment.ExpandEnvironmentVariables(arguments);
                 var processInfo = new ProcessStartInfo(command, arguments);
                 var process = Process.Start(processInfo);
-                process.WaitForExit();
+                if (process != null)
+                {
+                    // Delete the temp files when the diff tool has exited.
+                    process.Exited += (object sender, EventArgs e) =>
+                    {
+                        File.Delete(sourceFileName);
+                        File.Delete(targetFileName);
+                    };
+                }
             }
         }
     }

@@ -16,18 +16,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
         private static readonly string[] KnownFieldsWithReportableMeasure;
         private static readonly string[] KnownFieldsWithSyncNameChanges;
         private static readonly string[] KnownFieldsWithFormulaSum;
-        private static readonly string[] KnwonFieldsWithNamesToRemoveSpaces;
+        private static readonly string[] KnownFieldsWithNamesToRemoveSpaces;
         private static readonly string[] FieldRuleElementNames;
         private static readonly Dictionary<TfsMajorVersion, Dictionary<string, Dictionary<string, string>>> SystemFields;
 
         static XmlNormalizer()
         {
-            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName", "Microsoft.VSTS.CMMI.RootCause", "Microsoft.VSTS.CMMI.Probability" };
+            KnownFieldsWithReportableDimension = new string[] { "System.AreaPath", "System.AssignedTo", "System.ChangedBy", "System.ChangedDate", "System.CreatedBy", "System.CreatedDate", "System.Id", "System.IterationPath", "System.Reason", "System.State", "System.Title", "Microsoft.VSTS.Common.Severity", "Microsoft.VSTS.Common.StateChangeDate", "System.AuthorizedAs", "System.NodeName", "Microsoft.VSTS.CMMI.RootCause", "Microsoft.VSTS.CMMI.Probability", "Microsoft.VSTS.Common.ReviewedBy" };
             KnownFieldsWithReportableDetail = new string[] { "System.RevisedDate" };
             KnownFieldsWithReportableMeasure = new string[] { "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
-            KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy" };
+            KnownFieldsWithSyncNameChanges = new string[] { "System.AuthorizedAs", "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ClosedBy", "Microsoft.VSTS.Common.ResolvedBy", "System.AssignedTo", "System.ChangedBy", "System.CreatedBy", "Microsoft.VSTS.Common.ReviewedBy", "Microsoft.VSTS.CMMI.SubjectMatterExpert", "Microsoft.VSTS.CMMI.ActualAttendee", "Microsoft.VSTS.CMMI.OptionalAttendee", "Microsoft.VSTS.CMMI.RequiredAttendee", "Microsoft.VSTS.CMMI.CalledBy" };
             KnownFieldsWithFormulaSum = new string[] { "Microsoft.VSTS.Scheduling.OriginalEstimate", "Microsoft.VSTS.Scheduling.StoryPoints", "Microsoft.VSTS.Scheduling.CompletedWork", "Microsoft.VSTS.Scheduling.RemainingWork", "Microsoft.VSTS.Scheduling.BaselineWork", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount" };
-            KnwonFieldsWithNamesToRemoveSpaces = new string[] { "Microsoft.VSTS.TCM.ReproSteps", "System.AreaId", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount", "System.IterationId", "System.RelatedLinkCount", "Microsoft.VSTS.TCM.AutomatedTestId", "Microsoft.VSTS.TCM.AutomatedTestName", "Microsoft.VSTS.TCM.AutomatedTestStorage", "Microsoft.VSTS.TCM.AutomatedTestType", "Microsoft.VSTS.TCM.LocalDataSource" };
+            KnownFieldsWithNamesToRemoveSpaces = new string[] { "Microsoft.VSTS.TCM.ReproSteps", "System.AreaId", "System.AttachedFileCount", "System.ExternalLinkCount", "System.HyperLinkCount", "System.IterationId", "System.RelatedLinkCount", "Microsoft.VSTS.TCM.AutomatedTestId", "Microsoft.VSTS.TCM.AutomatedTestName", "Microsoft.VSTS.TCM.AutomatedTestStorage", "Microsoft.VSTS.TCM.AutomatedTestType", "Microsoft.VSTS.TCM.LocalDataSource" };
             FieldRuleElementNames = new string[] { "WHEN", "WHENCHANGED", "WHENNOT", "WHENNOTCHANGED" };
 
             // Create a lookup table of common system fields where the key is the refname.
@@ -60,7 +60,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 { "System.TeamProject", new Dictionary<string, string> { { "refname", "System.TeamProject" }, { "name", "Team Project" }, { "type", "String" }, { "reportable", "dimension" } } },
                 { "System.Title", new Dictionary<string, string> { { "refname", "System.Title" }, { "name", "Title" }, { "type", "String" }, { "reportable", "dimension" } } },
                 { "System.Watermark", new Dictionary<string, string> { { "refname", "System.Watermark" }, { "name", "Watermark" }, { "type", "Integer" } } },
-                { "System.WorkItemType", new Dictionary<string, string> { { "refname", "System.WorkItemType" }, { "name", "Work Item Type" }, { "type", "String" }, { "reportable", "dimension" } } }
+                { "System.WorkItemType", new Dictionary<string, string> { { "refname", "System.WorkItemType" }, { "name", "Work Item Type" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.BoardColumn", new Dictionary<string, string> { { "refname", "System.BoardColumn" }, { "name", "Board Column" }, { "type", "String" }, { "reportable", "dimension" } } },
+                { "System.BoardColumnDone", new Dictionary<string, string> { { "refname", "System.BoardColumnDone" }, { "name", "Board Column Done" }, { "type", "Boolean" }, { "reportable", "dimension" } } },
+                { "System.BoardLane", new Dictionary<string, string> { { "refname", "System.BoardLane" }, { "name", "Board Lane" }, { "type", "String" }, { "reportable", "dimension" } } }
             };
 
             // TFS 11 by default now uses HTML for the description.
@@ -261,7 +264,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
                 // Certain system fields have added spaces to their names, remove the spaces to normalize them.
                 // See http://blogs.msdn.com/b/greggboer/archive/2010/02/25/names-changed-for-core-wit-fields-and-implications-thereof.aspx for more information.
-                if (KnwonFieldsWithNamesToRemoveSpaces.Contains(refname))
+                if (KnownFieldsWithNamesToRemoveSpaces.Contains(refname))
                 {
                     var nameAttribute = field.Attributes["name"];
                     nameAttribute.Value = nameAttribute.Value.Replace(" ", string.Empty);
@@ -401,7 +404,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/CommonProjectConfiguration/Weekends"));
 
             // Sort all states by type.
-            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
+            foreach (XmlNode statesNode in normalizedXmlDefinition.SelectNodes("//States"))
+            {
+                SortChildNodes(statesNode, n => GetValue(n.Attributes["type"]));
+            }
         }
 
         #endregion
@@ -410,18 +416,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private static void NormalizeProcessConfiguration(XmlDocument normalizedXmlDefinition)
         {
-            // Sort the root node's child nodes.
-            SortChildNodes(normalizedXmlDefinition.DocumentElement);
-
-            // Sort the child nodes of the backlog nodes.
-            foreach (XmlNode portfolioBacklogNode in normalizedXmlDefinition.SelectNodes("/ProjectProcessConfiguration/PortfolioBacklogs/PortfolioBacklog"))
-            {
-                SortChildNodes(portfolioBacklogNode);
-            }
             var requirementBacklogNode = normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/RequirementBacklog");
             var taskBacklogNode = normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/TaskBacklog");
-            SortChildNodes(requirementBacklogNode);
-            SortChildNodes(taskBacklogNode);
 
             // Add the "parent" attribute for well-known backlogs.
             if (requirementBacklogNode != null && requirementBacklogNode.Attributes["parent"] == null)
@@ -429,15 +425,36 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 var parentAttribute = normalizedXmlDefinition.CreateAttribute("parent");
                 parentAttribute.Value = "Microsoft.FeatureCategory";
                 requirementBacklogNode.Attributes.Append(parentAttribute);
-                SortAttributes(requirementBacklogNode);
             }
             if (taskBacklogNode != null && taskBacklogNode.Attributes["parent"] == null)
             {
                 var parentAttribute = normalizedXmlDefinition.CreateAttribute("parent");
                 parentAttribute.Value = "Microsoft.RequirementCategory";
                 taskBacklogNode.Attributes.Append(parentAttribute);
-                SortAttributes(taskBacklogNode);
             }
+
+            // Set the "workItemCountLimit" attribute to its default value on all backlogs.
+            var workItemCountLimitAttributeName = "workItemCountLimit";
+            var workItemCountLimitAttributeValue = "500";
+            AddAttributeIfNeeded(requirementBacklogNode, workItemCountLimitAttributeName, workItemCountLimitAttributeValue);
+            AddAttributeIfNeeded(taskBacklogNode, workItemCountLimitAttributeName, workItemCountLimitAttributeValue);
+            foreach (XmlNode portfolioBacklogNode in normalizedXmlDefinition.SelectNodes("/ProjectProcessConfiguration/PortfolioBacklogs/PortfolioBacklog"))
+            {
+                AddAttributeIfNeeded(portfolioBacklogNode, workItemCountLimitAttributeName, workItemCountLimitAttributeValue);
+            }
+
+            // Sort the root node's child nodes.
+            SortChildNodes(normalizedXmlDefinition.DocumentElement);
+
+            // Sort the child nodes and attributes of the backlog nodes.
+            foreach (XmlNode portfolioBacklogNode in normalizedXmlDefinition.SelectNodes("/ProjectProcessConfiguration/PortfolioBacklogs/PortfolioBacklog"))
+            {
+                SortChildNodes(portfolioBacklogNode);
+            }
+            SortChildNodes(requirementBacklogNode);
+            SortAttributes(requirementBacklogNode);
+            SortChildNodes(taskBacklogNode);
+            SortAttributes(taskBacklogNode);
 
             // Sort all type fields by refname.
             SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/TypeFields"), n => GetValue(n.Attributes["refname"]));
@@ -449,10 +466,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/Weekends"));
 
             // Sort all states by type.
-            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("//States"), n => GetValue(n.Attributes["type"]));
+            foreach (XmlNode statesNode in normalizedXmlDefinition.SelectNodes("//States"))
+            {
+                SortChildNodes(statesNode, n => GetValue(n.Attributes["type"]));
+            }
 
             // Sort all work item colors by name.
             SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/WorkItemColors"), n => GetValue(n.Attributes["name"]));
+
+            // Sort all properties by name.
+            SortChildNodes(normalizedXmlDefinition.SelectSingleNode("/ProjectProcessConfiguration/Properties"), n => GetValue(n.Attributes["name"]));
         }
 
         #endregion
@@ -477,7 +500,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private static void SetAttributeIfNeeded(XmlNode field, string refname, IEnumerable<string> refnameLookupList, string attributeName, string attributeValue)
         {
-            if (refnameLookupList.Contains(refname, StringComparer.OrdinalIgnoreCase))
+            if (refnameLookupList.Any(r => refname.StartsWith(r, StringComparison.OrdinalIgnoreCase)))
             {
                 var reportableAttribute = field.Attributes[attributeName];
                 if (reportableAttribute == null)
@@ -529,6 +552,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     node.Attributes.Remove(nodeAttribute);
                     node.Attributes.Append(nodeAttribute);
                 }
+            }
+        }
+
+        private static void AddAttributeIfNeeded(XmlNode node, string attributeName, string attributeValue)
+        {
+            if (node != null && node.Attributes[attributeName] == null)
+            {
+                var attribute = node.OwnerDocument.CreateAttribute(attributeName);
+                attribute.Value = attributeValue;
+                node.Attributes.Append(attribute);
             }
         }
 

@@ -50,6 +50,9 @@ This application is completely free to use. If you feel it saves you a lot of ti
 
 !! What's New?
 
+* v2.0.XXXX (XXX)
+** Improved work item configuration comparison to have an option to ignore case and to better support newest templates
+** Upgraded to latest TFS SDK version
 * v2.0.5885 (February 11, 2016)
 ** Upgraded to latest TFS SDK version
 ** Fixed issue where application could crash when opening work item comparison

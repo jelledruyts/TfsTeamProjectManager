@@ -16,17 +16,21 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,5,0,0" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="Sources" />
+            <Label Grid.Row="0" Grid.Column="0" Content="Sources" />
 
-            <ListBox Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Description" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" MinHeight="70" MaxHeight="150" Margin="5,0,0,0" />
+            <ListBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Path=ComparisonSources}" DisplayMemberPath="Name" SelectedItem="{Binding Path=SelectedComparisonSource}" SelectionMode="Single" MinHeight="70" MaxHeight="150" Margin="5,0,0,0" />
 
-            <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
+            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
                 <TextBlock><Hyperlink Command="{Binding Path=AddComparisonSourceCommand}" ToolTip="Add a work item configuration to compare with">add...</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=EditSelectedComparisonSourceCommand}" ToolTip="Edit the selected work item configuration">edit</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedComparisonSourceCommand}" ToolTip="Remove the selected work item configuration">remove</Hyperlink></TextBlock>
@@ -37,6 +41,12 @@
                 </StackPanel>
                 <TextBlock><Hyperlink Command="{Binding Path=LoadComparisonSourcesCommand}" ToolTip="Load a list of sources from a saved file">load</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=SaveComparisonSourcesCommand}" ToolTip="Save the current list of sources to a file">save</Hyperlink></TextBlock>
+            </StackPanel>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Options" />
+
+            <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding Path=IgnoreCase}" VerticalAlignment="Center">Ignore casing differences</CheckBox>
             </StackPanel>
 
         </Grid>

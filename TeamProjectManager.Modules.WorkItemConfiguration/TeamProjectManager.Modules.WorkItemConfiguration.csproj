@@ -261,13 +261,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgileProjectConfigurationPart.cs" />
-    <Compile Include="CommonProjectConfigurationPart.cs" />
     <Compile Include="MacroDefinition.cs" />
     <Compile Include="MacroInformationDialog.xaml.cs">
       <DependentUpon>MacroInformationDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProcessProjectConfigurationPart.cs" />
     <Compile Include="ProcessTemplatePickerDialog.xaml.cs">
       <DependentUpon>ProcessTemplatePickerDialog.xaml</DependentUpon>
     </Compile>
@@ -331,7 +328,6 @@
     </Compile>
     <Compile Include="WorkItemQueryExport.cs" />
     <Compile Include="WorkItemQueryInfo.cs" />
-    <Compile Include="WorkItemTypeDefinitionPart.cs" />
     <Compile Include="WorkItemConfigurationItemEditorDialog.xaml.cs">
       <DependentUpon>WorkItemConfigurationItemEditorDialog.xaml</DependentUpon>
     </Compile>

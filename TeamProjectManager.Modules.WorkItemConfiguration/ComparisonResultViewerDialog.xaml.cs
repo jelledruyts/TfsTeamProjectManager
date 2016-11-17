@@ -95,6 +95,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             }
 
             // Visual Studio 2012 or above have a built-in diff tool, call devenv.exe directly.
+            TryAddDevenvTool("15.0", "Visual Studio 2017", diffTools);
             TryAddDevenvTool("14.0", "Visual Studio 2015", diffTools);
             TryAddDevenvTool("12.0", "Visual Studio 2013", diffTools);
             TryAddDevenvTool("11.0", "Visual Studio 2012", diffTools);

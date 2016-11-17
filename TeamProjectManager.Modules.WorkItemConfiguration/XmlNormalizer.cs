@@ -169,6 +169,20 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
             normalizedXmlDefinition.LoadXml(rawXml);
 
+            // Remove the work item type refname if present, since it is not returned from the project.
+            var workitemTypeNode = normalizedXmlDefinition.SelectSingleNode("//WORKITEMTYPE");
+            var refnameAttribute = workitemTypeNode.Attributes["refname"];
+            if (refnameAttribute != null)
+            {
+                workitemTypeNode.Attributes.Remove(refnameAttribute);
+            }
+
+            // Set the default page layout mode if needed.
+            foreach (var pageNode in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FORM/WebLayout/Page").Cast<XmlElement>())
+            {
+                AddAttributeIfNeeded(pageNode, "LayoutMode", "FirstColumnWide");
+            }
+
             // Remove all empty CustomControlOptions.
             foreach (var customControlOptionsNode in normalizedXmlDefinition.SelectNodes("//CustomControlOptions").Cast<XmlElement>().Where(n => !n.HasChildNodes))
             {
@@ -203,6 +217,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             foreach (XmlAttribute reconsideringAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Reconsidering the feature']/@value | //REASON[@value='Reconsidering the feature']/@value"))
             {
                 reconsideringAttribute.Value = "Reconsidering the Feature";
+            }
+            foreach (XmlAttribute reconsideringAttribute in normalizedXmlDefinition.SelectNodes("//DEFAULTREASON[@value='Reconsidering the epic']/@value | //REASON[@value='Reconsidering the epic']/@value"))
+            {
+                reconsideringAttribute.Value = "Reconsidering the Epic";
             }
             foreach (XmlAttribute fieldIdAttribute in normalizedXmlDefinition.SelectNodes("//WORKITEMTYPE/FIELDS/FIELD[@refname='System.Id']/@name"))
             {

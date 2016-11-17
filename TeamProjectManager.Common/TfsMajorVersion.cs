@@ -57,8 +57,13 @@ namespace TeamProjectManager.Common
         V14 = 140,
 
         /// <summary>
+        /// Represents Team Foundation Server 15 (TFS 2017).
+        /// </summary>
+        V15 = 150,
+
+        /// <summary>
         /// Represents the highest known version of Team Foundation Server.
         /// </summary>
-        HighestKnownVersion = V14
+        HighestKnownVersion = V15
     }
 }

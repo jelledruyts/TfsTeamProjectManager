@@ -14,7 +14,6 @@ using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
-using TeamProjectManager.Shell.Infrastructure;
 
 namespace TeamProjectManager.Shell.Modules.TeamProjects
 {
@@ -253,7 +252,11 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService8", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "vstfs", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "Authorization7", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V15, "Team Foundation Server 2017", "TFS 2017");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "WorkItemTracking", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "WorkitemService8", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V14, "Team Foundation Server 2015", "TFS 2015");
                 }

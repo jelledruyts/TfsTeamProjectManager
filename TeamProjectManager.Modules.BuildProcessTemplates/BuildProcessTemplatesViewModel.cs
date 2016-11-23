@@ -1,15 +1,10 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.Client;
-using Microsoft.TeamFoundation.VersionControl.Client;
-using Microsoft.TeamFoundation.VersionControl.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
@@ -26,7 +21,6 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
         public RelayCommand RegisterBuildProcessTemplateCommand { get; private set; }
         public RelayCommand GetBuildProcessTemplatesCommand { get; private set; }
         public RelayCommand DeleteSelectedBuildProcessTemplatesCommand { get; private set; }
-        public RelayCommand BrowseTemplateServerPathCommand { get; private set; }
 
         #endregion
 
@@ -120,48 +114,11 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
             this.RegisterBuildProcessTemplateCommand = new RelayCommand(RegisterBuildProcessTemplate, CanRegisterBuildProcessTemplate);
             this.GetBuildProcessTemplatesCommand = new RelayCommand(GetBuildProcessTemplates, CanGetBuildProcessTemplates);
             this.DeleteSelectedBuildProcessTemplatesCommand = new RelayCommand(DeleteSelectedBuildProcessTemplates, CanDeleteSelectedBuildProcessTemplates);
-            this.BrowseTemplateServerPathCommand = new RelayCommand(BrowseTemplateServerPath, CanBrowseTemplateServerPath);
         }
 
         #endregion
 
         #region Commands
-
-        private bool CanBrowseTemplateServerPath(object argument)
-        {
-            return this.SelectedTeamProjectCollection != null;
-        }
-
-        private void BrowseTemplateServerPath(object argument)
-        {
-            var tfs = GetSelectedTfsTeamProjectCollection();
-            var vcs = tfs.GetService<VersionControlServer>();
-            try
-            {
-                var assembly = Assembly.GetAssembly(typeof(WorkItemPolicy));
-                var args = new object[] { vcs };
-                using (var dialog = (System.Windows.Forms.Form)assembly.CreateInstance("Microsoft.TeamFoundation.VersionControl.Controls.DialogChooseItem", false, BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Instance, null, args, CultureInfo.CurrentCulture, null))
-                {
-                    dialog.GetType().GetProperty("AllowFileOnly").SetValue(dialog, true, null);
-                    dialog.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                    var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
-                    if (result == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var item = (Item)dialog.GetType().GetProperty("SelectedItem", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dialog, null);
-                        if (item != null)
-                        {
-                            this.TemplateServerPath = item.ServerItem;
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                var message = "There was a problem showing the internal TFS Source Control file browser dialog.";
-                Logger.Log(message, exc, TraceEventType.Warning);
-                MessageBox.Show(message + " See the log file for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
 
         private bool CanGetBuildProcessTemplates(object argument)
         {

@@ -245,7 +245,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
@@ -274,7 +273,7 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Infrastructure\ApplicationVersion.cs" />
-    <Compile Include="Infrastructure\CodePlexClient.cs" />
+    <Compile Include="Infrastructure\UpdateClient.cs" />
     <Compile Include="Infrastructure\HelpContentConverter.cs" />
     <Compile Include="Infrastructure\IStatusService.cs" />
     <Compile Include="Infrastructure\Logger.cs" />

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Microsoft.Practices.Prism.Events;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -128,13 +127,13 @@ namespace TeamProjectManager.Shell.Modules.Logo
 
         private void CheckForUpdates()
         {
-            if (CodePlexClient.IsOnline())
+            if (UpdateClient.IsOnline())
             {
                 // Check for the latest released version on a background thread.
                 var worker = new BackgroundWorker();
                 worker.DoWork += (sender, e) =>
                 {
-                    e.Result = CodePlexClient.GetLatestReleasedVersion(InternalConstants.CodePlexProjectName, this.Logger);
+                    e.Result = UpdateClient.GetLatestReleasedVersion(this.Logger);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
                 {

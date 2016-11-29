@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildProcessTemplates", "TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj", "{BDCA8650-C32C-4131-A622-DDA98C43656C}"
@@ -16,46 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.SourceControl", "TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj", "{FA594433-69DA-461E-9C57-6483529214EA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{B9D7B2AC-66F2-4AB7-B50F-A5ED7EEE4C9E}"
-	ProjectSection(SolutionItems) = preProject
-		Resources\Activity-ActivityDetails.png = Resources\Activity-ActivityDetails.png
-		Resources\Activity-GetActivity.png = Resources\Activity-GetActivity.png
-		Resources\BuildDefinitions-Update.png = Resources\BuildDefinitions-Update.png
-		Resources\BuildDefinitions-ViewUpdateDelete.png = Resources\BuildDefinitions-ViewUpdateDelete.png
-		Resources\BuildProcessTemplates-RegisterUpdate.png = Resources\BuildProcessTemplates-RegisterUpdate.png
-		Resources\BuildProcessTemplates-ViewUnregister-ByServerPath.png = Resources\BuildProcessTemplates-ViewUnregister-ByServerPath.png
-		Resources\BuildProcessTemplates-ViewUnregister.png = Resources\BuildProcessTemplates-ViewUnregister.png
-		Resources\Security-AddUpdateGroup.png = Resources\Security-AddUpdateGroup.png
-		Resources\Security-ViewDeleteGroups.png = Resources\Security-ViewDeleteGroups.png
-		Resources\SourceControl-UpdateSettings.png = Resources\SourceControl-UpdateSettings.png
-		Resources\SourceControl-ViewBranchHierarchies-ExportedDgml.png = Resources\SourceControl-ViewBranchHierarchies-ExportedDgml.png
-		Resources\SourceControl-ViewBranchHierarchies.png = Resources\SourceControl-ViewBranchHierarchies.png
-		Resources\SourceControl-ViewLatestChangesets.png = Resources\SourceControl-ViewLatestChangesets.png
-		Resources\SourceControl-ViewSettings.png = Resources\SourceControl-ViewSettings.png
-		Resources\WikiDocumentation.txt = Resources\WikiDocumentation.txt
-		Resources\WikiDocumentationHowToContribute.txt = Resources\WikiDocumentationHowToContribute.txt
-		Resources\WikiHomepage.txt = Resources\WikiHomepage.txt
-		Resources\WorkItemConfiguration-Categories-ExportEdit-Edit.png = Resources\WorkItemConfiguration-Categories-ExportEdit-Edit.png
-		Resources\WorkItemConfiguration-Categories-ExportEdit-Transform.png = Resources\WorkItemConfiguration-Categories-ExportEdit-Transform.png
-		Resources\WorkItemConfiguration-Categories-ExportEdit.png = Resources\WorkItemConfiguration-Categories-ExportEdit.png
-		Resources\WorkItemConfiguration-Categories-UpdateImport.png = Resources\WorkItemConfiguration-Categories-UpdateImport.png
-		Resources\WorkItemConfiguration-Categories-ViewDelete.png = Resources\WorkItemConfiguration-Categories-ViewDelete.png
-		Resources\WorkItemConfiguration-Compare-Edit.png = Resources\WorkItemConfiguration-Compare-Edit.png
-		Resources\WorkItemConfiguration-Compare.png = Resources\WorkItemConfiguration-Compare.png
-		Resources\WorkItemConfiguration-CompareDetails.png = Resources\WorkItemConfiguration-CompareDetails.png
-		Resources\WorkItemConfiguration-ProcessConfiguration-Import.png = Resources\WorkItemConfiguration-ProcessConfiguration-Import.png
-		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png
-		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png
-		Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png = Resources\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png
-		Resources\WorkItemConfiguration-Transform-Edit.png = Resources\WorkItemConfiguration-Transform-Edit.png
-		Resources\WorkItemConfiguration-Transform.png = Resources\WorkItemConfiguration-Transform.png
-		Resources\WorkItemConfiguration-WorkItemTypes-Import.png = Resources\WorkItemConfiguration-WorkItemTypes-Import.png
-		Resources\WorkItemConfiguration-WorkItemTypes-Search.png = Resources\WorkItemConfiguration-WorkItemTypes-Search.png
-		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png
-		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png
-		Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png = Resources\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Security", "TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj", "{412C41B9-CE97-47CA-9607-BBC22418B547}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildDefinitions", "TeamProjectManager.Modules.BuildDefinitions\TeamProjectManager.Modules.BuildDefinitions.csproj", "{59B5B1FA-EB79-430B-83CF-C1F9419AF573}"
@@ -63,36 +25,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Activity", "TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj", "{704821E4-5BCF-4053-AFE8-915C52933A31}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs06
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = TeamProjectManager.Common\\TeamProjectManager.Common.csproj
-		SccProjectName1 = TeamProjectManager.Common
-		SccLocalPath1 = TeamProjectManager.Common
-		SccProjectUniqueName2 = TeamProjectManager.Modules.BuildProcessTemplates\\TeamProjectManager.Modules.BuildProcessTemplates.csproj
-		SccProjectName2 = TeamProjectManager.Modules.BuildProcessTemplates
-		SccLocalPath2 = TeamProjectManager.Modules.BuildProcessTemplates
-		SccProjectUniqueName3 = TeamProjectManager.Modules.WorkItemConfiguration\\TeamProjectManager.Modules.WorkItemConfiguration.csproj
-		SccProjectName3 = TeamProjectManager.Modules.WorkItemConfiguration
-		SccLocalPath3 = TeamProjectManager.Modules.WorkItemConfiguration
-		SccProjectUniqueName4 = TeamProjectManager.Shell\\TeamProjectManager.Shell.csproj
-		SccProjectName4 = TeamProjectManager.Shell
-		SccLocalPath4 = TeamProjectManager.Shell
-		SccProjectUniqueName5 = TeamProjectManager.Modules.SourceControl\\TeamProjectManager.Modules.SourceControl.csproj
-		SccProjectName5 = TeamProjectManager.Modules.SourceControl
-		SccLocalPath5 = TeamProjectManager.Modules.SourceControl
-		SccProjectUniqueName6 = TeamProjectManager.Modules.Security\\TeamProjectManager.Modules.Security.csproj
-		SccProjectName6 = TeamProjectManager.Modules.Security
-		SccLocalPath6 = TeamProjectManager.Modules.Security
-		SccProjectUniqueName7 = TeamProjectManager.Modules.BuildDefinitions\\TeamProjectManager.Modules.BuildDefinitions.csproj
-		SccProjectName7 = TeamProjectManager.Modules.BuildDefinitions
-		SccLocalPath7 = TeamProjectManager.Modules.BuildDefinitions
-		SccProjectUniqueName8 = TeamProjectManager.Modules.Activity\\TeamProjectManager.Modules.Activity.csproj
-		SccProjectName8 = TeamProjectManager.Modules.Activity
-		SccLocalPath8 = TeamProjectManager.Modules.Activity
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms

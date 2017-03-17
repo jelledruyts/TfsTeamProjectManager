@@ -79,6 +79,19 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         public static readonly ObservableProperty<ICollection<TeamProjectInfo>> AvailableTeamProjectsProperty = new ObservableProperty<ICollection<TeamProjectInfo>, TeamProjectsViewModel>(o => o.AvailableTeamProjects);
 
+        public string TeamProjectsFilter
+        {
+            get { return this.GetValue(TeamProjectsFilterProperty); }
+            set { this.SetValue(TeamProjectsFilterProperty, value); }
+        }
+
+        public static readonly ObservableProperty<string> TeamProjectsFilterProperty = new ObservableProperty<string, TeamProjectsViewModel>(o => o.TeamProjectsFilter, OnTeamProjectsFilterChanged);
+
+        private static void OnTeamProjectsFilterChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<string> e)
+        {
+            ((TeamProjectsViewModel)sender).ApplyTeamProjectsFilter();
+        }
+
         #endregion
 
         #region Constructors
@@ -306,6 +319,18 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             this.InfoMessage = infoMessage;
             this.InfoMessageToolTip = toolTip;
+        }
+
+        private void ApplyTeamProjectsFilter()
+        {
+            if (string.IsNullOrEmpty(this.TeamProjectsFilter))
+            {
+                this.AvailableTeamProjects = this.SelectedTeamProjectCollection.TeamProjects;
+            }
+            else
+            {
+                this.AvailableTeamProjects = this.SelectedTeamProjectCollection.TeamProjects.Where(p => p.Name.IndexOf(this.TeamProjectsFilter, StringComparison.CurrentCultureIgnoreCase) >= 0).ToArray();
+            }
         }
 
         #endregion

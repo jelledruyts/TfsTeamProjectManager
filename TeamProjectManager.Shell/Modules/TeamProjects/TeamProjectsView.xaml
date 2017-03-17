@@ -31,6 +31,7 @@
         <Grid Grid.Row="3" Visibility="{Binding Path=TeamProjectsVisibility}" Margin="0,5,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -42,7 +43,11 @@
                 <TextBlock><Hyperlink Command="{Binding Path=ShowOnlySelectedTeamProjectsCommand}" ToolTip="Show only the selected Team Projects">show selected</Hyperlink></TextBlock>
             </WrapPanel>
 
-            <ListBox Grid.Row="1" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=AvailableTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" HorizontalContentAlignment="Stretch" />
+            <Grid Grid.Row="1" Margin="0,5,0,0">
+                <TextBox Text="{Binding Path=TeamProjectsFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Filter Team Projects" />
+            </Grid>
+
+            <ListBox Grid.Row="2" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=AvailableTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" HorizontalContentAlignment="Stretch" />
         </Grid>
 
     </Grid>

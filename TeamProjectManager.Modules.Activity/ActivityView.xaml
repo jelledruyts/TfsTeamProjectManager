@@ -34,9 +34,9 @@
 
                 <Label Grid.Row="1" Grid.Column="0" Content="Activity Components" Margin="0,5,0,0" />
                 <WrapPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" VerticalAlignment="Center">
-                    <CheckBox Content="Source Control" VerticalAlignment="Center" IsChecked="{Binding Path=SourceControlComponentEnabled}" />
+                    <CheckBox Content="TFVC History" VerticalAlignment="Center" IsChecked="{Binding Path=SourceControlComponentEnabled}" />
                     <CheckBox Content="Work Item Tracking" VerticalAlignment="Center" IsChecked="{Binding Path=WorkItemTrackingComponentEnabled}" Margin="5,0,0,0" />
-                    <CheckBox Content="Team Build" VerticalAlignment="Center" IsChecked="{Binding Path=TeamBuildComponentEnabled}" Margin="5,0,0,0" />
+                    <CheckBox Content="XAML Builds" VerticalAlignment="Center" IsChecked="{Binding Path=TeamBuildComponentEnabled}" Margin="5,0,0,0" />
                 </WrapPanel>
 
                 <Label Grid.Row="2" Grid.Column="0" Content="Exclude User(s)" Margin="0,5,0,0" />

@@ -23,11 +23,18 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         #endregion
 
+        #region Properties
+
+        public bool CanEdit { get; private set; }
+
+        #endregion
+
         #region Constructors
 
         public WorkItemTypeDefinition(string name, XmlDocument xmlDefinition)
             : base(WorkItemConfigurationItemType.WorkItemType, name, xmlDefinition)
         {
+            this.CanEdit = this.XmlDefinition != null;
         }
 
         #endregion

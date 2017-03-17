@@ -7,30 +7,45 @@
              xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemConfiguration"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item configuration from a standard configuration.">
-            <ContentPresenter Content="{Binding Path=ComparisonView, Mode=OneTime}" />
-        </TabItem>
+        <Border Grid.Row="0" Visibility="{Binding Path=VstsWarningVisibility}" BorderThickness="2" BorderBrush="{DynamicResource ErrorForegroundBrush}" Margin="5" Padding="5">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource ErrorForegroundBrush}">
+                Attention: support for work item configuration is limited when using Visual Studio Team Services.
+                <LineBreak />
+                You cannot edit work item types, categories or the process configuration.
+            </TextBlock>
+        </Border>
 
-        <TabItem Header="Work Item Types">
-            <ContentPresenter Content="{Binding Path=WorkItemTypesView, Mode=OneTime}" />
-        </TabItem>
+        <TabControl Grid.Row="1">
 
-        <TabItem Header="Queries">
-            <ContentPresenter Content="{Binding Path=WorkItemQueriesView, Mode=OneTime}" />
-        </TabItem>
+            <TabItem Header="Compare" i:HelpProvider.HelpContent="Allows you to compare the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration) used by Team Projects with work item configuration definition files on disk (e.g. from a Process Template) or from other Team Projects. This can be useful to determine which Team Projects have been created with which Process Template, or which Team Projects have changed their work item configuration from a standard configuration.">
+                <ContentPresenter Content="{Binding Path=ComparisonView, Mode=OneTime}" />
+            </TabItem>
 
-        <TabItem Header="Categories">
-            <ContentPresenter Content="{Binding Path=WorkItemCategoriesView, Mode=OneTime}" />
-        </TabItem>
+            <TabItem Header="Work Item Types">
+                <ContentPresenter Content="{Binding Path=WorkItemTypesView, Mode=OneTime}" />
+            </TabItem>
 
-        <TabItem Header="Process Configuration">
-            <ContentPresenter Content="{Binding Path=WorkItemProcessConfigurationView, Mode=OneTime}" />
-        </TabItem>
+            <TabItem Header="Queries">
+                <ContentPresenter Content="{Binding Path=WorkItemQueriesView, Mode=OneTime}" />
+            </TabItem>
 
-        <TabItem Header="Transform" i:HelpProvider.HelpContent="Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration). This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.">
-            <ContentPresenter Content="{Binding Path=WorkItemConfigurationTransformationView, Mode=OneTime}" />
-        </TabItem>
-    </TabControl>
+            <TabItem Header="Categories">
+                <ContentPresenter Content="{Binding Path=WorkItemCategoriesView, Mode=OneTime}" />
+            </TabItem>
+
+            <TabItem Header="Process Configuration">
+                <ContentPresenter Content="{Binding Path=WorkItemProcessConfigurationView, Mode=OneTime}" />
+            </TabItem>
+
+            <TabItem Header="Transform" i:HelpProvider.HelpContent="Allows you to transform the XML files that define the work item configuration (i.e. work item type definitions, work item categories and common and agile process configuration). This can be useful if you want have upgraded Team Foundation Server and want to take advantage of new features.">
+                <ContentPresenter Content="{Binding Path=WorkItemConfigurationTransformationView, Mode=OneTime}" />
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -171,7 +172,17 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                             };
                             var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = @WorkItemType AND [System.TeamProject] = @TeamProject", parameters);
                             var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
-                            var workItemTypeDefinition = WorkItemTypeDefinition.FromXml(workItemType.Export(false));
+                            var workItemTypeDefinition = default(WorkItemTypeDefinition);
+                            try
+                            {
+                                workItemTypeDefinition = WorkItemTypeDefinition.FromXml(workItemType.Export(false));
+                            }
+                            catch (VssServiceResponseException)
+                            {
+                                // A VssServiceResponseException with message "VS403207: The object does not exist or access is denied"
+                                // happens when trying to export a work item type in the inherited model.
+                                workItemTypeDefinition = new WorkItemTypeDefinition(workItemType.Name, null);
+                            }
                             results.Add(new WorkItemTypeInfo(teamProject, workItemType.Name, workItemType.Description, workItemCount, referencingCategories.ToList(), workItemTypeDefinition));
                         }
                     }
@@ -377,7 +388,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         private bool CanEditSelectedWorkItemTypes(object argument)
         {
-            return (this.SelectedWorkItemTypes != null && this.SelectedWorkItemTypes.Count > 0);
+            return (this.SelectedWorkItemTypes != null && this.SelectedWorkItemTypes.Count > 0 && this.SelectedWorkItemTypes.All(w => w.WorkItemTypeDefinition.CanEdit));
         }
 
         private void EditSelectedWorkItemTypes(object argument)

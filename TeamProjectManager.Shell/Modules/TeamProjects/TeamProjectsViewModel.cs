@@ -195,7 +195,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                     var tfs = GetTfsTeamProjectCollection(teamProjectCollectionToRefresh.Uri);
                     var tfsInfo = GetTeamFoundationServerInfo(tfs, this.Logger);
                     var store = tfs.GetService<ICommonStructureService>();
-                    var teamProjects = store.ListAllProjects().Where(p => p.Status == Microsoft.TeamFoundation.Common.ProjectState.WellFormed).Select(p => new TeamProjectInfo(teamProjectCollectionToRefresh, p.Name, new Uri(p.Uri))).OrderBy(p => p.Name).ToList();
+                    var teamProjects = store.ListAllProjects().Where(p => p.Status == Microsoft.TeamFoundation.Core.WebApi.ProjectState.WellFormed).Select(p => new TeamProjectInfo(teamProjectCollectionToRefresh, p.Name, new Uri(p.Uri))).OrderBy(p => p.Name).ToList();
                     e.Result = new Tuple<TeamFoundationServerInfo, ICollection<TeamProjectInfo>>(tfsInfo, teamProjects);
                 };
                 worker.RunWorkerCompleted += (sender, e) =>
@@ -231,10 +231,6 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 {
                     var infoMessage = "Connected to {0}".FormatCurrent(this.SelectedTeamProjectCollection.TeamFoundationServer.ShortDisplayVersion);
                     var toolTip = "Connected to {0}".FormatCurrent(this.SelectedTeamProjectCollection.TeamFoundationServer.DisplayVersion);
-                    if (this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion == TfsMajorVersion.HighestKnownVersion)
-                    {
-                        toolTip += " or later";
-                    }
                     SetInfoMessage(infoMessage, toolTip);
                     this.TeamProjectsVisibility = Visibility.Visible;
                 }
@@ -245,6 +241,10 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
 
         private static TeamFoundationServerInfo GetTeamFoundationServerInfo(TfsTeamProjectCollection tfs, ILogger logger)
         {
+            if (tfs.IsHostedServer)
+            {
+                return new TeamFoundationServerInfo(tfs.DisplayName, tfs.ConfigurationServer.Uri, TfsMajorVersion.TeamServices, "Visual Studio Team Services", "VSTS");
+            }
             try
             {
                 // Determine the version of TFS based on the service interfaces that are available.

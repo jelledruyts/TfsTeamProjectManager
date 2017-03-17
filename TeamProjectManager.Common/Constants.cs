@@ -14,7 +14,7 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// The URL of the homepage of the application.
         /// </summary>
-        public const string ApplicationUrl = "http://teamprojectmanager.codeplex.com";
+        public const string ApplicationUrl = "https://github.com/jelledruyts/TfsTeamProjectManager";
 
         /// <summary>
         /// The description of the application.

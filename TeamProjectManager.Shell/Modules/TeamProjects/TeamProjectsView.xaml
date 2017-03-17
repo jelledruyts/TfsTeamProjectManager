@@ -28,7 +28,7 @@
 
         <TextBlock Grid.Row="2" Text="{Binding Path=InfoMessage, Converter={StaticResource caseConverter}}" ToolTip="{Binding Path=InfoMessageToolTip}" Foreground="{StaticResource UserMessageFontBrush}" TextWrapping="Wrap" Margin="0,5,0,0" />
 
-        <Grid Grid.Row="3" Visibility="{Binding Path=TeamProjectsVisibility}">
+        <Grid Grid.Row="3" Visibility="{Binding Path=TeamProjectsVisibility}" Margin="0,5,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />

@@ -3,7 +3,7 @@ namespace TeamProjectManager.Shell
 {
     internal static partial class InternalConstants
     {
-        public const string AssemblyVersion = "2.1.*"; // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
+        public const string AssemblyVersion = "2.2.*"; // This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version).
         public const string AssemblyInformationalVersion = "2.0.0.0"; // Keep this constant as long as possible to avoid the user's settings getting lost (it is used for the LocalUserAppDataPath where the configuration file is stored).
         public const string DefaultWindowTitle = "TFS Team Project Manager";
 

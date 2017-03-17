@@ -62,8 +62,8 @@ namespace TeamProjectManager.Common
         V15 = 150,
 
         /// <summary>
-        /// Represents the highest known version of Team Foundation Server.
+        /// Represents Visual Studio Team Services.
         /// </summary>
-        HighestKnownVersion = V15
+        TeamServices = 1000
     }
 }

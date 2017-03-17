@@ -10,6 +10,7 @@ using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Common;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Common;
+using Microsoft.VisualStudio.Services.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

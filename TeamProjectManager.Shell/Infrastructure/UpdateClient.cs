@@ -18,7 +18,7 @@ namespace TeamProjectManager.Shell.Infrastructure
         #region IsOnline
 
         /// <summary>
-        /// Gets a value that determines if CodePlex is available.
+        /// Gets a value that determines if an update check is possible.
         /// </summary>
         /// <returns><see langword="true"/> if a network connection is available, <see langword="false"/> otherwise.</returns>
         public static bool IsOnline()
@@ -61,7 +61,7 @@ namespace TeamProjectManager.Shell.Infrastructure
             {
                 if (logger != null)
                 {
-                    logger.Log("Could not retrieve the latest released version from CodePlex.", exc);
+                    logger.Log("Could not retrieve the latest released version.", exc);
                 }
             }
             return null;

@@ -58,7 +58,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         protected override void OnSelectedTeamProjectCollectionChanged()
         {
-            this.VstsWarningVisibility = this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion == TfsMajorVersion.TeamServices ? Visibility.Visible : Visibility.Collapsed;
+            this.VstsWarningVisibility = (this.SelectedTeamProjectCollection != null && this.SelectedTeamProjectCollection.TeamFoundationServer != null && this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion == TfsMajorVersion.TeamServices) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         #endregion

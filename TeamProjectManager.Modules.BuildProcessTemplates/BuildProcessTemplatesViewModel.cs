@@ -109,7 +109,7 @@ namespace TeamProjectManager.Modules.BuildProcessTemplates
 
         [ImportingConstructor]
         public BuildProcessTemplatesViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Build Process Templates", "Allows you to manage the registered build process templates for Team Projects.")
+            : base(eventAggregator, logger, "XAML Build Process Templates", "Allows you to manage the registered XAML build process templates for Team Projects.")
         {
             this.RegisterBuildProcessTemplateCommand = new RelayCommand(RegisterBuildProcessTemplate, CanRegisterBuildProcessTemplate);
             this.GetBuildProcessTemplatesCommand = new RelayCommand(GetBuildProcessTemplates, CanGetBuildProcessTemplates);

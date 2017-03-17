@@ -49,7 +49,7 @@ namespace TeamProjectManager.Modules.BuildDefinitions
 
         [ImportingConstructor]
         public BuildDefinitionsViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Build Definitions", "Allows you to manage the build definitions for Team Projects.")
+            : base(eventAggregator, logger, "XAML Build Definitions", "Allows you to manage the XAML build definitions for Team Projects.")
         {
             this.GetBuildDefinitionsCommand = new RelayCommand(GetBuildDefinitions, CanGetBuildDefinitions);
             this.UpdateSelectedBuildDefinitionsCommand = new RelayCommand(UpdateSelectedBuildDefinitions, CanUpdateSelectedBuildDefinitions);

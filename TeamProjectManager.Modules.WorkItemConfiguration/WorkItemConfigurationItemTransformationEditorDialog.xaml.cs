@@ -33,6 +33,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             this.Items = items ?? new WorkItemConfigurationItemExport[0];
             this.SelectedItem = this.Items.FirstOrDefault();
             this.Title = "Transforming " + this.Items.Count.ToCountString(itemType);
+            this.transformationTextBox.Text = WorkItemConfigurationTransformationItem.SampleXdtSnippet;
             this.DataContext = this;
         }
 

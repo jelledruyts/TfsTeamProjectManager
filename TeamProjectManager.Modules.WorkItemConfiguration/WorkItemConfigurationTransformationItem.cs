@@ -7,6 +7,19 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
     [DataContract(Namespace = "http://schemas.teamprojectmanager.codeplex.com/workitemconfigurationtransform/2013/04")]
     public class WorkItemConfigurationTransformationItem : ObservableObject
     {
+        #region Constants
+
+        internal const string SampleXdtSnippet = @"<!--
+Use the snippet below to get started with a work item transformation.
+See https://msdn.microsoft.com/en-us/library/dd465326.aspx for full details on XDT syntax.
+-->
+<Witd:WITD xmlns:Witd=""http://schemas.microsoft.com/VisualStudio/2008/workitemtracking/typedef"" xmlns:xdt=""http://schemas.microsoft.com/XML-Document-Transform"">
+  <WORKITEMTYPE>
+  </WORKITEMTYPE>
+</Witd:WITD>";
+
+        #endregion
+
         #region Observable Properties
 
         [DataMember]
@@ -43,7 +56,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             set { this.SetValue(TransformationTypeProperty, value); }
         }
 
-        public static readonly ObservableProperty<TransformationType> TransformationTypeProperty = new ObservableProperty<TransformationType, WorkItemConfigurationTransformationItem>(o => o.TransformationType);
+        public static readonly ObservableProperty<TransformationType> TransformationTypeProperty = new ObservableProperty<TransformationType, WorkItemConfigurationTransformationItem>(o => o.TransformationType, TransformationType.Xdt);
 
         [DataMember]
         public string TransformationXml
@@ -52,7 +65,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
             set { this.SetValue(TransformationXmlProperty, value); }
         }
 
-        public static readonly ObservableProperty<string> TransformationXmlProperty = new ObservableProperty<string, WorkItemConfigurationTransformationItem>(o => o.TransformationXml);
+        public static readonly ObservableProperty<string> TransformationXmlProperty = new ObservableProperty<string, WorkItemConfigurationTransformationItem>(o => o.TransformationXml, SampleXdtSnippet);
 
         [IgnoreDataMember]
         public string DisplayName

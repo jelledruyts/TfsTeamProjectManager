@@ -44,7 +44,32 @@
             </WrapPanel>
 
             <Grid Grid.Row="1" Margin="0,5,0,0">
-                <TextBox Text="{Binding Path=TeamProjectsFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Filter Team Projects" />
+                <TextBox Text="{Binding Path=TeamProjectsFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Filter Team Projects">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush Stretch="None" AutoLayoutContent="True" AlignmentX="Left">
+                                                <VisualBrush.Visual>
+                                                    <TextBox BorderThickness="0" Text="Filter Team Projects" HorizontalContentAlignment="Left" VerticalAlignment="Center" Foreground="Gray" FontStyle="Italic"/>
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsFocused}" Value="True">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush Stretch="None"></VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
             </Grid>
 
             <ListBox Grid.Row="2" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=AvailableTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" HorizontalContentAlignment="Stretch" />

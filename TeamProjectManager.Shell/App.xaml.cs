@@ -23,6 +23,9 @@ namespace TeamProjectManager.Shell
         {
             base.OnStartup(e);
 
+            // Ensure that the application closes when the main window is closed (even if dialogs are still open or hidden).
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
             // Create the logger.
             this.logger = new Logger();
             this.logger.Log(string.Format(CultureInfo.CurrentCulture, "Application started (v{0})", ApplicationVersion.ToString()), TraceEventType.Information);
@@ -49,7 +52,7 @@ namespace TeamProjectManager.Shell
 
             // Set up the Windows jump list.
             var jumpList = new JumpList();
-            jumpList.JumpItems.Add(new JumpTask { Title = "Open Log File", ApplicationPath = "notepad.exe", Arguments = App.LogFilePath, Description = "Open the log file" });
+            jumpList.JumpItems.Add(new JumpTask { Title = "Open Log Directory", ApplicationPath = Path.GetDirectoryName(App.LogFilePath), Description = "Open the log directory" });
             jumpList.JumpItems.Add(new JumpTask { Title = "Go To Homepage", ApplicationPath = Constants.ApplicationUrl, Description = "Go to the homepage for " + Constants.ApplicationName });
             jumpList.Apply();
             JumpList.SetJumpList(this, jumpList);

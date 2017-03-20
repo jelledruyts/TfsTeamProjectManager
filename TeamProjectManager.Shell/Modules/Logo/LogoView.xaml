@@ -37,6 +37,7 @@
         
         <Expander Grid.Column="1" IsExpanded="False" ExpandDirection="Right" ToolTip="Support" Padding="5,0,0,0">
             <StackPanel Orientation="Vertical">
+                <TextBlock><Hyperlink Command="{Binding Path=ShowTaskHistoryCommand}">task history</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=OpenLogFileCommand}">open log file</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink Command="{Binding Path=OpenHomepageCommand}">go to homepage</Hyperlink></TextBlock>
             </StackPanel>

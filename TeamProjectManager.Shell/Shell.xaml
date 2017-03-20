@@ -13,7 +13,7 @@
     <Grid Margin="5">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MinHeight="55" />
+            <RowDefinition Height="55" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 

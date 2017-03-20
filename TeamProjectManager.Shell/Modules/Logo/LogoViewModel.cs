@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using TeamProjectManager.Common;
+using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 using TeamProjectManager.Shell.Infrastructure;
@@ -19,6 +20,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
 
         public string HeaderTitle { get; private set; }
         public string HeaderSubtitle { get; private set; }
+        public RelayCommand ShowTaskHistoryCommand { get; private set; }
         public RelayCommand OpenLogFileCommand { get; private set; }
         public RelayCommand OpenHomepageCommand { get; private set; }
 
@@ -92,6 +94,7 @@ namespace TeamProjectManager.Shell.Modules.Logo
         {
             this.HeaderTitle = InternalConstants.DefaultWindowTitle;
             this.HeaderSubtitle = string.Format(CultureInfo.CurrentCulture, "v{0}", App.ApplicationVersion.ToString(3));
+            this.ShowTaskHistoryCommand = new RelayCommand(ShowTaskHistory, CanShowTaskHistory);
             this.OpenLogFileCommand = new RelayCommand(OpenLogFile, CanOpenLogFile);
             this.OpenHomepageCommand = new RelayCommand(OpenHomepage, CanOpenHomepage);
             CheckForUpdates();
@@ -100,6 +103,16 @@ namespace TeamProjectManager.Shell.Modules.Logo
         #endregion
 
         #region Commands
+
+        private bool CanShowTaskHistory(object argument)
+        {
+            return true;
+        }
+
+        private void ShowTaskHistory(object argument)
+        {
+            this.EventAggregator.GetEvent<DialogRequestedEvent>().Publish(DialogType.TaskHistory);
+        }
 
         private bool CanOpenLogFile(object argument)
         {

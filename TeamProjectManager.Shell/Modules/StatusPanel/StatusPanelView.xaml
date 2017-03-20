@@ -16,7 +16,7 @@
                 </Style.Triggers>
             </Style>
         </Grid.Style>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="100">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <Border Margin="5,0,0,0" Padding="5,0,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0">
                 <ItemsControl ItemsSource="{Binding ExecutingTasks}" VerticalAlignment="Top">
                     <ItemsControl.ItemTemplate>

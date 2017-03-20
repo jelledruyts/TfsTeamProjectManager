@@ -9,21 +9,21 @@ namespace TeamProjectManager.Common.Infrastructure
     /// </summary>
     public class ApplicationTask : ObservableObject
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets the name of the task.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets the time the task started.
+        /// </summary>
+        public DateTimeOffset TimeStarted { get; private set; }
+
+        #endregion
+
         #region Observable Properties
-
-        /// <summary>
-        /// Gets or sets the name of the task.
-        /// </summary>
-        public string Name
-        {
-            get { return this.GetValue(NameProperty); }
-            private set { this.SetValue(NameProperty, value); }
-        }
-
-        /// <summary>
-        /// The definition for the <see cref="Name"/> observable property.
-        /// </summary>
-        public static ObservableProperty<string> NameProperty = new ObservableProperty<string, ApplicationTask>(o => o.Name);
 
         /// <summary>
         /// Gets or sets the status of the task.
@@ -225,6 +225,7 @@ namespace TeamProjectManager.Common.Infrastructure
                 throw new ArgumentException("The name must not be empty.");
             }
             this.Name = name;
+            this.TimeStarted = DateTimeOffset.Now;
             this.StatusHistory = new ObservableCollection<string>();
             this.TotalSteps = totalSteps;
             this.CanCancel = canCancel;

@@ -1,0 +1,76 @@
+﻿<Window x:Class="TeamProjectManager.Shell.Modules.TaskHistory.TaskHistoryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TeamProjectManager.Shell.Modules.TaskHistory"
+        mc:Ignorable="d"
+        Title="Task History"
+        Height="600" Width="800"
+        MinHeight="150" MinWidth="200"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow"
+        Closing="Window_Closing">
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <ListBox Grid.Column="0" ItemsSource="{Binding Path=Tasks}" SelectedItem="{Binding Path=SelectedTask}" SelectionMode="Single">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Task.Name}" ToolTip="{Binding Path=Task.Name}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Task.IsError, Mode=OneWay}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Task.IsWarning, Mode=OneWay}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource WarningForegroundBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Task.IsCanceled, Mode=OneWay}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource UserMessageFontBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
+        <Grid Grid.Column="2">
+            <Grid.Style>
+                <Style TargetType="Grid" BasedOn="{StaticResource {x:Type Grid}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=SelectedTask}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <Label Content="Task:" />
+                <TextBlock Text="{Binding Path=SelectedTask.Task.Name}" ToolTip="{Binding Path=SelectedTask.Task.Name}" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <Label Content="State:" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.State}" VerticalAlignment="Center" MinWidth="75" />
+                <Label Content="Started:" Margin="5,0,0,0" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeStarted, StringFormat=T}" VerticalAlignment="Center" MinWidth="75" />
+                <Label Content="Completed:" Margin="5,0,0,0" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeCompleted, StringFormat=T}" VerticalAlignment="Center" MinWidth="75" />
+            </StackPanel>
+            <TextBox Grid.Row="2" Text="{Binding Path=SelectedTask.StatusHistoryDescription}" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextChanged="statusHistoryTextBox_TextChanged" />
+        </Grid>
+    </Grid>
+</Window>

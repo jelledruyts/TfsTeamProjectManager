@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.XamlBuild.XamlBuildView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:local="clr-namespace:TeamProjectManager.Modules.XamlBuild"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
+
+        <TabControl Visibility="{Binding Path=TfsSupportedVisibility}">
+
+            <TabItem Header="Build Definitions">
+                <ContentPresenter Content="{Binding Path=BuildDefinitionsView, Mode=OneTime}" />
+            </TabItem>
+
+            <TabItem Header="Build Process Templates">
+                <ContentPresenter Content="{Binding Path=BuildProcessTemplatesView, Mode=OneTime}" />
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

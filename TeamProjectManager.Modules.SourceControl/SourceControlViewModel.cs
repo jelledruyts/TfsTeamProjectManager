@@ -86,7 +86,7 @@ namespace TeamProjectManager.Modules.SourceControl
 
         [ImportingConstructor]
         public SourceControlViewModel(IEventAggregator eventAggregator, ILogger logger)
-            : base(eventAggregator, logger, "Source Control", "Allows you to manage Source Control settings for Team Projects and see branch hierarchies.")
+            : base(eventAggregator, logger, "TFVC", "Allows you to manage Team Foundation Version Control settings for Team Projects and see branch hierarchies.")
         {
             this.GetSourceControlSettingsCommand = new RelayCommand(GetSourceControlSettings, CanGetSourceControlSettings);
             this.LoadSourceControlSettingsCommand = new RelayCommand(LoadSourceControlSettings, CanLoadSourceControlSettings);

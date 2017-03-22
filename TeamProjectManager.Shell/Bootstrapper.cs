@@ -1,12 +1,16 @@
 ﻿using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using Microsoft.Practices.Prism.Events;
 using Microsoft.Practices.Prism.Logging;
 using Microsoft.Practices.Prism.MefExtensions;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Shell.Infrastructure;
+using Microsoft.Practices.Prism.Regions;
+using Microsoft.Practices.ServiceLocation;
+using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Shell
 {
@@ -48,6 +52,17 @@ namespace TeamProjectManager.Shell
             base.InitializeShell();
             App.Current.MainWindow = (Window)this.Shell;
             App.Current.MainWindow.Show();
+
+            // Ensure that the first tab is selected upon startup.
+            var regionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
+            var region = regionManager.Regions[RegionNames.Modules];
+            region.Views.CollectionChanged += (sender, e) =>
+            {
+                if (region.Views.Any())
+                {
+                    region.Activate(region.Views.First());
+                }
+            };
         }
 
         protected override void InitializeModules()

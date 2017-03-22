@@ -2,23 +2,23 @@
 using System.ComponentModel.Composition;
 using System.Windows.Controls;
 
-namespace TeamProjectManager.Modules.WorkItemConfiguration
+namespace TeamProjectManager.Modules.XamlBuild
 {
     [Export]
-    [ViewSortHint("100")]
-    public partial class WorkItemConfigurationView : UserControl
+    [ViewSortHint("900")]
+    public partial class XamlBuildView : UserControl
     {
-        public WorkItemConfigurationView()
+        public XamlBuildView()
         {
             InitializeComponent();
         }
 
         [Import]
-        public WorkItemConfigurationViewModel ViewModel
+        public XamlBuildViewModel ViewModel
         {
             get
             {
-                return (WorkItemConfigurationViewModel)this.DataContext;
+                return (XamlBuildViewModel)this.DataContext;
             }
             set
             {

@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildProcessTemplates", "TeamProjectManager.Modules.BuildProcessTemplates\TeamProjectManager.Modules.BuildProcessTemplates.csproj", "{BDCA8650-C32C-4131-A622-DDA98C43656C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Common", "TeamProjectManager.Common\TeamProjectManager.Common.csproj", "{6034E65E-4E00-46FA-B683-65AB8F3C47E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.WorkItemConfiguration", "TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj", "{9A98F323-3B0D-41C3-9A6C-383DA3869FE7}"
@@ -22,8 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.SourceControl", "TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj", "{FA594433-69DA-461E-9C57-6483529214EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Security", "TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj", "{412C41B9-CE97-47CA-9607-BBC22418B547}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.BuildDefinitions", "TeamProjectManager.Modules.BuildDefinitions\TeamProjectManager.Modules.BuildDefinitions.csproj", "{59B5B1FA-EB79-430B-83CF-C1F9419AF573}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Activity", "TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj", "{704821E4-5BCF-4053-AFE8-915C52933A31}"
 EndProject
@@ -69,6 +65,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{27684F
 		Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.XamlBuild", "TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj", "{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,14 +81,6 @@ Global
 		{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}.Release|Any CPU.ActiveCfg = Release|x86
 		{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}.Release|Mixed Platforms.Build.0 = Release|x86
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BDCA8650-C32C-4131-A622-DDA98C43656C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6034E65E-4E00-46FA-B683-65AB8F3C47E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6034E65E-4E00-46FA-B683-65AB8F3C47E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6034E65E-4E00-46FA-B683-65AB8F3C47E7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -123,14 +113,6 @@ Global
 		{412C41B9-CE97-47CA-9607-BBC22418B547}.Release|Any CPU.Build.0 = Release|Any CPU
 		{412C41B9-CE97-47CA-9607-BBC22418B547}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{412C41B9-CE97-47CA-9607-BBC22418B547}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{59B5B1FA-EB79-430B-83CF-C1F9419AF573}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -139,6 +121,14 @@ Global
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Any CPU.Build.0 = Release|Any CPU
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{704821E4-5BCF-4053-AFE8-915C52933A31}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

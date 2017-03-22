@@ -1,0 +1,104 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.XamlBuild.BuildProcessTemplates.BuildProcessTemplatesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:l="clr-namespace:TeamProjectManager.Modules.XamlBuild.BuildProcessTemplates"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <l:BuildProcessHierarchyNodeColorConverter x:Key="BuildProcessHierarchyNodeColorConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <TabControl>
+
+            <TabItem Header="View / Unregister" i:HelpProvider.HelpContent="Allows you to track the build process templates that are registered for each Team Project, and which build definitions actually use them. This can be useful when you want to get an overview of all the builds and their build process templates.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="Get Registered Build Process Templates" Margin="0,5,0,5" Command="{Binding Path=GetBuildProcessTemplatesCommand}" />
+                    <TabControl Grid.Row="1">
+                        <TabItem Header="By Team Project">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <DataGrid Grid.Row="0" ItemsSource="{Binding Path=BuildProcessTemplates}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildProcessTemplatesDataGrid" SelectionChanged="buildProcessTemplatesDataGrid_SelectionChanged">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Team Project" Binding="{Binding Path=ProcessTemplate.TeamProject}" />
+                                        <DataGridTextColumn Header="Template Type" Binding="{Binding Path=ProcessTemplate.TemplateType}" />
+                                        <DataGridTextColumn Header="Server Path" Binding="{Binding Path=ProcessTemplate.ServerPath}" />
+                                        <DataGridTextColumn Header="Used By Build Definitions" Binding="{Binding Path=BuildDefinitionsDescription}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button Grid.Row="1" Content="Unregister Selected Build Process Templates" Margin="0,5,0,0" Command="{Binding Path=DeleteSelectedBuildProcessTemplatesCommand}" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="By Server Path">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <CheckBox Grid.Row="0" IsChecked="{Binding Path=BuildProcessHierarchyHidesUnused}" Content="Hide unused Build Process Templates" />
+                                <TreeView Grid.Row="1" ItemsSource="{Binding Path=BuildProcessHierarchy}" Margin="0,5,0,0">
+                                    <TreeView.ItemContainerStyle>
+                                        <Style TargetType="{x:Type TreeViewItem}">
+                                            <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded}" />
+                                        </Style>
+                                    </TreeView.ItemContainerStyle>
+                                    <TreeView.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                            <TextBlock Text="{Binding Path=DisplayName}" ToolTip="{Binding Path=Description}" Foreground="{Binding Path=., Converter={StaticResource BuildProcessHierarchyNodeColorConverter}}" />
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Register / Update" i:HelpProvider.HelpContent="Allows you to register new build process templates across multiple Team Projects, optionally unregistering any other template. This can be useful when you want to standardize on a single build process template for a selection of Team Projects in your organization.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="XAML Server Path In Source Control" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=TemplateServerPath, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Content="Template Type" Margin="0,5,0,0" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,0,0">
+                        <ComboBoxItem Content="Default" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Default}" />
+                        <ComboBoxItem Content="Upgrade" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Upgrade}" />
+                        <ComboBoxItem Content="Custom" IsSelected="{Binding Path=TemplateType, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Custom}" />
+                    </ComboBox>
+
+                    <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Unregister all other templates" IsChecked="{Binding Path=UnregisterAllOtherTemplates}" Margin="0,5,0,0" />
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="Also unregister the Upgrade template" IsChecked="{Binding Path=UnregisterAllOtherTemplatesIncludesUpgradeTemplate}" IsEnabled="{Binding Path=UnregisterAllOtherTemplates}" Margin="20,5,0,0" />
+
+                    <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Simulate only, do not save any changes" IsChecked="{Binding Path=Simulate}" Margin="0,5,0,0" />
+
+                    <Button Grid.Row="5" Grid.ColumnSpan="2" Content="Register Or Update Build Process Template" Command="{Binding Path=RegisterBuildProcessTemplateCommand}" Margin="0,5,0,0" />
+
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.Composition;
-using System.Linq;
+﻿using Microsoft.Practices.Prism.Regions;
+using System.ComponentModel.Composition;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace TeamProjectManager.Modules.SourceControl
 {
     [Export]
+    [ViewSortHint("950")]
     public partial class SourceControlView : UserControl
     {
         public SourceControlView()

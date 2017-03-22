@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.Composition;
+﻿using Microsoft.Practices.Prism.Regions;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;
 
 namespace TeamProjectManager.Modules.Security
 {
     [Export]
+    [ViewSortHint("500")]
     public partial class SecurityView : UserControl
     {
         public SecurityView()

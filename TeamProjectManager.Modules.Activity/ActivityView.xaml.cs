@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.Composition;
+﻿using Microsoft.Practices.Prism.Regions;
+using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace TeamProjectManager.Modules.Activity
 {
     [Export]
+    [ViewSortHint("600")]
     public partial class ActivityView : UserControl
     {
         public ActivityView()

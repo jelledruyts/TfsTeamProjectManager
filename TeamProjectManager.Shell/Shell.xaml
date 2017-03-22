@@ -44,7 +44,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TabControl Grid.Row="0" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" SelectedIndex="0" />
+                <TabControl Grid.Row="0" ItemContainerStyle="{StaticResource ShellTabItemStyle}" prism:RegionManager.RegionName="{x:Static c:RegionNames.Modules}" />
 
                 <Border Grid.Row="1" BorderThickness="0,1,0,0" Margin="0,5,0,0" BorderBrush="{StaticResource AccentBrush}">
                     <Expander Header="Info" IsExpanded="True" Foreground="{StaticResource UserMessageFontBrush}" Margin="0,2,0,0">

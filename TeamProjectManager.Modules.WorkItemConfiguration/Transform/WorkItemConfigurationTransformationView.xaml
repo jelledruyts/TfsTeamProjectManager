@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.WorkItemConfiguration.Transform.WorkItemConfigurationTransformationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:w="clr-namespace:TeamProjectManager.Modules.WorkItemConfiguration"
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Content="Transformations" />
+
+            <ListBox Grid.Column="1" ItemsSource="{Binding Path=Transformations}" DisplayMemberPath="DisplayName" SelectedItem="{Binding Path=SelectedTransformation}" SelectionMode="Single" Margin="5,0,0,0" />
+
+            <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5,0,0,0">
+                <TextBlock><Hyperlink Command="{Binding Path=AddTransformationCommand}" ToolTip="Add a transformation">add...</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink Command="{Binding Path=EditSelectedTransformationCommand}" ToolTip="Edit the selected transformation">edit</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink Command="{Binding Path=RemoveSelectedTransformationCommand}" ToolTip="Remove the selected transformation">remove</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink Command="{Binding Path=RemoveAllTransformationsCommand}" ToolTip="Remove all transformations">remove all</Hyperlink></TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock><Hyperlink Command="{Binding Path=MoveSelectedTransformationUpCommand}" ToolTip="Moves the selected transformation up">up</Hyperlink></TextBlock>
+                    <TextBlock Margin="5,0,0,0"><Hyperlink Command="{Binding Path=MoveSelectedTransformationDownCommand}" ToolTip="Moves the selected transformation up">down</Hyperlink></TextBlock>
+                </StackPanel>
+                <TextBlock><Hyperlink Command="{Binding Path=LoadTransformationsCommand}" ToolTip="Load a list of transformations from a saved file">load</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink Command="{Binding Path=SaveTransformationsCommand}" ToolTip="Save the current list of transformations to a file">save</Hyperlink></TextBlock>
+            </StackPanel>
+        </Grid>
+        <WrapPanel Grid.Row="1" Margin="0,5,0,0">
+            <Button Content="Apply Transformations" Command="{Binding Path=ApplyTransformationsCommand}" />
+            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0"><Hyperlink x:Name="macroInformationHyperlink" Command="{x:Static w:MacroInformationDialog.ShowInstanceCommand}">About macros</Hyperlink></TextBlock>
+            <CheckBox Content="Simulate only" ToolTip="Does not save any changes but simulates the process" IsChecked="{Binding Path=Simulate}" VerticalAlignment="Center" Margin="5,0,0,0" />
+            <CheckBox Content="Save a copy" ToolTip="Saves a copy of the imported files to the %TEMP% folder" IsChecked="{Binding Path=SaveCopy}" VerticalAlignment="Center" Margin="5,0,0,0" />
+        </WrapPanel>
+    </Grid>
+</UserControl>

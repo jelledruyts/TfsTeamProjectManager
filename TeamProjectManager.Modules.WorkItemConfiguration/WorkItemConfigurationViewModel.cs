@@ -4,6 +4,12 @@ using System.Windows;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
+using TeamProjectManager.Modules.WorkItemConfiguration.Categories;
+using TeamProjectManager.Modules.WorkItemConfiguration.Compare;
+using TeamProjectManager.Modules.WorkItemConfiguration.ProcessConfiguration;
+using TeamProjectManager.Modules.WorkItemConfiguration.Queries;
+using TeamProjectManager.Modules.WorkItemConfiguration.Transform;
+using TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration
 {

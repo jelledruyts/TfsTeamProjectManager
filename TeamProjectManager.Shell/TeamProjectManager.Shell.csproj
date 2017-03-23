@@ -104,9 +104,6 @@
     <Reference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundation.DistributedTask.Common.15.112.1\lib\net45\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.TeamFoundation.DistributedTask.WebApi, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.VisualStudio.Services.DistributedTask.Client.15.112.1-preview\lib\net45\Microsoft.TeamFoundation.DistributedTask.WebApi.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.112.1\lib\net45\Microsoft.TeamFoundation.Git.Client.dll</HintPath>
     </Reference>
@@ -342,6 +339,10 @@
     <ProjectReference Include="..\TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj">
       <Project>{704821E4-5BCF-4053-AFE8-915C52933A31}</Project>
       <Name>TeamProjectManager.Modules.Activity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TeamProjectManager.Modules.BuildAndRelease\TeamProjectManager.Modules.BuildAndRelease.csproj">
+      <Project>{442b7fdf-6576-4c5d-a06d-b0ee3aedb836}</Project>
+      <Name>TeamProjectManager.Modules.BuildAndRelease</Name>
     </ProjectReference>
     <ProjectReference Include="..\TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj">
       <Project>{412c41b9-ce97-47ca-9607-bbc22418b547}</Project>

@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions.BuildDefinitionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:TeamProjectManager.Common.Infrastructure;assembly=TeamProjectManager.Common"
+             xmlns:local="clr-namespace:TeamProjectManager.Modules.BuildAndRelease"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:BuildRepositoryContentConverter x:Key="buildRepositoryContentConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <TabControl>
+            <TabItem Header="View / Delete" i:HelpProvider.HelpContent="Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions. This can be useful when you want to get an overview of all the builds or want to standardize certain build properties across Team Projects.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <WrapPanel Grid.Row="0" >
+                        <Button Content="Get Build Definitions" Margin="0,5,0,5" Command="{Binding Path=GetBuildDefinitionsCommand}" />
+                    </WrapPanel>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=BuildDefinitions}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="buildDefinitionsDataGrid" SelectionChanged="buildDefinitionsDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Team Project" Binding="{Binding Path=Project.Name}" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" />
+                            <DataGridTextColumn Header="Type" Binding="{Binding Path=Type}" />
+                            <DataGridTextColumn Header="Quality" Binding="{Binding Path=DefinitionQuality}" />
+                            <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
+                            <DataGridTextColumn Header="Path" Binding="{Binding Path=Path}" />
+                            <DataGridTextColumn Header="Queue" Binding="{Binding Path=Queue.Name}" />
+                            <DataGridTextColumn Header="Repository Type" Binding="{Binding Path=Repository.Type}" />
+                            <DataGridTextColumn Header="Repository Name" Binding="{Binding Path=Repository.Name}" />
+                            <DataGridTextColumn Header="Repository Contents" Binding="{Binding Path=Repository, Converter={StaticResource buildRepositoryContentConverter}}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Delete Selected Build Definitions..." Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -1,24 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6034E65E-4E00-46FA-B683-65AB8F3C47E7}</ProjectGuid>
+    <ProjectGuid>{442B7FDF-6576-4C5D-A06D-B0EE3AEDB836}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TeamProjectManager.Common</RootNamespace>
-    <AssemblyName>TeamProjectManager.Common</AssemblyName>
+    <RootNamespace>TeamProjectManager.Modules.BuildAndRelease</RootNamespace>
+    <AssemblyName>TeamProjectManager.Modules.BuildAndRelease</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\TeamProjectManager.snk</AssemblyOriginatorKeyFile>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -30,9 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\TeamProjectManager.Common.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,9 +30,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\TeamProjectManager.Common.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.13.9.1126, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -52,13 +38,18 @@
     <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.Platform, Version=3.13.9.1126, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.13.9\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Prism">
+    <Reference Include="Microsoft.Practices.Prism, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Microsoft.Practices.Prism.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Interactivity">
+      <HintPath>..\References\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.MefExtensions">
       <HintPath>..\References\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation">
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -174,7 +165,6 @@
     <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.WebApi, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.15.112.1\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.WebApi.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualStudio.Services.Client.Interactive, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Services.InteractiveClient.15.112.1\lib\net45\Microsoft.VisualStudio.Services.Client.Interactive.dll</HintPath>
     </Reference>
@@ -184,23 +174,19 @@
     <Reference Include="Microsoft.VisualStudio.Services.WebApi, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.15.112.1\lib\net45\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.40306.1554, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.4.403061554\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -210,68 +196,50 @@
     </Reference>
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Converters\CaseConverter.cs" />
-    <Compile Include="Converters\InverseBooleanConverter.cs" />
-    <Compile Include="Converters\SingleLineConverter.cs" />
-    <Compile Include="Converters\XmlDocumentConverter.cs" />
-    <Compile Include="Events\DialogRequestedEvent.cs" />
-    <Compile Include="Events\DialogType.cs" />
-    <Compile Include="Events\TeamProjectCollectionSelectionChangedEventArgs.cs" />
-    <Compile Include="Events\TeamProjectCollectionSelectionChangedEvent.cs" />
-    <Compile Include="Events\StatusEvent.cs" />
-    <Compile Include="Events\StatusEventArgs.cs" />
-    <Compile Include="Infrastructure\ApplicationTask.cs" />
-    <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
-    <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />
-    <Compile Include="Infrastructure\AsyncRelayCommand.cs" />
-    <Compile Include="Infrastructure\FileSystem.cs" />
-    <Compile Include="Infrastructure\FindProvider.cs" />
-    <Compile Include="Infrastructure\HelpContentEventArgs.cs" />
-    <Compile Include="Infrastructure\HelpProvider.cs" />
-    <Compile Include="Infrastructure\ILogger.cs" />
-    <Compile Include="Infrastructure\Network.cs" />
-    <Compile Include="Infrastructure\SerializationProvider.cs" />
-    <Compile Include="Infrastructure\ViewModelBase.cs" />
-    <Compile Include="Infrastructure\StringExtensions.cs" />
-    <Compile Include="Infrastructure\ViewModelInfo.cs" />
-    <Compile Include="Infrastructure\WindowExtensions.cs" />
-    <Compile Include="RegionNames.cs" />
-    <Compile Include="Converters\EnumToBooleanConverter.cs" />
-    <Compile Include="Events\LogMessagePublishedEvent.cs" />
-    <Compile Include="Infrastructure\LogMessage.cs" />
-    <Compile Include="Infrastructure\LogMessageEventArgs.cs" />
-    <Compile Include="ObjectModel\ObservableObject.cs" />
-    <Compile Include="ObjectModel\ObservableProperty.cs" />
-    <Compile Include="ObjectModel\ObservablePropertyChangedCallback.cs" />
-    <Compile Include="ObjectModel\ObservablePropertyChangedEventArgs.cs" />
+    <Compile Include="BuildAndReleaseModule.cs" />
+    <Compile Include="BuildAndReleaseView.xaml.cs">
+      <DependentUpon>BuildAndReleaseView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BuildAndReleaseViewModel.cs" />
+    <Compile Include="BuildDefinitions\BuildDefinitionsView.xaml.cs">
+      <DependentUpon>BuildDefinitionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BuildDefinitions\BuildDefinitionsViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Infrastructure\RelayCommand.cs" />
-    <Compile Include="TeamFoundationServerInfo.cs" />
-    <Compile Include="TeamProjectCollectionInfo.cs" />
-    <Compile Include="TeamProjectInfo.cs" />
-    <Compile Include="TfsMajorVersion.cs" />
-    <Compile Include="TfsTeamProjectCollectionCache.cs" />
+    <Compile Include="BuildRepositoryContentConverter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
+    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj">
+      <Project>{6034e65e-4e00-46fa-b683-65ab8f3c47e7}</Project>
+      <Name>TeamProjectManager.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="BuildAndReleaseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BuildDefinitions\BuildDefinitionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.112.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets" Condition="Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.112.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" />
@@ -281,11 +249,4 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.112.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.112.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

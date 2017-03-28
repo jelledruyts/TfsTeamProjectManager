@@ -8,6 +8,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
+        <local:BuildDefinitionTriggerSchedulesConverter x:Key="buildDefinitionTriggerSchedulesConverter" />
+        <local:BuildDefinitionTriggerTypesConverter x:Key="buildDefinitionTriggerTypesConverter" />
         <local:BuildRepositoryContentConverter x:Key="buildRepositoryContentConverter" />
     </UserControl.Resources>
     <Grid>
@@ -29,6 +31,8 @@
                             <DataGridTextColumn Header="Type" Binding="{Binding Path=Type}" />
                             <DataGridTextColumn Header="Quality" Binding="{Binding Path=DefinitionQuality}" />
                             <DataGridTextColumn Header="Build Number Format" Binding="{Binding Path=BuildNumberFormat}" />
+                            <DataGridTextColumn Header="Triggers" Binding="{Binding Converter={StaticResource buildDefinitionTriggerTypesConverter}}" />
+                            <DataGridTextColumn Header="Schedules" Binding="{Binding Converter={StaticResource buildDefinitionTriggerSchedulesConverter}}" />
                             <DataGridTextColumn Header="Path" Binding="{Binding Path=Path}" />
                             <DataGridTextColumn Header="Queue" Binding="{Binding Path=Queue.Name}" />
                             <DataGridTextColumn Header="Repository Type" Binding="{Binding Path=Repository.Type}" />

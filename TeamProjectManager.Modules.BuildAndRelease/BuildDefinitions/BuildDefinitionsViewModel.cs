@@ -19,6 +19,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
         #region Properties
 
         public AsyncRelayCommand GetBuildDefinitionsCommand { get; private set; }
+        public AsyncRelayCommand UpdateSelectedBuildDefinitionsCommand { get; private set; }
         public AsyncRelayCommand DeleteSelectedBuildDefinitionsCommand { get; private set; }
 
         #endregion
@@ -50,6 +51,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
             : base(eventAggregator, logger, "Allows you to manage build definitions for Team Projects.")
         {
             this.GetBuildDefinitionsCommand = new AsyncRelayCommand(GetBuildDefinitions, CanGetBuildDefinitions);
+            this.UpdateSelectedBuildDefinitionsCommand = new AsyncRelayCommand(UpdateSelectedBuildDefinitions, CanUpdateSelectedBuildDefinitions);
             this.DeleteSelectedBuildDefinitionsCommand = new AsyncRelayCommand(DeleteSelectedBuildDefinitions, CanDeleteSelectedBuildDefinitions);
         }
 
@@ -67,7 +69,6 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
             var teamProjects = this.SelectedTeamProjects.ToList();
             var task = new ApplicationTask("Retrieving build definitions", teamProjects.Count, true);
             PublishStatus(new StatusEventArgs(task));
-
             try
             {
                 var tfs = GetSelectedTfsTeamProjectCollection();
@@ -80,7 +81,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
                     try
                     {
-                        var projectBuildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);//.ConfigureAwait(false);
+                        var projectBuildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
                         buildDefinitions.AddRange(projectBuildDefinitions);
                     }
                     catch (Exception exc)
@@ -101,6 +102,72 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
                 Logger.Log("An unexpected exception occurred while retrieving build definitions", exc);
                 task.SetError(exc);
                 task.SetComplete("An unexpected exception occurred");
+            }
+        }
+
+        #endregion
+
+        #region UpdateSelectedBuildDefinitions Command
+
+        private bool CanUpdateSelectedBuildDefinitions(object argument)
+        {
+            return this.SelectedBuildDefinitions != null && this.SelectedBuildDefinitions.Count > 0;
+        }
+
+        private async Task UpdateSelectedBuildDefinitions(object argument)
+        {
+            var buildDefinitionsToUpdate = this.SelectedBuildDefinitions;
+            var dialog = new BuildDefinitionUpdateDialog("Updating " + buildDefinitionsToUpdate.Count.ToCountString("build definition"));
+            dialog.Owner = Application.Current.MainWindow;
+            var dialogResult = dialog.ShowDialog();
+            if (dialogResult == true)
+            {
+                var task = new ApplicationTask("Updating build definitions", buildDefinitionsToUpdate.Count, true);
+                PublishStatus(new StatusEventArgs(task));
+                try
+                {
+                    var tfs = GetSelectedTfsTeamProjectCollection();
+                    var buildServer = tfs.GetClient<BuildHttpClient>();
+                    var update = dialog.BuildDefinitionUpdate;
+                    var step = 0;
+                    var count = 0;
+                    foreach (var buildDefinitionToUpdate in buildDefinitionsToUpdate)
+                    {
+                        task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Updating build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToUpdate.Name, buildDefinitionToUpdate.Project.Name));
+                        try
+                        {
+                            if (update.UpdateBuildNumberFormat)
+                            {
+                                buildDefinitionToUpdate.BuildNumberFormat = update.BuildNumberFormat;
+                            }
+                            if (update.UpdatePath)
+                            {
+                                buildDefinitionToUpdate.Path = update.Path;
+                            }
+                            await buildServer.UpdateDefinitionAsync(buildDefinitionToUpdate);
+                            count++;
+                        }
+                        catch (Exception exc)
+                        {
+                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while updating build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToUpdate.Name, buildDefinitionToUpdate.Project.Name), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            task.Status = "Canceled";
+                            break;
+                        }
+                    }
+                    task.SetComplete("Updated " + count.ToCountString("build definition"));
+
+                    // Refresh the list.
+                    await GetBuildDefinitions(null);
+                }
+                catch (Exception exc)
+                {
+                    Logger.Log("An unexpected exception occurred while updating build definitions", exc);
+                    task.SetError(exc);
+                    task.SetComplete("An unexpected exception occurred");
+                }
             }
         }
 

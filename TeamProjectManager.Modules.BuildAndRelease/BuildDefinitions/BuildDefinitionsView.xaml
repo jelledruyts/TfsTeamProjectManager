@@ -12,7 +12,7 @@
     </UserControl.Resources>
     <Grid>
         <TabControl>
-            <TabItem Header="View / Delete" i:HelpProvider.HelpContent="Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions. This can be useful when you want to get an overview of all the builds or want to standardize certain build properties across Team Projects.">
+            <TabItem Header="View / Update / Delete" i:HelpProvider.HelpContent="Allows you to track the build definitions in each Team Project, and some of their common properties. You can also bulk update or delete build definitions. This can be useful when you want to get an overview of all the builds or want to standardize certain build properties across Team Projects.">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -37,7 +37,8 @@
                         </DataGrid.Columns>
                     </DataGrid>
                     <WrapPanel Grid.Row="2" Margin="0,5,0,0">
-                        <Button Content="Delete Selected Build Definitions..." Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
+                        <Button Content="Update Selected Build Definitions..." Command="{Binding Path=UpdateSelectedBuildDefinitionsCommand}" />
+                        <Button Content="Delete Selected Build Definitions..." Margin="5,0,0,0" Command="{Binding Path=DeleteSelectedBuildDefinitionsCommand}" />
                     </WrapPanel>
                 </Grid>
             </TabItem>

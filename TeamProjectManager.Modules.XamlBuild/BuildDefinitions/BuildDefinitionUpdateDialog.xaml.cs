@@ -21,7 +21,7 @@ namespace TeamProjectManager.Modules.XamlBuild.BuildDefinitions
 
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("This will udpate the selected build definitions. Are you sure you want to continue?", "Confirm Update", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will update the selected build definitions. Are you sure you want to continue?", "Confirm Update", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
                 this.DialogResult = true;

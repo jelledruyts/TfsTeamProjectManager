@@ -15,7 +15,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
+
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -34,20 +34,22 @@
 
                 <Label Grid.Row="1" Grid.Column="0" Content="Activity Components" Margin="0,5,0,0" />
                 <WrapPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" VerticalAlignment="Center">
-                    <CheckBox Content="TFVC History" VerticalAlignment="Center" IsChecked="{Binding Path=SourceControlComponentEnabled}" />
+                    <CheckBox Content="TFVC History" VerticalAlignment="Center" IsChecked="{Binding Path=TfvcComponentEnabled}" />
+                    <CheckBox Content="Git History" VerticalAlignment="Center" IsChecked="{Binding Path=GitComponentEnabled}" Margin="5,0,0,0" />
                     <CheckBox Content="Work Item Tracking" VerticalAlignment="Center" IsChecked="{Binding Path=WorkItemTrackingComponentEnabled}" Margin="5,0,0,0" />
-                    <CheckBox Content="XAML Builds" VerticalAlignment="Center" IsChecked="{Binding Path=TeamBuildComponentEnabled}" Margin="5,0,0,0" />
+                    <CheckBox Content="Builds" VerticalAlignment="Center" IsChecked="{Binding Path=BuildComponentEnabled}" Margin="5,0,0,0" />
+                    <CheckBox Content="XAML Builds" VerticalAlignment="Center" IsChecked="{Binding Path=XamlBuildComponentEnabled}" Margin="5,0,0,0" />
                 </WrapPanel>
 
                 <Label Grid.Row="2" Grid.Column="0" Content="Exclude User(s)" Margin="0,5,0,0" />
                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=UserExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="E.g. to exclude Team Build service accounts. Separate multiple entries with a semicolon (;)" />
 
-                <Label Grid.Row="3" Grid.Column="0" Content="Source Control: Exclude When Comment Contains" Margin="0,5,0,0" IsEnabled="{Binding Path=SourceControlComponentEnabled, Mode=OneWay}" />
-                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=SourceControlCommentExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" IsEnabled="{Binding Path=SourceControlComponentEnabled, Mode=OneWay}" />
+                <Label Grid.Row="3" Grid.Column="0" Content="Source Control: Exclude When Comment Contains" Margin="0,5,0,0" />
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=SourceControlCommentExclusions, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" ToolTip="Separate multiple entries with a semicolon (;)" />
 
                 <Button Grid.Row="4" Grid.ColumnSpan="2" Content="Get Activity" Command="{Binding Path=GetActivityCommand}" Margin="0,5,0,0" />
             </Grid>
-            
+
             <DataGrid Grid.Row="1" Margin="0,5,0,0" ItemsSource="{Binding Path=Activities}" x:Name="activitiesDataGrid" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" SelectedItem="{Binding Path=SelectedActivity}" MouseDoubleClick="activitiesDataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject}" />
@@ -57,7 +59,7 @@
                     <DataGridTextColumn Header="Last Activity Description" Binding="{Binding Path=MostRecentActivity.Description}" />
                 </DataGrid.Columns>
             </DataGrid>
-            
+
             <Button Grid.Row="2" Content="View Activity Details" Margin="0,5,0,0" Command="{Binding Path=ViewActivityDetailsCommand}" />
         </Grid>
 

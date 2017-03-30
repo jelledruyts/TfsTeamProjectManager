@@ -4,55 +4,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         mc:Ignorable="d" 
-        Title="Comparison Result Details"
+        Title="Activity details"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Height="480" Width="640">
+        Height="600" Width="800">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TabControl Grid.Row="0">
-            <TabItem Header="All">
-                <DataGrid ItemsSource="{Binding Path=AllActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
-                        <DataGridTextColumn Header="Component" Binding="{Binding Path=ComponentName}" />
-                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
-            <TabItem Header="Source Control">
-                <DataGrid ItemsSource="{Binding Path=SourceControlActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
-                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
-            <TabItem Header="Work Item Tracking">
-                <DataGrid ItemsSource="{Binding Path=WorkItemTrackingActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
-                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
-            <TabItem Header="Team Build">
-                <DataGrid ItemsSource="{Binding Path=TeamBuildActivities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
-                        <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
-        </TabControl>
+        <DataGrid Grid.Row="0" Margin="0,5,0,0" ItemsSource="{Binding Path=Activities}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Time" Binding="{Binding Path=Time}" />
+                <DataGridTextColumn Header="Component" Binding="{Binding Path=ComponentName}" />
+                <DataGridTextColumn Header="User" Binding="{Binding Path=User}" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Path=Description}" />
+            </DataGrid.Columns>
+        </DataGrid>
 
         <Grid Grid.Row="1" Margin="0,5,0,0">
             <Grid.ColumnDefinitions>

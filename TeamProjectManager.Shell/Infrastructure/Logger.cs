@@ -103,6 +103,7 @@ namespace TeamProjectManager.Shell.Infrastructure
                 {
                     var messageDetails = (string.IsNullOrEmpty(logMessage.Details) ? null : Environment.NewLine + logMessage.Details);
                     var fullMessage = string.Format(CultureInfo.CurrentCulture, "{0}[T{1:00}] [{2}] {3}{4}", new string(' ', 11 - logMessage.EventType.ToString().Length), Thread.CurrentThread.ManagedThreadId, DateTime.Now, logMessage.Message, messageDetails);
+                    Debug.WriteLine(fullMessage);
                     tracer.TraceEvent(logMessage.EventType, 0, fullMessage);
                     tracer.Flush();
                     OnLogMessagePublished(new LogMessageEventArgs(logMessage));

@@ -14,6 +14,9 @@
             <TabItem Header="Build Definitions">
                 <ContentPresenter Content="{Binding Path=BuildDefinitionsView, Mode=OneTime}" />
             </TabItem>
+            <TabItem Header="Build Templates">
+                <ContentPresenter Content="{Binding Path=BuildTemplatesView, Mode=OneTime}" />
+            </TabItem>
 
         </TabControl>
     </Grid>

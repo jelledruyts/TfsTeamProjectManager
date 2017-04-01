@@ -222,6 +222,10 @@
     </Compile>
     <Compile Include="BuildDefinitionTriggerSchedulesConverter.cs" />
     <Compile Include="BuildDefinitionTriggerTypesConverter.cs" />
+    <Compile Include="BuildTemplates\BuildTemplatesView.xaml.cs">
+      <DependentUpon>BuildTemplatesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BuildTemplates\BuildTemplatesViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildRepositoryContentConverter.cs" />
   </ItemGroup>
@@ -247,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BuildDefinitions\BuildDefinitionUpdateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BuildTemplates\BuildTemplatesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

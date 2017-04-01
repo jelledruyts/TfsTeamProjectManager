@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions;
+using TeamProjectManager.Modules.BuildAndRelease.BuildTemplates;
 
 namespace TeamProjectManager.Modules.BuildAndRelease
 {
@@ -13,6 +14,9 @@ namespace TeamProjectManager.Modules.BuildAndRelease
 
         [Import]
         public BuildDefinitionsView BuildDefinitionsView { get; set; }
+
+        [Import]
+        public BuildTemplatesView BuildTemplatesView { get; set; }
 
         #endregion
 

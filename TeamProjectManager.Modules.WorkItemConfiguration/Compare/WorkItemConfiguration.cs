@@ -119,7 +119,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                 projectWorkItemTypes.Add(processConfig);
             }
 
-            return new WorkItemConfiguration(project.Name, projectWorkItemTypes);
+            return new WorkItemConfiguration("Team Project - " + project.Name, projectWorkItemTypes);
         }
 
         public static WorkItemConfiguration FromProcessTemplate(string processTemplateFileName)
@@ -201,7 +201,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                 }
             }
 
-            return new WorkItemConfiguration(processTemplateName, items);
+            return new WorkItemConfiguration("Process Template - " + processTemplateName, items);
         }
 
         #endregion

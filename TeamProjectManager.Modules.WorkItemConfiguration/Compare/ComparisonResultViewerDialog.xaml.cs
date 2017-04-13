@@ -1,10 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -94,20 +96,46 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                 diffTools.Add(new DiffTool("Custom", diffToolCommandOverride, diffToolArgumentsOverride));
             }
 
-            // Visual Studio 2012 or above have a built-in diff tool, call devenv.exe directly.
-            TryAddDevenvTool("15.0", "Visual Studio 2017", diffTools);
-            TryAddDevenvTool("14.0", "Visual Studio 2015", diffTools);
-            TryAddDevenvTool("12.0", "Visual Studio 2013", diffTools);
-            TryAddDevenvTool("11.0", "Visual Studio 2012", diffTools);
+            // Visual Studio 2017 and above don't store their setup information in the registry but expose it via a COM interface.
+            try
+            {
+                var configuration = new SetupConfiguration();
+                var instancesQuery = configuration.EnumInstances();
+                var fetched = int.MaxValue;
+                var instances = new ISetupInstance[1];
+                while (fetched > 0)
+                {
+                    instancesQuery.Next(1, instances, out fetched);
+                    if (fetched > 0)
+                    {
+                        var instance = instances[0];
+                        var visualStudioName = instance.GetDisplayName();
+                        var devenvPath = instance.ResolvePath("Common7\\IDE\\devenv.exe");
+                        if (!string.IsNullOrWhiteSpace(devenvPath) && File.Exists(devenvPath))
+                        {
+                            diffTools.Add(new DiffTool(visualStudioName, devenvPath, "/diff %1 %2 %6 %7"));
+                        }
+                    }
+                }
+            }
+            catch (COMException)
+            {
+                // Ignore COM Exceptions.
+            }
+
+            // Visual Studio 2012 and above have a built-in diff tool, call devenv.exe directly.
+            TryAddDevenvToolFromRegistry("14.0", "Visual Studio 2015", diffTools);
+            TryAddDevenvToolFromRegistry("12.0", "Visual Studio 2013", diffTools);
+            TryAddDevenvToolFromRegistry("11.0", "Visual Studio 2012", diffTools);
 
             // Older versions should have a diffmerge.exe tool in the IDE path.
-            TryAddDiffmergeTool("10.0", "Visual Studio 2010", diffTools);
-            TryAddDiffmergeTool("9.0", "Visual Studio 2008", diffTools);
+            TryAddDiffmergeToolFromRegistry("10.0", "Visual Studio 2010", diffTools);
+            TryAddDiffmergeToolFromRegistry("9.0", "Visual Studio 2008", diffTools);
 
             return diffTools;
         }
 
-        private static void TryAddDevenvTool(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
+        private static void TryAddDevenvToolFromRegistry(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
         {
             using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\{0}\Setup\VS".FormatInvariant(visualStudioVersion)))
             {
@@ -122,7 +150,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
             }
         }
 
-        private static void TryAddDiffmergeTool(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
+        private static void TryAddDiffmergeToolFromRegistry(string visualStudioVersion, string visualStudioName, IList<DiffTool> diffTools)
         {
             using (var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\{0}\Setup\VS".FormatInvariant(visualStudioVersion)))
             {

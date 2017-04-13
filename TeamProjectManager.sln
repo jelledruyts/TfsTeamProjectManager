@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Shell", "TeamProjectManager.Shell\TeamProjectManager.Shell.csproj", "{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}"
 EndProject
@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
+		TeamProjectManager.png = TeamProjectManager.png
 		TeamProjectManager.snk = TeamProjectManager.snk
 	EndProjectSection
 EndProject
@@ -22,48 +23,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Security", "TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj", "{412C41B9-CE97-47CA-9607-BBC22418B547}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.Activity", "TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj", "{704821E4-5BCF-4053-AFE8-915C52933A31}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{41060245-084C-4050-8495-E7C1C0FC227A}"
-	ProjectSection(SolutionItems) = preProject
-		Documentation\Index.md = Documentation\Index.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{27684FC7-086F-4591-ADB1-D5221A5848EB}"
-	ProjectSection(SolutionItems) = preProject
-		Documentation\Images\Activity-ActivityDetails.png = Documentation\Images\Activity-ActivityDetails.png
-		Documentation\Images\Activity-GetActivity.png = Documentation\Images\Activity-GetActivity.png
-		Documentation\Images\BuildDefinitions-Update.png = Documentation\Images\BuildDefinitions-Update.png
-		Documentation\Images\BuildDefinitions-ViewUpdateDelete.png = Documentation\Images\BuildDefinitions-ViewUpdateDelete.png
-		Documentation\Images\BuildProcessTemplates-RegisterUpdate.png = Documentation\Images\BuildProcessTemplates-RegisterUpdate.png
-		Documentation\Images\BuildProcessTemplates-ViewUnregister-ByServerPath.png = Documentation\Images\BuildProcessTemplates-ViewUnregister-ByServerPath.png
-		Documentation\Images\BuildProcessTemplates-ViewUnregister.png = Documentation\Images\BuildProcessTemplates-ViewUnregister.png
-		Documentation\Images\Security-AddUpdateGroup.png = Documentation\Images\Security-AddUpdateGroup.png
-		Documentation\Images\Security-ViewDeleteGroups.png = Documentation\Images\Security-ViewDeleteGroups.png
-		Documentation\Images\SourceControl-UpdateSettings.png = Documentation\Images\SourceControl-UpdateSettings.png
-		Documentation\Images\SourceControl-ViewBranchHierarchies-ExportedDgml.png = Documentation\Images\SourceControl-ViewBranchHierarchies-ExportedDgml.png
-		Documentation\Images\SourceControl-ViewBranchHierarchies.png = Documentation\Images\SourceControl-ViewBranchHierarchies.png
-		Documentation\Images\SourceControl-ViewLatestChangesets.png = Documentation\Images\SourceControl-ViewLatestChangesets.png
-		Documentation\Images\SourceControl-ViewSettings.png = Documentation\Images\SourceControl-ViewSettings.png
-		Documentation\Images\WorkItemConfiguration-Categories-ExportEdit-Edit.png = Documentation\Images\WorkItemConfiguration-Categories-ExportEdit-Edit.png
-		Documentation\Images\WorkItemConfiguration-Categories-ExportEdit-Transform.png = Documentation\Images\WorkItemConfiguration-Categories-ExportEdit-Transform.png
-		Documentation\Images\WorkItemConfiguration-Categories-ExportEdit.png = Documentation\Images\WorkItemConfiguration-Categories-ExportEdit.png
-		Documentation\Images\WorkItemConfiguration-Categories-UpdateImport.png = Documentation\Images\WorkItemConfiguration-Categories-UpdateImport.png
-		Documentation\Images\WorkItemConfiguration-Categories-ViewDelete.png = Documentation\Images\WorkItemConfiguration-Categories-ViewDelete.png
-		Documentation\Images\WorkItemConfiguration-Compare-Edit.png = Documentation\Images\WorkItemConfiguration-Compare-Edit.png
-		Documentation\Images\WorkItemConfiguration-Compare.png = Documentation\Images\WorkItemConfiguration-Compare.png
-		Documentation\Images\WorkItemConfiguration-CompareDetails.png = Documentation\Images\WorkItemConfiguration-CompareDetails.png
-		Documentation\Images\WorkItemConfiguration-ProcessConfiguration-Import.png = Documentation\Images\WorkItemConfiguration-ProcessConfiguration-Import.png
-		Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png = Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Edit.png
-		Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png = Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit-Transform.png
-		Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png = Documentation\Images\WorkItemConfiguration-ProcessConfiguration-ViewExportEdit.png
-		Documentation\Images\WorkItemConfiguration-Transform-Edit.png = Documentation\Images\WorkItemConfiguration-Transform-Edit.png
-		Documentation\Images\WorkItemConfiguration-Transform.png = Documentation\Images\WorkItemConfiguration-Transform.png
-		Documentation\Images\WorkItemConfiguration-WorkItemTypes-Import.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-Import.png
-		Documentation\Images\WorkItemConfiguration-WorkItemTypes-Search.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-Search.png
-		Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Edit.png
-		Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit-Transform.png
-		Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png = Documentation\Images\WorkItemConfiguration-WorkItemTypes-ViewExportDeleteEdit.png
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamProjectManager.Modules.XamlBuild", "TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj", "{B880E7FC-85D5-44B7-8D73-DD98F1A5EEB2}"
 EndProject
@@ -142,8 +101,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{27684FC7-086F-4591-ADB1-D5221A5848EB} = {41060245-084C-4050-8495-E7C1C0FC227A}
 	EndGlobalSection
 EndGlobal

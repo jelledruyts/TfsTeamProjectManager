@@ -1,39 +1,42 @@
 TFS Team Project Manager automates various tasks across Team Projects in Team Foundation Server. If you find yourself managing multiple Team Projects for an organization and have recurring tasks and questions that repeat themselves over and over again, Team Project Manager probably has some answers for you.
 
-![TFS Team Project Manager](Documentation/Images/WorkItemConfiguration-Compare.png "TFS Team Project Manager")
+![TFS Team Project Manager](TeamProjectManager.png "TFS Team Project Manager")
 
 ## Features
 
-Team Project Manager can help you...
+Team Project Manager has the following modules:
 
-* **View activity**
-  * View recent activity (in Source Control, Work Item Tracking and Team Build)
-* **Manage build definitions**
+* **Work Item Configuration**
+  * Compare work item configurations (i.e. work item type definitions, categories, process configuration) with various sources, e.g. to determine which Process Template was likely used to create which project
+  * Understand which projects use which work item types and how many work items there are of each
+  * Import new or update existing work item types
+  * Manage work item queries
+  * Manage work item categories
+  * Manage process configuration
+  * Transform work item tracking configuration (i.e. apply XML transformations on work item type definitions, categories, process configuration)
+* **Build & Release**
   * View and delete build definitions
   * Update common properties within build definitions
-* **Manage build process templates**
-  * Understand which build templates are used by which build definitions
-  * Unregister existing build process templates
-  * Register new or update existing build process templates
-* **Manage security**
+  * View and delete build templates
+  * Import build templates
+* **Security**
   * Understand which security groups have which members
   * Delete security groups
   * Export permissions from existing security groups
   * Add or update security groups
   * Manage members and permissions for security groups
-* **Manage source control**
+* **Activity**
+  * View recent activity (from TFVC, Git, Work Item Tracking and builds)
+* **Manage XAML Builds**
+  * View and delete build definitions
+  * Update common properties within build definitions
+  * Understand which build templates are used by which build definitions
+  * Unregister existing build process templates
+  * Register new or update existing build process templates
+* **Manage Team Foundation Version Control**
   * Understand which projects have which source control settings (multiple check-out, get latest on check-out, check-in notes)
   * Update source control settings
   * Visualize branch hierarchies
-* **Manage work item configuration**
-  * Compare work item configurations (i.e. work item type definitions, categories, process configuration) with various sources, e.g. to determine which Process Template was likely used to create which project
-  * Understand which projects use which work item types and how many work items there are of each
-  * Import new or update existing work item types
-  * Manage work item categories
-  * Manage process configuration (i.e. common and agile configuration)
-  * Transform work item tracking configuration (i.e. apply XML transformations on work item type definitions, categories, process configuration)
-
-For more details on how all this works, see the [Documentation](Documentation/Index.md) page.
 
 If you can think of other great features, please let us know through the discussion forums or the issue tracker! Or (even better) because it's built with a very modular framework ([Microsoft Prism](http://compositewpf.codeplex.com/)) you can also contribute by building your own modules!
 

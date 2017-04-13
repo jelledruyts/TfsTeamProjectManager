@@ -1,0 +1,68 @@
+﻿<Window x:Class="TeamProjectManager.Modules.BuildAndRelease.BuildTemplates.BuildTemplatesImportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:TeamProjectManager.Modules.BuildAndRelease.BuildTemplates"
+        mc:Ignorable="d"
+        Title="Define Build Templates To Import"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Width="640" MinWidth="640"
+        Height="480" MinHeight="480">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Header="Import">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Content="From existing build templates..." Click="importFromBuildTemplatesButton_Click" />
+                <Button Content="From existing build definitions..." Click="importFromBuildDefinitionsButton_Click" Margin="5,0,0,0" />
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Build Templates" Margin="0,5,0,0">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ListBox Grid.Column="0" ItemsSource="{Binding}" DisplayMemberPath="Name" x:Name="buildTemplatesListBox" />
+                <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
+                <Grid Grid.Column="2" DataContext="{Binding ElementName=buildTemplatesListBox, Path=SelectedItem}">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="IsEnabled" Value="True" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=buildTemplatesListBox, Path=SelectedItem}" Value="{x:Null}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="ID:" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Id}" VerticalAlignment="Center" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Name:" Margin="0,5,0,0" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="0,5,0,0" />
+                    <Label Grid.Row="2" Grid.Column="0" Content="Description:" Margin="0,5,0,0" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Description}" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,5,0,0" />
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Content="OK" Width="75" x:Name="okButton" Click="okButton_Click" />
+            <Button Content="Cancel" IsCancel="True" Margin="5,0,0,0" Width="75" />
+        </StackPanel>
+    </Grid>
+</Window>

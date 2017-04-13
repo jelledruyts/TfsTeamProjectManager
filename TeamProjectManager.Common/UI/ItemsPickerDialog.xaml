@@ -1,7 +1,10 @@
-﻿<Window x:Class="TeamProjectManager.Modules.WorkItemConfiguration.Compare.ProcessTemplatePickerDialog"
+﻿<Window x:Class="TeamProjectManager.Common.UI.ItemsPickerDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Please select a Process Template"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:TeamProjectManager.Common.UI"
+        Title="Please make your selection"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Height="300" Width="400">
@@ -12,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <ListBox x:Name="processTemplatesListBox" SelectionMode="Single" SelectionChanged="processTemplatesListBox_SelectionChanged" DisplayMemberPath="Name" />
+            <ListBox x:Name="itemsListBox" HorizontalContentAlignment="Stretch" SelectionChanged="itemsListBox_SelectionChanged" />
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">

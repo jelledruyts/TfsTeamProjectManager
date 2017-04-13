@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Services.Common;
+using System;
+using System.Diagnostics;
+using TeamProjectManager.Common.Infrastructure;
 
 namespace TeamProjectManager.Common
 {
@@ -18,6 +21,11 @@ namespace TeamProjectManager.Common
         public string Name { get; private set; }
 
         /// <summary>
+        /// Gets the GUID of this Team Project.
+        /// </summary>
+        public Guid Guid { get; private set; }
+
+        /// <summary>
         /// Gets the URI of this Team Project.
         /// </summary>
         public Uri Uri { get; private set; }
@@ -28,11 +36,27 @@ namespace TeamProjectManager.Common
         /// <param name="teamProjectCollection">The Team Project Collection that this Team Project is part of.</param>
         /// <param name="name">The name of this Team Project.</param>
         /// <param name="uri">The URI of this Team Project.</param>
-        public TeamProjectInfo(TeamProjectCollectionInfo teamProjectCollection, string name, Uri uri)
+        /// <param name="logger">The logger.</param>
+        public TeamProjectInfo(TeamProjectCollectionInfo teamProjectCollection, string name, Uri uri, ILogger logger)
         {
             this.TeamProjectCollection = teamProjectCollection;
             this.Name = name;
             this.Uri = uri;
+            if (this.Uri != null)
+            {
+                try
+                {
+                    var artifactId = LinkingUtilities.DecodeUri(this.Uri.ToString());
+                    this.Guid = new Guid(artifactId.ToolSpecificId);
+                }
+                catch (Exception exc)
+                {
+                    if (logger != null)
+                    {
+                        logger.Log("Could not determine the GUID from Uri \"{0}\" for Team Project \"{1}\"".FormatCurrent(uri, this.Name), exc, TraceEventType.Warning);
+                    }
+                }
+            }
         }
     }
 }

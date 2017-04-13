@@ -1,7 +1,9 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.WebApi;
+using Microsoft.TeamFoundation.Core.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -20,6 +22,10 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         public AsyncRelayCommand GetBuildTemplatesCommand { get; private set; }
         public AsyncRelayCommand DeleteSelectedBuildTemplatesCommand { get; private set; }
+        public RelayCommand AddBuildTemplateToImportCommand { get; private set; }
+        public RelayCommand RemoveBuildTemplateToImportCommand { get; private set; }
+        public RelayCommand RemoveAllBuildTemplatesToImportCommand { get; private set; }
+        public AsyncRelayCommand ImportCommand { get; private set; }
 
         #endregion
 
@@ -41,6 +47,22 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         public static readonly ObservableProperty<ICollection<BuildDefinitionTemplate>> SelectedBuildTemplatesProperty = new ObservableProperty<ICollection<BuildDefinitionTemplate>, BuildTemplatesViewModel>(o => o.SelectedBuildTemplates);
 
+        public ObservableCollection<BuildDefinitionTemplate> BuildTemplatesToImport
+        {
+            get { return this.GetValue(BuildTemplatesToImportProperty); }
+            set { this.SetValue(BuildTemplatesToImportProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ObservableCollection<BuildDefinitionTemplate>> BuildTemplatesToImportProperty = new ObservableProperty<ObservableCollection<BuildDefinitionTemplate>, BuildTemplatesViewModel>(o => o.BuildTemplatesToImport);
+
+        public ICollection<BuildDefinitionTemplate> SelectedBuildTemplatesToImport
+        {
+            get { return this.GetValue(SelectedBuildTemplatesToImportProperty); }
+            set { this.SetValue(SelectedBuildTemplatesToImportProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ICollection<BuildDefinitionTemplate>> SelectedBuildTemplatesToImportProperty = new ObservableProperty<ICollection<BuildDefinitionTemplate>, BuildTemplatesViewModel>(o => o.SelectedBuildTemplatesToImport);
+
         #endregion
 
         #region Constructors
@@ -49,8 +71,13 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
         protected BuildTemplatesViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base(eventAggregator, logger, "Allows you to manage build templates for Team Projects.")
         {
+            this.BuildTemplatesToImport = new ObservableCollection<BuildDefinitionTemplate>();
             this.GetBuildTemplatesCommand = new AsyncRelayCommand(GetBuildTemplates, CanGetBuildTemplates);
             this.DeleteSelectedBuildTemplatesCommand = new AsyncRelayCommand(DeleteSelectedBuildTemplates, CanDeleteSelectedBuildTemplates);
+            this.AddBuildTemplateToImportCommand = new RelayCommand(AddBuildTemplateToImport, CanAddBuildTemplateToImport);
+            this.RemoveBuildTemplateToImportCommand = new RelayCommand(RemoveBuildTemplateToImport, CanRemoveBuildTemplateToImport);
+            this.RemoveAllBuildTemplatesToImportCommand = new RelayCommand(RemoveAllBuildTemplatesToImport, CanRemoveAllBuildTemplatesToImport);
+            this.ImportCommand = new AsyncRelayCommand(Import, CanImport);
         }
 
         #endregion
@@ -157,6 +184,122 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
             catch (Exception exc)
             {
                 Logger.Log("An unexpected exception occurred while deleting build templates", exc);
+                task.SetError(exc);
+                task.SetComplete("An unexpected exception occurred");
+            }
+        }
+
+        #endregion
+
+        #region AddBuildTemplateToImport Command
+
+        private bool CanAddBuildTemplateToImport(object argument)
+        {
+            return true;
+        }
+
+        private void AddBuildTemplateToImport(object argument)
+        {
+            var dialog = new BuildTemplatesImportDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            var dialogResult = dialog.ShowDialog();
+            if (dialogResult == true)
+            {
+                foreach (var buildTemplateToImport in dialog.BuildTemplates)
+                {
+                    this.BuildTemplatesToImport.Add(buildTemplateToImport);
+                }
+            }
+        }
+
+        #endregion
+
+        #region RemoveBuildTemplateToImport Command
+
+        private bool CanRemoveBuildTemplateToImport(object argument)
+        {
+            return this.SelectedBuildTemplatesToImport != null && this.SelectedBuildTemplatesToImport.Any();
+        }
+
+        private void RemoveBuildTemplateToImport(object argument)
+        {
+            foreach (var selectedBuildTemplateToImport in this.SelectedBuildTemplatesToImport)
+            {
+                this.BuildTemplatesToImport.Remove(selectedBuildTemplateToImport);
+            }
+        }
+
+        #endregion
+
+        #region RemoveAllBuildTemplatesToImport Command
+
+        private bool CanRemoveAllBuildTemplatesToImport(object argument)
+        {
+            return this.BuildTemplatesToImport != null && this.BuildTemplatesToImport.Any();
+        }
+
+        private void RemoveAllBuildTemplatesToImport(object argument)
+        {
+            this.BuildTemplatesToImport.Clear();
+        }
+
+        #endregion
+
+        #region Import Command
+
+        private bool CanImport(object argument)
+        {
+            return this.IsAnyTeamProjectSelected() && this.BuildTemplatesToImport != null && this.BuildTemplatesToImport.Any();
+        }
+
+        private async Task Import(object argument)
+        {
+            var result = MessageBox.Show("This will import the selected build templates. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+            var teamProjects = this.SelectedTeamProjects.ToList();
+            var buildTemplates = this.BuildTemplatesToImport.ToArray();
+            var task = new ApplicationTask("Importing build templates", teamProjects.Count * buildTemplates.Length, true);
+            PublishStatus(new StatusEventArgs(task));
+            try
+            {
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var buildServer = tfs.GetClient<BuildHttpClient>();
+
+                var step = 0;
+                foreach (var teamProject in teamProjects)
+                {
+                    task.Status = "Processing Team Project \"{0}\"".FormatCurrent(teamProject.Name);
+                    foreach (var buildTemplate in buildTemplates)
+                    {
+                        try
+                        {
+                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing build template \"{0}\" into Team Project \"{1}\"", buildTemplate.Name, teamProject.Name));
+                            buildTemplate.Template.Project = new TeamProjectReference { Name = teamProject.Name, Id = teamProject.Guid };
+                            await buildServer.SaveTemplateAsync(buildTemplate, teamProject.Name, buildTemplate.Id);
+                        }
+                        catch (Exception exc)
+                        {
+                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while importing build template \"{0}\" into Team Project \"{1}\"", buildTemplate.Name, teamProject.Name), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            break;
+                        }
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+                task.SetComplete("Imported " + buildTemplates.Length.ToCountString("build template"));
+            }
+            catch (Exception exc)
+            {
+                Logger.Log("An unexpected exception occurred while importing build templates", exc);
                 task.SetError(exc);
                 task.SetComplete("An unexpected exception occurred");
             }

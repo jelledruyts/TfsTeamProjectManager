@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
+using TeamProjectManager.Common.UI;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
 {
@@ -166,29 +167,37 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                         var processTemplateService = projectCollection.GetService<IProcessTemplates>();
                         var registeredTemplates = processTemplateService.TemplateHeaders().OrderBy(t => t.Rank).ToArray();
 
-                        var processTemplatePicker = new ProcessTemplatePickerDialog(registeredTemplates);
+                        var processTemplatePicker = new ItemsPickerDialog();
+                        processTemplatePicker.Title = "Please select a Process Template";
+                        processTemplatePicker.SelectionMode = SelectionMode.Single;
+                        processTemplatePicker.AvailableItems = registeredTemplates;
+                        processTemplatePicker.ItemDisplayMemberPath = nameof(TemplateHeader.Name);
                         processTemplatePicker.Owner = this;
                         if (processTemplatePicker.ShowDialog() == true)
                         {
-                            var downloadedTemplateZipFileName = processTemplateService.GetTemplateData(processTemplatePicker.SelectedProcessTemplate.TemplateId);
-                            var unzipPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                            try
+                            var selectedProcessTemplate = (TemplateHeader)processTemplatePicker.SelectedItem;
+                            if (selectedProcessTemplate != null)
                             {
-                                ZipFile.ExtractToDirectory(downloadedTemplateZipFileName, unzipPath);
-                                var processTemplateXmlFile = Path.Combine(unzipPath, "ProcessTemplate.xml");
-                                if (!File.Exists(processTemplateXmlFile))
+                                var downloadedTemplateZipFileName = processTemplateService.GetTemplateData(selectedProcessTemplate.TemplateId);
+                                var unzipPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                                try
                                 {
-                                    MessageBox.Show("The selected Process Template did not contain a \"ProcessTemplate.xml\" file in its root directory.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    ZipFile.ExtractToDirectory(downloadedTemplateZipFileName, unzipPath);
+                                    var processTemplateXmlFile = Path.Combine(unzipPath, "ProcessTemplate.xml");
+                                    if (!File.Exists(processTemplateXmlFile))
+                                    {
+                                        MessageBox.Show("The selected Process Template did not contain a \"ProcessTemplate.xml\" file in its root directory.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    }
+                                    else
+                                    {
+                                        this.Configuration = WorkItemConfiguration.FromProcessTemplate(processTemplateXmlFile);
+                                    }
                                 }
-                                else
+                                finally
                                 {
-                                    this.Configuration = WorkItemConfiguration.FromProcessTemplate(processTemplateXmlFile);
+                                    File.Delete(downloadedTemplateZipFileName);
+                                    Directory.Delete(unzipPath, true);
                                 }
-                            }
-                            finally
-                            {
-                                File.Delete(downloadedTemplateZipFileName);
-                                Directory.Delete(unzipPath, true);
                             }
                         }
                     }

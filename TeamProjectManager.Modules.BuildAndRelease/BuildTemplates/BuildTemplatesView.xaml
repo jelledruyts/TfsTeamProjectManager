@@ -33,6 +33,29 @@
                     </WrapPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import build templates into existing Team Projects. This can be useful when you want to standardize certain build templates across Team Projects.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,5,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ListBox Grid.Column="0" ItemsSource="{Binding Path=BuildTemplatesToImport}" SelectedItem="{Binding Path=SelectedBuildTemplateToImport}" SelectionMode="Extended" DisplayMemberPath="Name" x:Name="buildTemplatesToImportListBox" SelectionChanged="buildTemplatesToImportListBox_SelectionChanged" />
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5,0,0,0">
+                            <TextBlock><Hyperlink Command="{Binding Path=AddBuildTemplateToImportCommand}" ToolTip="Add a Build Template">add...</Hyperlink></TextBlock>
+                            <TextBlock><Hyperlink Command="{Binding Path=RemoveBuildTemplateToImportCommand}" ToolTip="Remove the selected Build Template">remove</Hyperlink></TextBlock>
+                            <TextBlock><Hyperlink Command="{Binding Path=RemoveAllBuildTemplatesToImportCommand}" ToolTip="Remove all Build Templates">remove all</Hyperlink></TextBlock>
+                        </StackPanel>
+                    </Grid>
+                    <WrapPanel Grid.Row="1">
+                        <Button Content="Import" Command="{Binding Path=ImportCommand}" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

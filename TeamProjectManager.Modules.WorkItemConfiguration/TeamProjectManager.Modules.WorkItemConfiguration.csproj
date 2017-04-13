@@ -234,9 +234,6 @@
     <Compile Include="MacroInformationDialog.xaml.cs">
       <DependentUpon>MacroInformationDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Compare\ProcessTemplatePickerDialog.xaml.cs">
-      <DependentUpon>ProcessTemplatePickerDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="TransformationType.cs" />
     <Compile Include="WorkItemConfigurationItem.cs" />
     <Compile Include="WorkItemConfigurationItemPart.cs" />
@@ -324,10 +321,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MacroInformationDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Compare\ProcessTemplatePickerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

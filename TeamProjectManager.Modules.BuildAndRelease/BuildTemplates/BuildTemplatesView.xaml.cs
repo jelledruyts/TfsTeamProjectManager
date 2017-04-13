@@ -42,5 +42,10 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
         {
             this.ViewModel.SelectedBuildTemplates = this.buildTemplatesDataGrid.SelectedItems.Cast<BuildDefinitionTemplate>().ToList();
         }
+
+        private void buildTemplatesToImportListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.ViewModel.SelectedBuildTemplatesToImport = this.buildTemplatesToImportListBox.SelectedItems.Cast<BuildDefinitionTemplate>().ToList();
+        }
     }
 }

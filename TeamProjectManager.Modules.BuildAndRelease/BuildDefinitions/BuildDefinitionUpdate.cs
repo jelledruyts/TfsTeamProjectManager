@@ -6,5 +6,7 @@
         public string BuildNumberFormat { get; set; }
         public bool UpdatePath { get; set; }
         public string Path { get; set; }
+        public bool UpdateAgentQueue { get; set; }
+        public string AgentQueueName { get; set; }
     }
 }

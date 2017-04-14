@@ -1,8 +1,10 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.WebApi;
+using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -128,9 +130,11 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
                 {
                     var tfs = GetSelectedTfsTeamProjectCollection();
                     var buildServer = tfs.GetClient<BuildHttpClient>();
+                    var taskAgentClient = tfs.GetClient<TaskAgentHttpClient>();
                     var update = dialog.BuildDefinitionUpdate;
                     var step = 0;
                     var count = 0;
+                    var projectAgentQueues = new Dictionary<Guid, List<TaskAgentQueue>>();
                     foreach (var buildDefinitionToUpdate in buildDefinitionsToUpdate)
                     {
                         task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Updating build definition \"{0}\" in Team Project \"{1}\"", buildDefinitionToUpdate.Name, buildDefinitionToUpdate.Project.Name));
@@ -143,6 +147,23 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
                             if (update.UpdatePath)
                             {
                                 buildDefinitionToUpdate.Path = update.Path;
+                            }
+                            if (update.UpdateAgentQueue)
+                            {
+                                if (!projectAgentQueues.ContainsKey(buildDefinitionToUpdate.Project.Id))
+                                {
+                                    projectAgentQueues[buildDefinitionToUpdate.Project.Id] = await taskAgentClient.GetAgentQueuesAsync(project: buildDefinitionToUpdate.Project.Id);
+                                }
+                                var agentQueues = projectAgentQueues[buildDefinitionToUpdate.Project.Id];
+                                var agentQueue = agentQueues.FirstOrDefault(q => string.Equals(q.Name, update.AgentQueueName, StringComparison.CurrentCultureIgnoreCase));
+                                if (agentQueue == null)
+                                {
+                                    task.SetWarning($"An agent queue named \"{update.AgentQueueName}\" was not found in Team Project \"{buildDefinitionToUpdate.Project.Name}\"");
+                                }
+                                else
+                                {
+                                    buildDefinitionToUpdate.Queue = new AgentPoolQueue { Id = agentQueue.Id };
+                                }
                             }
                             await buildServer.UpdateDefinitionAsync(buildDefinitionToUpdate);
                             count++;

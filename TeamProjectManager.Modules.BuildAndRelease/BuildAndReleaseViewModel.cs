@@ -5,6 +5,7 @@ using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions;
 using TeamProjectManager.Modules.BuildAndRelease.BuildTemplates;
 using TeamProjectManager.Modules.BuildAndRelease.ServiceEndpoints;
+using TeamProjectManager.Modules.BuildAndRelease.TaskGroups;
 
 namespace TeamProjectManager.Modules.BuildAndRelease
 {
@@ -18,6 +19,9 @@ namespace TeamProjectManager.Modules.BuildAndRelease
 
         [Import]
         public BuildTemplatesView BuildTemplatesView { get; set; }
+
+        [Import]
+        public TaskGroupsView TaskGroupsView { get; set; }
 
         [Import]
         public ServiceEndpointsView ServiceEndpointsView { get; set; }

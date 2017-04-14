@@ -241,6 +241,11 @@
       <DependentUpon>ServiceEndpointsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ServiceEndpoints\ServiceEndpointsViewModel.cs" />
+    <Compile Include="TaskGroups\TaskGroupInfo.cs" />
+    <Compile Include="TaskGroups\TaskGroupsView.xaml.cs">
+      <DependentUpon>TaskGroupsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TaskGroups\TaskGroupsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj">
@@ -276,6 +281,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ServiceEndpoints\ServiceEndpointsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TaskGroups\TaskGroupsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

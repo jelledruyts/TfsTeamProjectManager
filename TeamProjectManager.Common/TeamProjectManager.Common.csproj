@@ -225,6 +225,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\CaseConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Converters\JoinedListConverter.cs" />
     <Compile Include="Converters\SingleLineConverter.cs" />
     <Compile Include="Converters\XmlDocumentConverter.cs" />
     <Compile Include="Events\DialogRequestedEvent.cs" />

@@ -235,6 +235,12 @@
     <Compile Include="BuildTemplates\BuildTemplatesViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildRepositoryContentConverter.cs" />
+    <Compile Include="ServiceEndpoints\GenericServiceEndpoint.cs" />
+    <Compile Include="ServiceEndpoints\ServiceEndpointInfo.cs" />
+    <Compile Include="ServiceEndpoints\ServiceEndpointsView.xaml.cs">
+      <DependentUpon>ServiceEndpointsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceEndpoints\ServiceEndpointsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj">
@@ -266,6 +272,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BuildTemplates\BuildTemplatesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ServiceEndpoints\ServiceEndpointsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

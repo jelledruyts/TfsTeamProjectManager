@@ -4,6 +4,7 @@ using TeamProjectManager.Common;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions;
 using TeamProjectManager.Modules.BuildAndRelease.BuildTemplates;
+using TeamProjectManager.Modules.BuildAndRelease.ServiceEndpoints;
 
 namespace TeamProjectManager.Modules.BuildAndRelease
 {
@@ -17,6 +18,9 @@ namespace TeamProjectManager.Modules.BuildAndRelease
 
         [Import]
         public BuildTemplatesView BuildTemplatesView { get; set; }
+
+        [Import]
+        public ServiceEndpointsView ServiceEndpointsView { get; set; }
 
         #endregion
 

@@ -36,6 +36,57 @@
                     </WrapPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import task groups into existing Team Projects. This can be useful when you want to standardize certain task groups across Team Projects.">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Button Content="Add Task Groups From Team Project..." Command="{Binding Path=AddTaskGroupFromTeamProjectCommand}" />
+                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ListBox Grid.Column="0" ItemsSource="{Binding Path=TaskGroupsToImport}" DisplayMemberPath="Name" x:Name="taskGroupsToImportListBox" />
+                        <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
+                        <Grid Grid.Column="2" DataContext="{Binding ElementName=taskGroupsToImportListBox, Path=SelectedItem}">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=taskGroupsToImportListBox, Path=SelectedItem}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Content="Name:" />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
+                            <Label Grid.Row="1" Grid.Column="0" Content="Instance Name Format:" Margin="0,5,0,0" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=InstanceNameFormat}" VerticalAlignment="Center" Margin="0,5,0,0" />
+                            <Label Grid.Row="2" Grid.Column="0" Content="Description:" Margin="0,5,0,0" />
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Description}" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,5,0,0" />
+                        </Grid>
+                    </Grid>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5,0,0">
+                        <Button Content="Import Task Groups..." Command="{Binding Path=ImportTaskGroupsCommand}" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

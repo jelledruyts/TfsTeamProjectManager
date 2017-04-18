@@ -1,15 +1,19 @@
 ﻿using Microsoft.Practices.Prism.Events;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
+using TeamProjectManager.Common.UI;
 
 namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 {
@@ -20,6 +24,8 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         public AsyncRelayCommand GetTaskGroupsCommand { get; private set; }
         public AsyncRelayCommand DeleteSelectedTaskGroupsCommand { get; private set; }
+        public AsyncRelayCommand AddTaskGroupFromTeamProjectCommand { get; private set; }
+        public AsyncRelayCommand ImportTaskGroupsCommand { get; private set; }
 
         #endregion
 
@@ -41,6 +47,14 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         public static readonly ObservableProperty<ICollection<TaskGroupInfo>> SelectedTaskGroupsProperty = new ObservableProperty<ICollection<TaskGroupInfo>, TaskGroupsViewModel>(o => o.SelectedTaskGroups);
 
+        public ObservableCollection<TaskGroup> TaskGroupsToImport
+        {
+            get { return this.GetValue(TaskGroupsToImportProperty); }
+            set { this.SetValue(TaskGroupsToImportProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ObservableCollection<TaskGroup>> TaskGroupsToImportProperty = new ObservableProperty<ObservableCollection<TaskGroup>, TaskGroupsViewModel>(o => o.TaskGroupsToImport);
+
         #endregion
 
         #region Constructors
@@ -49,8 +63,11 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
         protected TaskGroupsViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base(eventAggregator, logger, "Allows you to manage task groups for Team Projects.")
         {
+            this.TaskGroupsToImport = new ObservableCollection<TaskGroup>();
             this.GetTaskGroupsCommand = new AsyncRelayCommand(GetTaskGroups, CanGetTaskGroups);
             this.DeleteSelectedTaskGroupsCommand = new AsyncRelayCommand(DeleteSelectedTaskGroups, CanDeleteSelectedTaskGroups);
+            this.AddTaskGroupFromTeamProjectCommand = new AsyncRelayCommand(AddTaskGroupFromTeamProject, CanAddTaskGroupFromTeamProject);
+            this.ImportTaskGroupsCommand = new AsyncRelayCommand(ImportTaskGroups, CanImportTaskGroups);
         }
 
         #endregion
@@ -114,7 +131,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         private async Task DeleteSelectedTaskGroups(object argument)
         {
-            var result = MessageBox.Show("This will delete the selected task groups. Are you sure you want to continue?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will delete the selected task groups and thereby break all build definitions that refer to them. Are you sure you want to continue?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -157,6 +174,116 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
             catch (Exception exc)
             {
                 Logger.Log("An unexpected exception occurred while deleting task groups", exc);
+                task.SetError(exc);
+                task.SetComplete("An unexpected exception occurred");
+            }
+        }
+
+        #endregion
+
+        #region AddTaskGroupFromTeamProject Command
+
+        private bool CanAddTaskGroupFromTeamProject(object argument)
+        {
+            return true;
+        }
+
+        private async Task AddTaskGroupFromTeamProject(object argument)
+        {
+            using (var dialog = new TeamProjectPicker(TeamProjectPickerMode.SingleProject, false))
+            {
+                var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                if (result == System.Windows.Forms.DialogResult.OK && dialog.SelectedProjects != null && dialog.SelectedProjects.Length > 0)
+                {
+                    var teamProjectCollection = dialog.SelectedTeamProjectCollection;
+                    var teamProject = dialog.SelectedProjects.First();
+                    var taskAgentClient = teamProjectCollection.GetClient<TaskAgentHttpClient>();
+                    var taskGroups = await taskAgentClient.GetTaskGroupsAsync(teamProject.Name);
+
+                    if (!taskGroups.Any())
+                    {
+                        MessageBox.Show("The selected Team Project does not contain any task groups.", "No Task Groups", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        var picker = new ItemsPickerDialog();
+                        picker.ItemDisplayMemberPath = nameof(TaskGroup.Name);
+                        picker.Owner = Application.Current.MainWindow;
+                        picker.Title = "Select the task groups to add";
+                        picker.SelectionMode = SelectionMode.Multiple;
+                        picker.AvailableItems = taskGroups;
+                        if (picker.ShowDialog() == true)
+                        {
+                            foreach (var taskGroupToImport in picker.SelectedItems.Cast<TaskGroup>().ToArray())
+                            {
+                                this.TaskGroupsToImport.Add(taskGroupToImport);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region ImportTaskGroups Command
+
+        private bool CanImportTaskGroups(object argument)
+        {
+            return this.IsAnyTeamProjectSelected() && this.TaskGroupsToImport.Any();
+        }
+
+        private async Task ImportTaskGroups(object argument)
+        {
+            var result = MessageBox.Show("This will import the selected task groups. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+            var teamProjects = this.SelectedTeamProjects.ToList();
+            var taskGroups = this.TaskGroupsToImport.ToArray();
+            var task = new ApplicationTask("Importing task groups", teamProjects.Count * taskGroups.Length, true);
+            PublishStatus(new StatusEventArgs(task));
+            try
+            {
+                var tfs = GetSelectedTfsTeamProjectCollection();
+                var taskAgentClient = tfs.GetClient<TaskAgentHttpClient>();
+
+                var step = 0;
+                foreach (var teamProject in teamProjects)
+                {
+                    task.Status = "Processing Team Project \"{0}\"".FormatCurrent(teamProject.Name);
+                    foreach (var taskGroup in taskGroups)
+                    {
+                        try
+                        {
+                            task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing task group \"{0}\" into Team Project \"{1}\"", taskGroup.Name, teamProject.Name));
+                            await taskAgentClient.AddTaskGroupAsync(teamProject.Guid, taskGroup);
+                        }
+                        catch (MetaTaskDefinitionExistsException)
+                        {
+                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "The task group \"{0}\" already exists in Team Project \"{1}\"", taskGroup.Name, teamProject.Name));
+                        }
+                        catch (Exception exc)
+                        {
+                            task.SetWarning(string.Format(CultureInfo.CurrentCulture, "An error occurred while importing task group \"{0}\" into Team Project \"{1}\"", taskGroup.Name, teamProject.Name), exc);
+                        }
+                        if (task.IsCanceled)
+                        {
+                            break;
+                        }
+                    }
+                    if (task.IsCanceled)
+                    {
+                        task.Status = "Canceled";
+                        break;
+                    }
+                }
+                task.SetComplete("Imported " + taskGroups.Length.ToCountString("task group"));
+            }
+            catch (Exception exc)
+            {
+                Logger.Log("An unexpected exception occurred while importing task groups", exc);
                 task.SetError(exc);
                 task.SetComplete("An unexpected exception occurred");
             }

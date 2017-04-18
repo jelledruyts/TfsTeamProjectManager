@@ -34,25 +34,64 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import build templates into existing Team Projects. This can be useful when you want to standardize certain build templates across Team Projects.">
-                <Grid>
+                <Grid Margin="0,5,0,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Margin="0,5,0,5">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Button Content="From Existing Build Templates..." Command="{Binding Path=AddBuildTemplateFromExistingBuildTemplatesCommand}" />
+                        <Button Content="From Existing Build Definitions..." Command="{Binding Path=AddBuildTemplateFromExistingBuildDefinitionsCommand}" Margin="5,0,0,0" />
+                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="200" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <ListBox Grid.Column="0" ItemsSource="{Binding Path=BuildTemplatesToImport}" SelectedItem="{Binding Path=SelectedBuildTemplateToImport}" SelectionMode="Extended" DisplayMemberPath="Name" x:Name="buildTemplatesToImportListBox" SelectionChanged="buildTemplatesToImportListBox_SelectionChanged" />
-                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5,0,0,0">
-                            <TextBlock><Hyperlink Command="{Binding Path=AddBuildTemplateToImportCommand}" ToolTip="Add a Build Template">add...</Hyperlink></TextBlock>
-                            <TextBlock><Hyperlink Command="{Binding Path=RemoveBuildTemplateToImportCommand}" ToolTip="Remove the selected Build Template">remove</Hyperlink></TextBlock>
-                            <TextBlock><Hyperlink Command="{Binding Path=RemoveAllBuildTemplatesToImportCommand}" ToolTip="Remove all Build Templates">remove all</Hyperlink></TextBlock>
-                        </StackPanel>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ListBox Grid.Column="0" ItemsSource="{Binding Path=BuildTemplatesToImport}" DisplayMemberPath="Name" x:Name="buildTemplatesToImportListBox" SelectionChanged="buildTemplatesToImportListBox_SelectionChanged" />
+                            <WrapPanel Grid.Row="1">
+                                <TextBlock Margin="0,0,5,0"><Hyperlink Command="{Binding Path=RemoveBuildTemplateToImportCommand}">remove</Hyperlink></TextBlock>
+                                <TextBlock><Hyperlink Command="{Binding Path=RemoveAllBuildTemplatesToImportCommand}">remove all</Hyperlink></TextBlock>
+                            </WrapPanel>
+                        </Grid>
+                        <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
+                        <Grid Grid.Column="2" DataContext="{Binding ElementName=buildTemplatesToImportListBox, Path=SelectedItem}">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=buildTemplatesToImportListBox, Path=SelectedItem}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Content="ID:" />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Id}" VerticalAlignment="Center" />
+                            <Label Grid.Row="1" Grid.Column="0" Content="Name:" Margin="0,5,0,0" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="0,5,0,0" />
+                            <Label Grid.Row="2" Grid.Column="0" Content="Description:" Margin="0,5,0,0" />
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Description}" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,5,0,0" />
+                        </Grid>
                     </Grid>
-                    <WrapPanel Grid.Row="1">
-                        <Button Content="Import" Command="{Binding Path=ImportCommand}" />
+                    <WrapPanel Grid.Row="2" Margin="0,5,0,0">
+                        <Button Content="Import Build Templates..." Command="{Binding Path=ImportCommand}" />
                     </WrapPanel>
                 </Grid>
             </TabItem>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Prism.Events;
 using Microsoft.TeamFoundation.Build.WebApi;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Core.WebApi;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
+using TeamProjectManager.Common.UI;
 
 namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 {
@@ -22,7 +25,8 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         public AsyncRelayCommand GetBuildTemplatesCommand { get; private set; }
         public AsyncRelayCommand DeleteSelectedBuildTemplatesCommand { get; private set; }
-        public RelayCommand AddBuildTemplateToImportCommand { get; private set; }
+        public AsyncRelayCommand AddBuildTemplateFromExistingBuildTemplatesCommand { get; private set; }
+        public AsyncRelayCommand AddBuildTemplateFromExistingBuildDefinitionsCommand { get; private set; }
         public RelayCommand RemoveBuildTemplateToImportCommand { get; private set; }
         public RelayCommand RemoveAllBuildTemplatesToImportCommand { get; private set; }
         public AsyncRelayCommand ImportCommand { get; private set; }
@@ -74,7 +78,8 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
             this.BuildTemplatesToImport = new ObservableCollection<BuildDefinitionTemplate>();
             this.GetBuildTemplatesCommand = new AsyncRelayCommand(GetBuildTemplates, CanGetBuildTemplates);
             this.DeleteSelectedBuildTemplatesCommand = new AsyncRelayCommand(DeleteSelectedBuildTemplates, CanDeleteSelectedBuildTemplates);
-            this.AddBuildTemplateToImportCommand = new RelayCommand(AddBuildTemplateToImport, CanAddBuildTemplateToImport);
+            this.AddBuildTemplateFromExistingBuildTemplatesCommand = new AsyncRelayCommand(AddBuildTemplateFromExistingBuildTemplates, CanAddBuildTemplateFromExistingBuildTemplates);
+            this.AddBuildTemplateFromExistingBuildDefinitionsCommand = new AsyncRelayCommand(AddBuildTemplateFromExistingBuildDefinitions, CanAddBuildTemplateFromExistingBuildDefinitions);
             this.RemoveBuildTemplateToImportCommand = new RelayCommand(RemoveBuildTemplateToImport, CanRemoveBuildTemplateToImport);
             this.RemoveAllBuildTemplatesToImportCommand = new RelayCommand(RemoveAllBuildTemplatesToImport, CanRemoveAllBuildTemplatesToImport);
             this.ImportCommand = new AsyncRelayCommand(Import, CanImport);
@@ -191,24 +196,37 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         #endregion
 
-        #region AddBuildTemplateToImport Command
+        #region AddBuildTemplateFromExistingBuildTemplates Command
 
-        private bool CanAddBuildTemplateToImport(object argument)
+        private bool CanAddBuildTemplateFromExistingBuildTemplates(object argument)
         {
             return true;
         }
 
-        private void AddBuildTemplateToImport(object argument)
+        private async Task AddBuildTemplateFromExistingBuildTemplates(object argument)
         {
-            var dialog = new BuildTemplatesImportDialog();
-            dialog.Owner = Application.Current.MainWindow;
-            var dialogResult = dialog.ShowDialog();
-            if (dialogResult == true)
+            var buildTemplates = await GetBuildTemplatesAsync(false);
+            foreach (var buildTemplate in buildTemplates)
             {
-                foreach (var buildTemplateToImport in dialog.BuildTemplates)
-                {
-                    this.BuildTemplatesToImport.Add(buildTemplateToImport);
-                }
+                this.BuildTemplatesToImport.Add(buildTemplate);
+            }
+        }
+
+        #endregion
+
+        #region AddBuildTemplateFromExistingBuildDefinitions Command
+
+        private bool CanAddBuildTemplateFromExistingBuildDefinitions(object argument)
+        {
+            return true;
+        }
+
+        private async Task AddBuildTemplateFromExistingBuildDefinitions(object argument)
+        {
+            var buildTemplates = await GetBuildTemplatesAsync(true);
+            foreach (var buildTemplate in buildTemplates)
+            {
+                this.BuildTemplatesToImport.Add(buildTemplate);
             }
         }
 
@@ -254,7 +272,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         private async Task Import(object argument)
         {
-            var result = MessageBox.Show("This will import the selected build templates. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("This will import the specified build templates. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -303,6 +321,83 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
                 task.SetError(exc);
                 task.SetComplete("An unexpected exception occurred");
             }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private async Task<ICollection<BuildDefinitionTemplate>> GetBuildTemplatesAsync(bool fromBuildDefinitions)
+        {
+            var buildTemplates = new List<BuildDefinitionTemplate>();
+            using (var dialog = new TeamProjectPicker(TeamProjectPickerMode.SingleProject, false))
+            {
+                var result = dialog.ShowDialog(Application.Current.MainWindow.GetIWin32Window());
+                if (result == System.Windows.Forms.DialogResult.OK && dialog.SelectedProjects != null && dialog.SelectedProjects.Length > 0)
+                {
+                    var teamProjectCollection = dialog.SelectedTeamProjectCollection;
+                    var teamProject = dialog.SelectedProjects.First();
+                    var buildServer = teamProjectCollection.GetClient<BuildHttpClient>();
+
+                    if (fromBuildDefinitions)
+                    {
+                        var buildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
+                        buildDefinitions = buildDefinitions.Where(b => b.Type == DefinitionType.Build).OrderBy(b => b.Name).ToList();
+
+                        if (!buildDefinitions.Any())
+                        {
+                            MessageBox.Show("The selected Team Project does not contain any build definitions.", "No Build Definitions", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            foreach (var buildDefinition in buildDefinitions)
+                            {
+                                var template = new BuildDefinitionTemplate
+                                {
+                                    Id = buildDefinition.Name.Replace(" ", ""),
+                                    Name = buildDefinition.Name,
+                                    Description = "Build template based on build definition \"{0}\" in Team Project \"{1}\"".FormatCurrent(buildDefinition.Name, teamProject.Name),
+                                    Template = buildDefinition
+                                };
+                                buildTemplates.Add(template);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var buildTemplatesFromProject = await buildServer.GetTemplatesAsync(project: teamProject.Name);
+                        buildTemplatesFromProject = buildTemplatesFromProject.Where(t => t.Template != null && t.Template.Project != null).OrderBy(t => t.Name).ToList();
+
+                        if (!buildTemplatesFromProject.Any())
+                        {
+                            MessageBox.Show("The selected Team Project does not contain any build templates.", "No Build Templates", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            foreach (var buildTemplate in buildTemplatesFromProject)
+                            {
+                                buildTemplates.Add(buildTemplate);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (buildTemplates.Any())
+            {
+                var picker = new ItemsPickerDialog();
+                picker.ItemDisplayMemberPath = nameof(BuildDefinitionTemplate.Name);
+                picker.Owner = Application.Current.MainWindow;
+                picker.Title = fromBuildDefinitions ? "Select the build definitions to import" : "Select the build templates to import";
+                picker.SelectionMode = SelectionMode.Multiple;
+                picker.AvailableItems = buildTemplates;
+                if (picker.ShowDialog() == true)
+                {
+                    return picker.SelectedItems.Cast<BuildDefinitionTemplate>().ToArray();
+                }
+            }
+
+            return new BuildDefinitionTemplate[0];
         }
 
         #endregion

@@ -25,6 +25,8 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
         public AsyncRelayCommand GetTaskGroupsCommand { get; private set; }
         public AsyncRelayCommand DeleteSelectedTaskGroupsCommand { get; private set; }
         public AsyncRelayCommand AddTaskGroupFromTeamProjectCommand { get; private set; }
+        public RelayCommand RemoveSelectedTaskGroupsToImportCommand { get; private set; }
+        public RelayCommand RemoveAllTaskGroupsToImportCommand { get; private set; }
         public AsyncRelayCommand ImportTaskGroupsCommand { get; private set; }
 
         #endregion
@@ -55,6 +57,14 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         public static readonly ObservableProperty<ObservableCollection<TaskGroup>> TaskGroupsToImportProperty = new ObservableProperty<ObservableCollection<TaskGroup>, TaskGroupsViewModel>(o => o.TaskGroupsToImport);
 
+        public ICollection<TaskGroup> SelectedTaskGroupsToImport
+        {
+            get { return this.GetValue(SelectedTaskGroupsToImportProperty); }
+            set { this.SetValue(SelectedTaskGroupsToImportProperty, value); }
+        }
+
+        public static readonly ObservableProperty<ICollection<TaskGroup>> SelectedTaskGroupsToImportProperty = new ObservableProperty<ICollection<TaskGroup>, TaskGroupsViewModel>(o => o.SelectedTaskGroupsToImport);
+
         #endregion
 
         #region Constructors
@@ -67,6 +77,8 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
             this.GetTaskGroupsCommand = new AsyncRelayCommand(GetTaskGroups, CanGetTaskGroups);
             this.DeleteSelectedTaskGroupsCommand = new AsyncRelayCommand(DeleteSelectedTaskGroups, CanDeleteSelectedTaskGroups);
             this.AddTaskGroupFromTeamProjectCommand = new AsyncRelayCommand(AddTaskGroupFromTeamProject, CanAddTaskGroupFromTeamProject);
+            this.RemoveSelectedTaskGroupsToImportCommand = new RelayCommand(RemoveSelectedTaskGroupsToImport, CanRemoveSelectedTaskGroupsToImport);
+            this.RemoveAllTaskGroupsToImportCommand = new RelayCommand(RemoveAllTaskGroupsToImport, CanRemoveAllTaskGroupsToImport);
             this.ImportTaskGroupsCommand = new AsyncRelayCommand(ImportTaskGroups, CanImportTaskGroups);
         }
 
@@ -222,6 +234,37 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
                     }
                 }
             }
+        }
+
+        #endregion
+
+        #region RemoveSelectedTaskGroupsToImport Command
+
+        private bool CanRemoveSelectedTaskGroupsToImport(object argument)
+        {
+            return this.SelectedTaskGroupsToImport != null && this.SelectedTaskGroupsToImport.Any();
+        }
+
+        private void RemoveSelectedTaskGroupsToImport(object argument)
+        {
+            foreach (var selectedTaskGroupToImport in this.SelectedTaskGroupsToImport)
+            {
+                this.TaskGroupsToImport.Remove(selectedTaskGroupToImport);
+            }
+        }
+
+        #endregion
+
+        #region RemoveAllTaskGroupsToImport Command
+
+        private bool CanRemoveAllTaskGroupsToImport(object argument)
+        {
+            return this.TaskGroupsToImport != null && this.TaskGroupsToImport.Any();
+        }
+
+        private void RemoveAllTaskGroupsToImport(object argument)
+        {
+            this.TaskGroupsToImport.Clear();
         }
 
         #endregion

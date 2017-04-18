@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using Microsoft.TeamFoundation.DistributedTask.WebApi;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;
 
@@ -28,6 +29,11 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
         private void taskGroupsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.ViewModel.SelectedTaskGroups = this.taskGroupsDataGrid.SelectedItems.Cast<TaskGroupInfo>().ToList();
+        }
+
+        private void taskGroupsToImportListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.ViewModel.SelectedTaskGroupsToImport = this.taskGroupsToImportListBox.SelectedItems.Cast<TaskGroup>().ToList();
         }
     }
 }

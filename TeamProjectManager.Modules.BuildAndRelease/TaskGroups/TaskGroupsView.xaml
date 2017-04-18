@@ -37,14 +37,14 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Import" i:HelpProvider.HelpContent="Allows you to import task groups into existing Team Projects. This can be useful when you want to standardize certain task groups across Team Projects.">
-                <Grid>
+                <Grid Margin="0,5,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button Content="Add Task Groups From Team Project..." Command="{Binding Path=AddTaskGroupFromTeamProjectCommand}" />
+                        <Button Content="From Existing Task Groups..." Command="{Binding Path=AddTaskGroupFromTeamProjectCommand}" />
                     </StackPanel>
                     <Grid Grid.Row="1" Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
@@ -52,7 +52,17 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <ListBox Grid.Column="0" ItemsSource="{Binding Path=TaskGroupsToImport}" DisplayMemberPath="Name" x:Name="taskGroupsToImportListBox" />
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ListBox Grid.Column="0" ItemsSource="{Binding Path=TaskGroupsToImport}" DisplayMemberPath="Name" x:Name="taskGroupsToImportListBox" SelectionChanged="taskGroupsToImportListBox_SelectionChanged" />
+                            <WrapPanel Grid.Row="1">
+                                <TextBlock Margin="0,0,5,0"><Hyperlink Command="{Binding Path=RemoveSelectedTaskGroupsToImportCommand}">remove</Hyperlink></TextBlock>
+                                <TextBlock><Hyperlink Command="{Binding Path=RemoveAllTaskGroupsToImportCommand}">remove all</Hyperlink></TextBlock>
+                            </WrapPanel>
+                        </Grid>
                         <GridSplitter Grid.Column="1" Width="3" Margin="3,0,3,0" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
                         <Grid Grid.Column="2" DataContext="{Binding ElementName=taskGroupsToImportListBox, Path=SelectedItem}">
                             <Grid.Style>

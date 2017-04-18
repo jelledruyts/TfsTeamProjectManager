@@ -129,6 +129,15 @@ namespace TeamProjectManager.Modules.Activity
 
         #endregion
 
+        #region Overrides
+
+        protected override bool IsTfsSupported(TeamFoundationServerInfo server)
+        {
+            return server.MajorVersion >= TfsMajorVersion.V14;
+        }
+
+        #endregion
+
         #region GetActivity Command
 
         private bool CanGetActivity(object argument)

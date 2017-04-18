@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <Grid>
-        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2010 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
+        <TextBlock Text="This functionality is not supported in the version of the currently selected Team Project Collection: TFS 2015 or higher is required." TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=TfsUnsupportedVisibility}" />
 
         <Grid Visibility="{Binding Path=TfsSupportedVisibility}" i:HelpProvider.HelpContent="Allows you to see the most recent activity in each Team Project. This can be useful if you want to see which projects are still actively being worked on, for example.">
             <Grid.RowDefinitions>

@@ -17,10 +17,10 @@
             <TabItem Header="Build Templates">
                 <ContentPresenter Content="{Binding Path=BuildTemplatesView, Mode=OneTime}" />
             </TabItem>
-            <TabItem Header="Task Groups">
+            <TabItem Header="Task Groups" Visibility="{Binding Path=TaskGroupsViewVisibility}">
                 <ContentPresenter Content="{Binding Path=TaskGroupsView, Mode=OneTime}" />
             </TabItem>
-            <TabItem Header="Service Endpoints">
+            <TabItem Header="Service Endpoints" Visibility="{Binding Path=ServiceEndpointsViewVisibility}">
                 <ContentPresenter Content="{Binding Path=ServiceEndpointsView, Mode=OneTime}" />
             </TabItem>
             

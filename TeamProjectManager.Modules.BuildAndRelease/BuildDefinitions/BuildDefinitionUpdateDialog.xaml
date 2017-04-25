@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Height="170"
-        MinHeight="170"
+        Height="200"
+        MinHeight="200"
         Width="640">
     <Grid Margin="5">
         <Grid.RowDefinitions>

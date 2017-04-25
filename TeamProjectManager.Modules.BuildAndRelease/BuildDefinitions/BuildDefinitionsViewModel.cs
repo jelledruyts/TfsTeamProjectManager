@@ -4,11 +4,11 @@ using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -73,6 +73,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
             PublishStatus(new StatusEventArgs(task));
             try
             {
+                var tfsVersion = this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion;
                 var tfs = GetSelectedTfsTeamProjectCollection();
                 var buildServer = tfs.GetClient<BuildHttpClient>();
 
@@ -83,8 +84,22 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildDefinitions
                     task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Processing Team Project \"{0}\"", teamProject.Name));
                     try
                     {
-                        var projectBuildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
-                        buildDefinitions.AddRange(projectBuildDefinitions);
+                        if (tfsVersion == TfsMajorVersion.TeamServices)
+                        {
+                            // Use a single API call if available.
+                            var projectBuildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
+                            buildDefinitions.AddRange(projectBuildDefinitions);
+                        }
+                        else
+                        {
+                            // Otherwise get the base info first and then individual details.
+                            var baseBuildDefinitions = await buildServer.GetDefinitionsAsync(project: teamProject.Name);
+                            foreach (var baseBuildDefinition in baseBuildDefinitions)
+                            {
+                                var buildDefinition = await buildServer.GetDefinitionAsync(teamProject.Guid, baseBuildDefinition.Id);
+                                buildDefinitions.Add(buildDefinition);
+                            }
+                        }
                     }
                     catch (Exception exc)
                     {

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
@@ -205,7 +206,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         private async Task AddBuildTemplateFromExistingBuildTemplates(object argument)
         {
-            var buildTemplates = await GetBuildTemplatesAsync(false);
+            var buildTemplates = await GetBuildTemplatesAsync(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, false);
             foreach (var buildTemplate in buildTemplates)
             {
                 this.BuildTemplatesToImport.Add(buildTemplate);
@@ -223,7 +224,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         private async Task AddBuildTemplateFromExistingBuildDefinitions(object argument)
         {
-            var buildTemplates = await GetBuildTemplatesAsync(true);
+            var buildTemplates = await GetBuildTemplatesAsync(this.SelectedTeamProjectCollection.TeamFoundationServer.MajorVersion, true);
             foreach (var buildTemplate in buildTemplates)
             {
                 this.BuildTemplatesToImport.Add(buildTemplate);
@@ -327,7 +328,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
         #region Helper Methods
 
-        private async Task<ICollection<BuildDefinitionTemplate>> GetBuildTemplatesAsync(bool fromBuildDefinitions)
+        private async Task<ICollection<BuildDefinitionTemplate>> GetBuildTemplatesAsync(TfsMajorVersion tfsVersion, bool fromBuildDefinitions)
         {
             var buildTemplates = new List<BuildDefinitionTemplate>();
             using (var dialog = new TeamProjectPicker(TeamProjectPickerMode.SingleProject, false))
@@ -341,7 +342,23 @@ namespace TeamProjectManager.Modules.BuildAndRelease.BuildTemplates
 
                     if (fromBuildDefinitions)
                     {
-                        var buildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
+                        var buildDefinitions = new List<BuildDefinition>();
+                        if (tfsVersion == TfsMajorVersion.TeamServices)
+                        {
+                            // Use a single API call if available.
+                            var projectBuildDefinitions = await buildServer.GetFullDefinitionsAsync(project: teamProject.Name);
+                            buildDefinitions.AddRange(projectBuildDefinitions);
+                        }
+                        else
+                        {
+                            // Otherwise get the base info first and then individual details.
+                            var baseBuildDefinitions = await buildServer.GetDefinitionsAsync(project: teamProject.Name);
+                            foreach (var baseBuildDefinition in baseBuildDefinitions.Where(b => b.Type == DefinitionType.Build))
+                            {
+                                var buildDefinition = await buildServer.GetDefinitionAsync(project: teamProject.Name, definitionId: baseBuildDefinition.Id);
+                                buildDefinitions.Add(buildDefinition);
+                            }
+                        }
                         buildDefinitions = buildDefinitions.Where(b => b.Type == DefinitionType.Build).OrderBy(b => b.Name).ToList();
 
                         if (!buildDefinitions.Any())

@@ -8,12 +8,12 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes
         public TeamProjectInfo TeamProject { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public int WorkItemCount { get; private set; }
+        public int? WorkItemCount { get; private set; }
         public ICollection<string> WorkItemCategories { get; private set; }
         public string WorkItemCategoriesList { get; private set; }
         public WorkItemTypeDefinition WorkItemTypeDefinition { get; private set; }
 
-        public WorkItemTypeInfo(TeamProjectInfo teamProject, string name, string description, int workItemCount, ICollection<string> workItemCategories, WorkItemTypeDefinition workItemTypeDefinition)
+        public WorkItemTypeInfo(TeamProjectInfo teamProject, string name, string description, int? workItemCount, ICollection<string> workItemCategories, WorkItemTypeDefinition workItemTypeDefinition)
         {
             this.TeamProject = teamProject;
             this.Name = name;

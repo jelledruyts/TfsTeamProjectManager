@@ -170,7 +170,16 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes
                                 { "WorkItemType", workItemType.Name },
                                 { "TeamProject", workItemType.Project.Name}
                             };
-                            var workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = @WorkItemType AND [System.TeamProject] = @TeamProject", parameters);
+                            var workItemCount = default(int?);
+                            try
+                            {
+                                workItemCount = store.QueryCount("SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = @WorkItemType AND [System.TeamProject] = @TeamProject", parameters);
+                            }
+                            catch (ClientException)
+                            {
+                                // Exceptions while running the query are not important and can be ignored.
+                                // An example is "VS402337: The number of work items returned exceeds the size limit of 20000".
+                            }
                             var referencingCategories = categoryList.Categories.Where(c => c.WorkItemTypes.Concat(new WorkItemTypeReference[] { c.DefaultWorkItemType }).Any(w => string.Equals(w.Name, workItemType.Name, StringComparison.OrdinalIgnoreCase))).Select(c => c.Name);
                             var workItemTypeDefinition = default(WorkItemTypeDefinition);
                             try
@@ -237,7 +246,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes
             }
 
             // Warn even harder when there are work items that use the work item types.
-            if (workItemTypesToDelete.Any(w => w.WorkItemCount > 0))
+            if (workItemTypesToDelete.Any(w => w.WorkItemCount == null || w.WorkItemCount.Value > 0))
             {
                 result = MessageBox.Show("You have selected work item types have actual work item instances. These individual work items will be deleted when deleting the work item type. Are you REALLY sure you want to continue?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result != MessageBoxResult.Yes)

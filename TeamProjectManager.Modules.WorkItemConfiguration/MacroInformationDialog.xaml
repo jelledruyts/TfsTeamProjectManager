@@ -17,7 +17,7 @@
             support the macros below, which are replaced by their actual value just before the file is uploaded to Team Foundation Server.
         </TextBlock>
         
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Macros}" SelectedItem="{Binding Path=SelectedMacro}" SelectionMode="Single" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,5,0,0" HorizontalScrollBarVisibility="Auto">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Macros}" SelectedItem="{Binding Path=SelectedMacro}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,5,0,0" HorizontalScrollBarVisibility="Auto">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Macro" Binding="{Binding Path=Macro}" />
                 <DataGridTextColumn Header="Example" Binding="{Binding Path=Example}" />

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using TeamProjectManager.Common;
@@ -39,6 +40,7 @@ namespace TeamProjectManager.Shell.Infrastructure
         {
             try
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 // Get the latest release JSON document.
                 using (var client = new HttpClient())
                 {

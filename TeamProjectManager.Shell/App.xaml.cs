@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Net;
+using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -33,6 +36,9 @@ namespace TeamProjectManager.Shell
 
             // Ensure that the current culture is used for all controls (see http://www.west-wind.com/Weblog/posts/796725.aspx).
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+
+            // Use TLS version(s) specified in config
+            ServicePointManager.SecurityProtocol = GetSecurityProtocolTypeFromConfig() ?? ServicePointManager.SecurityProtocol;
 
             var applicationDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
@@ -80,6 +86,19 @@ namespace TeamProjectManager.Shell
                 message += Environment.NewLine + Environment.NewLine + "If you keep experiencing this issue, please report it and include the contents of the log file (\"{0}\").".FormatCurrent(this.logger.LogFilePath);
                 MessageBox.Show(message, "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private SecurityProtocolType? GetSecurityProtocolTypeFromConfig()
+        {
+            string versions = ConfigurationManager.AppSettings["TlsVersions"];
+            if (string.IsNullOrWhiteSpace(versions)) return null;
+
+            //OR all the flags together: https://stackoverflow.com/a/20737127
+            return versions.Split(null).ToList().Select(v =>
+            {
+                Enum.TryParse<SecurityProtocolType>(v, out var e);
+                return e;
+            }).Aggregate((f, e) => (f |= e));
         }
 
         protected override void OnExit(ExitEventArgs e)

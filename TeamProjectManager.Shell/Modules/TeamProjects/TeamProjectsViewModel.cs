@@ -265,7 +265,13 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                 var serviceInterfaces = from e in registrationService.GetRegistrationEntries(string.Empty)
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "vstfs", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "Authorization7", StringComparison.OrdinalIgnoreCase)))
+
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "framework", StringComparison.OrdinalIgnoreCase)))
+                {
+                    // wiki functionality available (integrated) since TFS 2018
+                    return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V16, "Team Foundation Server 2018", "TFS 2018");
+                }
+                else if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "vstfs", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "Authorization7", StringComparison.OrdinalIgnoreCase)))
                 {
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V15, "Team Foundation Server 2017", "TFS 2017");
                 }

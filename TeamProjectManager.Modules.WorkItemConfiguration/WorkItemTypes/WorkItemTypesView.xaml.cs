@@ -29,5 +29,13 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes
         {
             this.ViewModel.SelectedWorkItemTypes = this.workItemTypesDataGrid.SelectedItems.Cast<WorkItemTypeInfo>().ToList();
         }
+
+        private void workItemTypesDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ViewModel.EditSelectedWorkItemTypesCommand.CanExecute(ViewModel.SelectedWorkItemTypes))
+            {
+                ViewModel.EditSelectedWorkItemTypesCommand.Execute(ViewModel.SelectedWorkItemTypes);
+            }
+        }
     }
 }

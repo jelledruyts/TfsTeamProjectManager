@@ -19,7 +19,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Button Grid.Row="0" Content="Get Work Item Categories" Margin="0,5,0,5" Command="{Binding Path=GetWorkItemCategoriesXmlCommand}" />
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=WorkItemCategoriesXml}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="workItemCategoriesXmlDataGrid" SelectionChanged="workItemCategoriesXmlDataGrid_SelectionChanged">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=WorkItemCategoriesXml}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="workItemCategoriesXmlDataGrid" SelectionChanged="workItemCategoriesXmlDataGrid_SelectionChanged" MouseDoubleClick="workItemCategoriesXmlDataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
                         </DataGrid.Columns>

@@ -22,7 +22,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Button Grid.Row="0" Content="Get Process Configurations" Margin="0,5,0,5" Command="{Binding Path=GetProcessConfigurationsCommand}" />
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=ProcessConfigurations}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="processConfigurationsDataGrid" SelectionChanged="processConfigurationsDataGrid_SelectionChanged">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=ProcessConfigurations}" IsReadOnly="True" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" x:Name="processConfigurationsDataGrid" SelectionChanged="processConfigurationsDataGrid_SelectionChanged" MouseDoubleClick="processConfigurationsDataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Team Project" Binding="{Binding Path=TeamProject.Name}" />
                             <DataGridTextColumn Header="Type" Binding="{Binding Path=Item.Type, Converter={StaticResource workItemConfigurationItemTypeConverter}}" />

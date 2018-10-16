@@ -29,5 +29,13 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.ProcessConfiguration
         {
             this.ViewModel.SelectedProcessConfigurations = this.processConfigurationsDataGrid.SelectedItems.Cast<WorkItemConfigurationItemExport>().ToList();
         }
+
+        private void processConfigurationsDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ViewModel.EditSelectedProcessConfigurationsCommand.CanExecute(ViewModel.SelectedProcessConfigurations))
+            {
+                ViewModel.EditSelectedProcessConfigurationsCommand.Execute(ViewModel.SelectedProcessConfigurations);
+            }
+        }
     }
 }

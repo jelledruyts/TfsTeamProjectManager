@@ -35,6 +35,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Categories
             this.ViewModel.SelectedWorkItemCategoriesXml = this.workItemCategoriesXmlDataGrid.SelectedItems.Cast<WorkItemConfigurationItemExport>().ToList();
         }
 
+        private void workItemCategoriesXmlDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ViewModel.EditSelectedWorkItemCategoriesXmlCommand.CanExecute(ViewModel.SelectedWorkItemCategoriesXml))
+            {
+                ViewModel.EditSelectedWorkItemCategoriesXmlCommand.Execute(ViewModel.SelectedWorkItemCategoriesXml);
+            }
+        }
+
         private void workItemCategoriesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var category = this.ViewModel.SelectedWorkItemCategory;

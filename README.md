@@ -42,7 +42,7 @@ If you can think of other great features, please let us know through the discuss
 
 ## Compatibility
 
-TFS Team Project Manager works against any version of Team Foundation Server, including Visual Studio Team Services (even though not all features are always supported there).
+TFS Team Project Manager works against any version of Team Foundation Server, including Azure DevOps (even though not all features are always supported there).
 
 ## Free Software
 

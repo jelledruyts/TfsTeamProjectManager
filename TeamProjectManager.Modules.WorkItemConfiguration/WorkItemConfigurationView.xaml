@@ -15,7 +15,7 @@
 
         <Border Grid.Row="0" Visibility="{Binding Path=VstsWarningVisibility}" BorderThickness="2" BorderBrush="{DynamicResource ErrorForegroundBrush}" Margin="5" Padding="5">
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource ErrorForegroundBrush}">
-                Attention: support for work item configuration is limited when using Visual Studio Team Services.
+                Attention: support for work item configuration is limited when using Azure DevOps.
                 <LineBreak />
                 You cannot edit work item types, categories or the process configuration.
             </TextBlock>

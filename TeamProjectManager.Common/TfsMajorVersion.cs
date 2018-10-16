@@ -67,7 +67,7 @@ namespace TeamProjectManager.Common
         V16 = 160,
 
         /// <summary>
-        /// Represents Visual Studio Team Services.
+        /// Represents Azure DevOps (formerly Visual Studio Team Services).
         /// </summary>
         TeamServices = 1000
     }

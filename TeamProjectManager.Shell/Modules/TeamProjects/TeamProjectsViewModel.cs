@@ -256,7 +256,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         {
             if (tfs.IsHostedServer)
             {
-                return new TeamFoundationServerInfo(tfs.DisplayName, tfs.ConfigurationServer.Uri, TfsMajorVersion.TeamServices, "Visual Studio Team Services", "VSTS");
+                return new TeamFoundationServerInfo(tfs.DisplayName, tfs.ConfigurationServer.Uri, TfsMajorVersion.TeamServices, "Azure DevOps", "Azure DevOps");
             }
             try
             {

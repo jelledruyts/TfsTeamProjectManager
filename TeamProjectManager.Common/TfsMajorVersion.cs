@@ -62,6 +62,11 @@ namespace TeamProjectManager.Common
         V15 = 150,
 
         /// <summary>
+        /// Represents Team Foundation Server 16 (TFS 2018).
+        /// </summary>
+        V16 = 160,
+
+        /// <summary>
         /// Represents Visual Studio Team Services.
         /// </summary>
         TeamServices = 1000

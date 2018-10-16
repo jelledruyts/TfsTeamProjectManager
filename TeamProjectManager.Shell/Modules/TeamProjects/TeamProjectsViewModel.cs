@@ -266,7 +266,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                                         from si in e.ServiceInterfaces
                                         select new { RegistrationEntryType = e.Type, Name = si.Name, Url = si.Url };
 
-                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "framework", StringComparison.OrdinalIgnoreCase)))
+                if (serviceInterfaces.Any(e => string.Equals(e.RegistrationEntryType, "framework", StringComparison.OrdinalIgnoreCase) && string.Equals(e.Name, "wiki", StringComparison.OrdinalIgnoreCase)))
                 {
                     // wiki functionality available (integrated) since TFS 2018
                     return new TeamFoundationServerInfo(tfs.ConfigurationServer.Name, tfs.ConfigurationServer.Uri, TfsMajorVersion.V16, "Team Foundation Server 2018", "TFS 2018");

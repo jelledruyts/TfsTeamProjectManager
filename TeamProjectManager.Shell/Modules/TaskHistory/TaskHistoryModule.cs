@@ -1,7 +1,7 @@
-﻿using Microsoft.Practices.Prism.Events;
-using Microsoft.Practices.Prism.MefExtensions.Modularity;
-using Microsoft.Practices.Prism.Modularity;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
+using Prism.Events;
+using Prism.Mef.Modularity;
+using Prism.Modularity;
 using TeamProjectManager.Common.Events;
 
 namespace TeamProjectManager.Shell.Modules.TaskHistory

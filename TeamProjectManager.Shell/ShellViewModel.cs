@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Shell;
-using Microsoft.Practices.Prism.Events;
+using Prism.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Common.ObjectModel;
 using TeamProjectManager.Shell.Infrastructure;

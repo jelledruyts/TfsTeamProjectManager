@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Events;
+﻿using Prism.Events;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.Win32;

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.Practices.Prism.Logging;
+using Prism.Events;
+using Prism.Logging;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
 

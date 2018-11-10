@@ -1,7 +1,7 @@
-﻿using Microsoft.Practices.Prism.MefExtensions.Modularity;
-using Microsoft.Practices.Prism.Modularity;
-using Microsoft.Practices.Prism.Regions;
+﻿using Prism.Modularity;
+using Prism.Regions;
 using System.ComponentModel.Composition;
+using Prism.Mef.Modularity;
 using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.BuildAndRelease

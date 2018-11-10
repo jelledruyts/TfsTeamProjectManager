@@ -3,13 +3,13 @@ using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Prism.Events;
-using Microsoft.Practices.Prism.Logging;
-using Microsoft.Practices.Prism.MefExtensions;
+using Prism.Events;
 using TeamProjectManager.Common.Infrastructure;
 using TeamProjectManager.Shell.Infrastructure;
-using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.ServiceLocation;
+using Prism.Logging;
+using Prism.Mef;
+using Prism.Regions;
 using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Shell

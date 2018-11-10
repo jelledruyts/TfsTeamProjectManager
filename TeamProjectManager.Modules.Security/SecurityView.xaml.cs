@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Regions;
+﻿using Prism.Regions;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;

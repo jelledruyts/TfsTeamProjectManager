@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Microsoft.Practices.Prism.Events;
+using Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.ObjectModel;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Events;
+﻿using Prism.Events;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;

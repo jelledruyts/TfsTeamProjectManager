@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Events;
+﻿using Prism.Events;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using TeamProjectManager.Common.Events;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Events;
+﻿using Prism.Events;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System;

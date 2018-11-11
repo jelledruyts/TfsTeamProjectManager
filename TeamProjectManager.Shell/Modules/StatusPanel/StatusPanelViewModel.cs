@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Timers;
 using System.Windows.Shell;
-using Microsoft.Practices.Prism.Events;
+using Prism.Events;
 using Microsoft.Practices.ServiceLocation;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;

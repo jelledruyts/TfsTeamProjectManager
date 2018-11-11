@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Prism.Events;
+﻿using Prism.Events;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.Win32;
 using System;

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.Composition;
-using Microsoft.Practices.Prism.MefExtensions.Modularity;
-using Microsoft.Practices.Prism.Modularity;
-using Microsoft.Practices.Prism.Regions;
+using Prism.Mef.Modularity;
+using Prism.Modularity;
+using Prism.Regions;
 using TeamProjectManager.Common;
 
 namespace TeamProjectManager.Modules.WorkItemConfiguration

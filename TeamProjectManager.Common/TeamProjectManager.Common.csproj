@@ -232,6 +232,8 @@
     <Compile Include="Events\TeamProjectCollectionSelectionChangedEvent.cs" />
     <Compile Include="Events\StatusEvent.cs" />
     <Compile Include="Events\StatusEventArgs.cs" />
+    <Compile Include="Events\ExternalEditorSelectionChangedEvent.cs" />
+    <Compile Include="Events\ExternalEditorSelectionChangedEventArgs.cs" />
     <Compile Include="Infrastructure\ApplicationTask.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />

@@ -231,6 +231,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorService.cs" />
     <Compile Include="MacroDefinition.cs" />
     <Compile Include="MacroInformationDialog.xaml.cs">
       <DependentUpon>MacroInformationDialog.xaml</DependentUpon>

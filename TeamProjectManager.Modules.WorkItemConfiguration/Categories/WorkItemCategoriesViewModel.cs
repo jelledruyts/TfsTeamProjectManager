@@ -383,23 +383,45 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Categories
             return this.SelectedWorkItemCategoriesXml != null && this.SelectedWorkItemCategoriesXml.Any();
         }
 
-        private void EditSelectedWorkItemCategoriesXml(object argument)
+        private async void EditSelectedWorkItemCategoriesXml(object argument)
         {
-            var categoriesToEdit = this.SelectedWorkItemCategoriesXml.ToList();
-            var dialog = new WorkItemConfigurationItemEditorDialog(categoriesToEdit, "Work Item Category File");
-            dialog.Owner = Application.Current.MainWindow;
-            if (dialog.ShowDialog() == true)
+            if (string.IsNullOrEmpty(SelectedExternalEditor))
             {
-                var options = dialog.Options;
-                var result = MessageBoxResult.Yes;
-                if (!options.HasFlag(ImportOptions.Simulate))
+                var categoriesToEdit = this.SelectedWorkItemCategoriesXml.ToList();
+                var dialog = new WorkItemConfigurationItemEditorDialog(categoriesToEdit, "Work Item Category File");
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() == true)
                 {
-                    result = MessageBox.Show("This will import the edited work item categories. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    var options = dialog.Options;
+                    var result = MessageBoxResult.Yes;
+                    if (!options.HasFlag(ImportOptions.Simulate))
+                    {
+                        result = MessageBox.Show("This will import the edited work item categories. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    }
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithCategories = categoriesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                        PerformImport(teamProjectsWithCategories, options);
+                    }
                 }
-                if (result == MessageBoxResult.Yes)
+            }
+            else
+            {
+                var categoriesToEdit = this.SelectedWorkItemCategoriesXml.ToList();
+                var editor = new EditorService(categoriesToEdit);
+                var startEditor = await editor.StartEditor(SelectedExternalEditor);
+
+                if (startEditor.Completed && startEditor.ExitCode == 0)
                 {
-                    var teamProjectsWithCategories = categoriesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
-                    PerformImport(teamProjectsWithCategories, options);
+                    var result = MessageBox.Show(
+                        "This will import the edited work item categories. Are you sure you want to continue?",
+                        "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithCategories = categoriesToEdit.GroupBy(w => w.TeamProject)
+                            .ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                        PerformImport(teamProjectsWithCategories, ImportOptions.None);
+                    }
                 }
             }
         }
@@ -567,6 +589,10 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Categories
         protected override bool IsTfsSupported(TeamFoundationServerInfo server)
         {
             return server.MajorVersion >= TfsMajorVersion.V10;
+        }
+
+        protected override void OnSelectedExternalEditorChanged()
+        {
         }
 
         #endregion

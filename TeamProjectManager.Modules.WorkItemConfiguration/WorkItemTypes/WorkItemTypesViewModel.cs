@@ -400,23 +400,48 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.WorkItemTypes
             return (this.SelectedWorkItemTypes != null && this.SelectedWorkItemTypes.Count > 0 && this.SelectedWorkItemTypes.All(w => w.WorkItemTypeDefinition.CanEdit));
         }
 
-        private void EditSelectedWorkItemTypes(object argument)
+        private async void EditSelectedWorkItemTypes(object argument)
         {
-            var workItemTypesToEdit = this.SelectedWorkItemTypes.ToList();
-            var dialog = new WorkItemConfigurationItemEditorDialog(workItemTypesToEdit.Select(w => new WorkItemConfigurationItemExport(w.TeamProject, w.WorkItemTypeDefinition)).ToList(), "Work Item Type");
-            dialog.Owner = Application.Current.MainWindow;
-            if (dialog.ShowDialog() == true)
+            if (string.IsNullOrEmpty(SelectedExternalEditor))
             {
-                var options = dialog.Options;
-                var result = MessageBoxResult.Yes;
-                if (!options.HasFlag(ImportOptions.Simulate))
+                var workItemTypesToEdit = this.SelectedWorkItemTypes.ToList();
+                var dialog = new WorkItemConfigurationItemEditorDialog(workItemTypesToEdit.Select(w => new WorkItemConfigurationItemExport(w.TeamProject, w.WorkItemTypeDefinition)).ToList(), "Work Item Type");
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() == true)
                 {
-                    result = MessageBox.Show("This will import the edited work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    var options = dialog.Options;
+                    var result = MessageBoxResult.Yes;
+                    if (!options.HasFlag(ImportOptions.Simulate))
+                    {
+                        result = MessageBox.Show("This will import the edited work item types. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    }
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
+                        PerformImport(options, teamProjectsWithWorkItemTypes);
+                    }
                 }
-                if (result == MessageBoxResult.Yes)
+            }
+            else
+            {
+                var workItemTypesToEdit = this.SelectedWorkItemTypes.ToList();
+                var editor = new EditorService(workItemTypesToEdit
+                    .Select(w => new WorkItemConfigurationItemExport(w.TeamProject, w.WorkItemTypeDefinition))
+                    .ToList());
+                var startEditor = await editor.StartEditor(SelectedExternalEditor);
+
+                if (startEditor.Completed && startEditor.ExitCode == 0)
                 {
-                    var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => (WorkItemConfigurationItem)w.WorkItemTypeDefinition).ToList());
-                    PerformImport(options, teamProjectsWithWorkItemTypes);
+                    var result = MessageBox.Show(
+                        "This will import the edited work item types. Are you sure you want to continue?",
+                        "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithWorkItemTypes = workItemTypesToEdit.GroupBy(w => w.TeamProject)
+                            .ToDictionary(g => g.Key,
+                                g => g.Select(w => (WorkItemConfigurationItem) w.WorkItemTypeDefinition).ToList());
+                        PerformImport(ImportOptions.None, teamProjectsWithWorkItemTypes);
+                    }
                 }
             }
         }

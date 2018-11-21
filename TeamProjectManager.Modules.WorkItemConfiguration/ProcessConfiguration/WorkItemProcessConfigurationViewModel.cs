@@ -318,23 +318,46 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.ProcessConfiguration
             return CanExportSelectedProcessConfigurations(argument);
         }
 
-        private void EditSelectedProcessConfigurations(object argument)
+        private async void EditSelectedProcessConfigurations(object argument)
         {
-            var processConfigurationsToEdit = this.SelectedProcessConfigurations.ToList();
-            var dialog = new WorkItemConfigurationItemEditorDialog(processConfigurationsToEdit, "Process Configuration");
-            dialog.Owner = Application.Current.MainWindow;
-            if (dialog.ShowDialog() == true)
+            if (string.IsNullOrEmpty(SelectedExternalEditor))
             {
-                var options = dialog.Options;
-                var result = MessageBoxResult.Yes;
-                if (!options.HasFlag(ImportOptions.Simulate))
+                var processConfigurationsToEdit = this.SelectedProcessConfigurations.ToList();
+                var dialog = new WorkItemConfigurationItemEditorDialog(processConfigurationsToEdit, "Process Configuration");
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() == true)
                 {
-                    result = MessageBox.Show("This will import the edited process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    var options = dialog.Options;
+                    var result = MessageBoxResult.Yes;
+                    if (!options.HasFlag(ImportOptions.Simulate))
+                    {
+                        result = MessageBox.Show("This will import the edited process configurations. Are you sure you want to continue?", "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    }
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithProcessConfigurations = processConfigurationsToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                        PerformImport(teamProjectsWithProcessConfigurations, options);
+                    }
                 }
-                if (result == MessageBoxResult.Yes)
+            }
+            else
+            {
+                var processConfigurationsToEdit = this.SelectedProcessConfigurations.ToList();
+                var editor = new EditorService(processConfigurationsToEdit);
+                var startEditor = await editor.StartEditor(SelectedExternalEditor);
+
+                if (startEditor.Completed && startEditor.ExitCode == 0)
                 {
-                    var teamProjectsWithProcessConfigurations = processConfigurationsToEdit.GroupBy(w => w.TeamProject).ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
-                    PerformImport(teamProjectsWithProcessConfigurations, options);
+                    var result = MessageBox.Show(
+                        "This will import the edited process configurations. Are you sure you want to continue?",
+                        "Confirm Import", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var teamProjectsWithProcessConfigurations = processConfigurationsToEdit
+                            .GroupBy(w => w.TeamProject)
+                            .ToDictionary(g => g.Key, g => g.Select(w => w.Item).ToList());
+                        PerformImport(teamProjectsWithProcessConfigurations, ImportOptions.None);
+                    }
                 }
             }
         }

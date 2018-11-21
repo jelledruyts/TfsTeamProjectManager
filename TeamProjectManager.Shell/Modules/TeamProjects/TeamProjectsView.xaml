@@ -11,6 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,1" Margin="0,0,0,5">
@@ -73,6 +74,16 @@
             </Grid>
 
             <ListBox Grid.Row="2" Style="{StaticResource CheckedListBoxStyle}" ItemsSource="{Binding Path=AvailableTeamProjects}" x:Name="teamProjectsListBox" SelectionMode="Extended" SelectionChanged="teamProjectsListBox_SelectionChanged" Margin="0,5,0,0" HorizontalContentAlignment="Stretch" />
+
+        </Grid>
+
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" ItemsSource="{Binding Path=ExternalEditors}" SelectedItem="{Binding Path=SelectedExternalEditor, Mode=TwoWay}" />
+            <TextBlock Grid.Column="1" Margin="5,0,0,0"><Hyperlink Command="{Binding Path=AddExternalEditorCommand}" ToolTip="Add a new external editor">add</Hyperlink></TextBlock>
         </Grid>
 
     </Grid>

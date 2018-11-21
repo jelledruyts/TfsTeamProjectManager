@@ -68,6 +68,21 @@ namespace TeamProjectManager.Common.Infrastructure
         /// </summary>
         public static ObservableProperty<TeamProjectCollectionInfo> SelectedTeamProjectCollectionProperty = new ObservableProperty<TeamProjectCollectionInfo, ViewModelBase>(o => o.SelectedTeamProjectCollection, OnSelectedTeamProjectCollectionChanged);
 
+
+        /// <summary>
+        /// Gets the currently selected external editor.
+        /// </summary>
+        public string SelectedExternalEditor
+        {
+            get { return this.GetValue(SelectedExternalEditorProperty); }
+            set { this.SetValue(SelectedExternalEditorProperty, value); }
+        }
+
+        /// <summary>
+        /// The definition of the <see cref="SelectedExternalEditor"/> observable property.
+        /// </summary>
+        public static ObservableProperty<string> SelectedExternalEditorProperty = new ObservableProperty<string, ViewModelBase>(o => o.SelectedExternalEditor, OnSelectedExternalEditorChanged);
+
         /// <summary>
         /// Gets the currently selected Team Projects.
         /// </summary>
@@ -139,6 +154,7 @@ namespace TeamProjectManager.Common.Infrastructure
             this.Info = new ViewModelInfo(title, description);
             this.EventAggregator.GetEvent<TeamProjectCollectionSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjectCollection = e.SelectedTeamProjectCollection);
             this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Subscribe(e => this.SelectedTeamProjects = e.SelectedTeamProjects);
+            this.EventAggregator.GetEvent<ExternalEditorSelectionChangedEvent>().Subscribe(e => this.SelectedExternalEditor = e.SelectedExternalEditor);
         }
 
         #endregion
@@ -158,6 +174,12 @@ namespace TeamProjectManager.Common.Infrastructure
             this.TfsUnsupportedVisibility = supported ? Visibility.Hidden : Visibility.Visible;
 
             OnSelectedTeamProjectCollectionChanged();
+        }
+
+        private static void OnSelectedExternalEditorChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<string> e)
+        {
+            var viewModel = (ViewModelBase)sender;
+            viewModel.OnSelectedExternalEditorChanged();
         }
 
         private static void OnSelectedTeamProjectsChanged(ObservableObject sender, ObservablePropertyChangedEventArgs<ICollection<TeamProjectInfo>> e)
@@ -237,6 +259,16 @@ namespace TeamProjectManager.Common.Infrastructure
         /// Override this to handle any logic that must run when the Team Project Collection changed.
         /// </remarks>
         protected virtual void OnSelectedTeamProjectCollectionChanged()
+        {
+        }
+
+        /// <summary>
+        /// Called when the selected External Editor changed.
+        /// </summary>
+        /// <remarks>
+        /// Override this to handle any logic that must run when the External Editor changed.
+        /// </remarks>
+        protected virtual void OnSelectedExternalEditorChanged()
         {
         }
 

@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Win32;
 using TeamProjectManager.Common;
 using TeamProjectManager.Common.Events;
 using TeamProjectManager.Common.Infrastructure;
@@ -23,6 +24,7 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         #region Properties
 
         public RelayCommand AddTeamProjectCollectionCommand { get; private set; }
+        public RelayCommand AddExternalEditorCommand { get; private set; }
         public RelayCommand RefreshTeamProjectsCommand { get; private set; }
         public RelayCommand ShowAllTeamProjectsCommand { get; private set; }
         public RelayCommand ShowOnlySelectedTeamProjectsCommand { get; private set; }
@@ -38,6 +40,14 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         }
 
         public static ObservableProperty<IEnumerable<TeamProjectCollectionInfo>> TeamProjectCollectionsProperty = new ObservableProperty<IEnumerable<TeamProjectCollectionInfo>, TeamProjectsViewModel>(o => o.TeamProjectCollections);
+
+        public IEnumerable<string> ExternalEditors
+        {
+            get { return this.GetValue(ExternalEditorsProperty); }
+            set { this.SetValue(ExternalEditorsProperty, value); }
+        }
+
+        public static ObservableProperty<IEnumerable<string>> ExternalEditorsProperty = new ObservableProperty<IEnumerable<string>, TeamProjectsViewModel>(o => o.ExternalEditors);
 
         public Visibility TeamProjectsVisibility
         {
@@ -101,10 +111,12 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             : base(eventAggregator, logger, "Team Projects")
         {
             this.AddTeamProjectCollectionCommand = new RelayCommand(AddTeamProjectCollection, CanAddTeamProjectCollection);
+            this.AddExternalEditorCommand = new RelayCommand(AddExternalEditor);
             this.RefreshTeamProjectsCommand = new RelayCommand(RefreshTeamProjects, CanRefreshTeamProjects);
             this.ShowAllTeamProjectsCommand = new RelayCommand(ShowAllTeamProjects, CanShowAllTeamProjects);
             this.ShowOnlySelectedTeamProjectsCommand = new RelayCommand(ShowOnlySelectedTeamProjects, CanShowOnlySelectedTeamProjects);
             RefreshTeamProjectCollections(null);
+            this.ExternalEditors = new List<string>();
         }
 
         #endregion
@@ -119,6 +131,11 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
         protected override void OnSelectedTeamProjectsChanged()
         {
             this.EventAggregator.GetEvent<TeamProjectSelectionChangedEvent>().Publish(new TeamProjectSelectionChangedEventArgs(this.SelectedTeamProjects));
+        }
+
+        protected override void OnSelectedExternalEditorChanged()
+        {
+            this.EventAggregator.GetEvent<ExternalEditorSelectionChangedEvent>().Publish(new ExternalEditorSelectionChangedEventArgs(this.SelectedExternalEditor));
         }
 
         #endregion
@@ -141,6 +158,18 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
                     RegisteredTfsConnections.RegisterProjectCollection(projectCollection);
                     RefreshTeamProjectCollections(projectCollection.Name);
                 }
+            }
+        }
+
+        private void AddExternalEditor(object argument)
+        {
+            var dialog = new OpenFileDialog {Multiselect = false};
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                var filename = dialog.FileName;
+                RefreshExternalEditors(filename);
             }
         }
 
@@ -188,6 +217,24 @@ namespace TeamProjectManager.Shell.Modules.TeamProjects
             catch (Exception exc)
             {
                 Logger.Log("An unexpected exception occurred while retrieving the Team Project Collections", exc);
+            }
+        }
+        private void RefreshExternalEditors(string selectedExternalEditor)
+        {
+            try
+            {
+                var list = this.ExternalEditors.ToList();
+                if (!list.Contains(selectedExternalEditor))
+                {
+                    list.Add(selectedExternalEditor);
+                }
+
+                this.ExternalEditors = list;
+                this.SelectedExternalEditor = this.ExternalEditors.FirstOrDefault(t => t == selectedExternalEditor);
+            }
+            catch (Exception exc)
+            {
+                Logger.Log("An unexpected exception occurred while retrieving the external editors", exc);
             }
         }
 

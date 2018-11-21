@@ -232,6 +232,8 @@
     <Compile Include="Events\TeamProjectCollectionSelectionChangedEvent.cs" />
     <Compile Include="Events\StatusEvent.cs" />
     <Compile Include="Events\StatusEventArgs.cs" />
+    <Compile Include="Events\ExternalEditorSelectionChangedEvent.cs" />
+    <Compile Include="Events\ExternalEditorSelectionChangedEventArgs.cs" />
     <Compile Include="Infrastructure\ApplicationTask.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEvent.cs" />
     <Compile Include="Events\TeamProjectSelectionChangedEventArgs.cs" />
@@ -242,6 +244,7 @@
     <Compile Include="Infrastructure\HelpProvider.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\Network.cs" />
+    <Compile Include="Infrastructure\ProcessAsyncHelper.cs" />
     <Compile Include="Infrastructure\SerializationProvider.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />

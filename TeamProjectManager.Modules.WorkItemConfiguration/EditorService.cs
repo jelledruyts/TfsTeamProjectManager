@@ -10,6 +10,8 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
     public class EditorService
     {
+        private const string VsCodeName = "code";
+
         public IDictionary<WorkItemConfigurationItemExport, string> OriginalItemsWithPaths { get; private set; }
 
         public EditorService(IList<WorkItemConfigurationItemExport> items)
@@ -30,8 +32,14 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 
         public async Task<ProcessAsyncHelper.ProcessResult> StartEditor(string externalEditor)
         {
+            var arguments = string.Empty;
+            if (externalEditor.ToLower().Contains(VsCodeName))
+            {
+                arguments = "-n -w";
+            }
+
             var process = await ProcessAsyncHelper.ExecuteShellCommand(externalEditor,
-                "\"" + string.Join("\" \"", this.OriginalItemsWithPaths.Select(pair => pair.Value)) + "\"" + " -n -w",
+                "\"" + string.Join("\" \"", this.OriginalItemsWithPaths.Select(pair => pair.Value)) + "\" " + arguments,
                 true);
 
             if (process.Completed && process.ExitCode == 0)

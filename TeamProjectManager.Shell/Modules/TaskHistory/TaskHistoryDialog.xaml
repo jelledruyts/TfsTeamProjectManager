@@ -64,11 +64,11 @@
             </StackPanel>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <Label Content="State:" />
-                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.State}" VerticalAlignment="Center" MinWidth="75" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.State, Mode=OneWay}" VerticalAlignment="Center" MinWidth="75" />
                 <Label Content="Started:" Margin="5,0,0,0" />
-                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeStarted, StringFormat=T}" VerticalAlignment="Center" MinWidth="75" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeStarted, StringFormat=T, Mode=OneWay}" VerticalAlignment="Center" MinWidth="75" />
                 <Label Content="Completed:" Margin="5,0,0,0" />
-                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeCompleted, StringFormat=T}" VerticalAlignment="Center" MinWidth="75" />
+                <TextBox IsReadOnly="True" Text="{Binding Path=SelectedTask.Task.TimeCompleted, StringFormat=T, Mode=OneWay}" VerticalAlignment="Center" MinWidth="75" />
             </StackPanel>
             <TextBox Grid.Row="2" Text="{Binding Path=SelectedTask.StatusHistoryDescription}" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextChanged="statusHistoryTextBox_TextChanged" />
         </Grid>

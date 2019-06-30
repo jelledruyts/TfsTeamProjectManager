@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Setup.Configuration;
+﻿//using Microsoft.VisualStudio.Setup.Configuration; // package doesn't work in PackageReference mode
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -96,6 +96,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                 diffTools.Add(new DiffTool("Custom", diffToolCommandOverride, diffToolArgumentsOverride));
             }
 
+            /* This interop package doesn't work with PackageReference
             // Visual Studio 2017 and above don't store their setup information in the registry but expose it via a COM interface.
             try
             {
@@ -122,6 +123,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
             {
                 // Ignore COM Exceptions.
             }
+            */
 
             // Visual Studio 2012 and above have a built-in diff tool, call devenv.exe directly.
             TryAddDevenvToolFromRegistry("14.0", "Visual Studio 2015", diffTools);

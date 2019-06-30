@@ -300,8 +300,30 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
                     {
                         try
                         {
+                            var taskGroupCreateParam = new TaskGroupCreateParameter()
+                            {
+                                Name = taskGroup.Name,
+                                FriendlyName = taskGroup.FriendlyName,
+                                Author = taskGroup.Author,
+                                Description = taskGroup.Description,
+                                ParentDefinitionId = taskGroup.ParentDefinitionId,
+                                IconUrl = taskGroup.IconUrl,
+                                InstanceNameFormat = taskGroup.InstanceNameFormat,
+                                Category = taskGroup.Category,
+                                Version = taskGroup.Version
+                            };
+
+                            foreach (var ro in taskGroup.RunsOn)
+                                taskGroupCreateParam.RunsOn.Add(ro);
+
+                            foreach (var t in taskGroup.Tasks)
+                                taskGroupCreateParam.Tasks.Add(t);
+
+                            foreach (var i in taskGroup.Inputs)
+                                taskGroupCreateParam.Inputs.Add(i);
+
                             task.SetProgress(step++, string.Format(CultureInfo.CurrentCulture, "Importing task group \"{0}\" into Team Project \"{1}\"", taskGroup.Name, teamProject.Name));
-                            await taskAgentClient.AddTaskGroupAsync(teamProject.Guid, taskGroup);
+                            await taskAgentClient.AddTaskGroupAsync(teamProject.Guid, taskGroupCreateParam);
                         }
                         catch (MetaTaskDefinitionExistsException)
                         {

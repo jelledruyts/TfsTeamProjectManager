@@ -1,12 +1,10 @@
-﻿//using Microsoft.VisualStudio.Setup.Configuration; // package doesn't work in PackageReference mode
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +14,9 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
 {
     public partial class ComparisonResultViewerDialog : Window
     {
+        private const string VsWhereLocation = @"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe";
+        private const string VsWhereArgs = @"-format json -nologo -utf8";
+
         private TeamProjectComparisonResult comparisonResult;
 
         public ComparisonResultViewerDialog(TeamProjectComparisonResult comparisonResult)
@@ -96,35 +97,37 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration.Compare
                 diffTools.Add(new DiffTool("Custom", diffToolCommandOverride, diffToolArgumentsOverride));
             }
 
-            /* This interop package doesn't work with PackageReference
-            // Visual Studio 2017 and above don't store their setup information in the registry but expose it via a COM interface.
-            try
+            var vswhere = Environment.ExpandEnvironmentVariables(VsWhereLocation);
+            if (File.Exists(vswhere))
             {
-                var configuration = new SetupConfiguration();
-                var instancesQuery = configuration.EnumInstances();
-                var fetched = int.MaxValue;
-                var instances = new ISetupInstance[1];
-                while (fetched > 0)
+                var psi = new ProcessStartInfo(vswhere, VsWhereArgs)
                 {
-                    instancesQuery.Next(1, instances, out fetched);
-                    if (fetched > 0)
+                    CreateNoWindow = true,
+                    ErrorDialog = false,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
+                };
+
+                var vswhereProcess = new Process()
+                {
+                    StartInfo = psi
+                };
+                vswhereProcess.Start();
+                string vswhereOutput = vswhereProcess.StandardOutput.ReadToEnd();
+                vswhereProcess.WaitForExit();
+
+                if (vswhereProcess.ExitCode == 0)
+                {
+                    var vsinstances = Newtonsoft.Json.JsonConvert.DeserializeObject<VsWhere.VsInstance[]>(vswhereOutput);
+                    
+                    foreach (var vs in vsinstances)
                     {
-                        var instance = instances[0];
-                        var visualStudioName = instance.GetDisplayName();
-                        var devenvPath = instance.ResolvePath("Common7\\IDE\\devenv.exe");
-                        if (!string.IsNullOrWhiteSpace(devenvPath) && File.Exists(devenvPath))
-                        {
-                            diffTools.Add(new DiffTool(visualStudioName, devenvPath, "/diff %1 %2 %6 %7"));
-                        }
+                        diffTools.Add(new DiffTool(vs.displayName, vs.productPath, "/diff %1 %2 %6 %7"));
                     }
                 }
             }
-            catch (COMException)
-            {
-                // Ignore COM Exceptions.
-            }
-            */
-
+            
             // Visual Studio 2012 and above have a built-in diff tool, call devenv.exe directly.
             TryAddDevenvToolFromRegistry("14.0", "Visual Studio 2015", diffTools);
             TryAddDevenvToolFromRegistry("12.0", "Visual Studio 2013", diffTools);

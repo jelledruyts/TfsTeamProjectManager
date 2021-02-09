@@ -96,7 +96,8 @@ namespace TeamProjectManager.Shell
             //OR all the flags together: https://stackoverflow.com/a/20737127
             return versions.Split(null).ToList().Select(v =>
             {
-                Enum.TryParse<SecurityProtocolType>(v, out var e);
+                SecurityProtocolType e;
+                Enum.TryParse<SecurityProtocolType>(v, out e);
                 return e;
             }).Aggregate((f, e) => (f |= e));
         }

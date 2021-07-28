@@ -25,9 +25,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity">
-      <HintPath>..\References\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
@@ -77,45 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="15.112.1" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Prism.Mef" Version="6.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x86\Debug\.NETFramework,Version=v4.5.AssemblyAttributes.cs" />
-    <Compile Remove="obj\x86\Debug\App.g.cs" />
-    <Compile Remove="obj\x86\Debug\App.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x86\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\Shell.g.cs" />
-    <Compile Remove="obj\x86\Debug\Shell.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\TeamProjectManager_Content.g.cs" />
-    <Compile Remove="obj\x86\Debug\TeamProjectManager_Content.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Remove="obj\x86\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Remove="obj\x86\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
-    <Compile Remove="obj\x86\Release\App.g.cs" />
-    <Compile Remove="obj\x86\Release\App.g.i.cs" />
-    <Compile Remove="obj\x86\Release\Shell.g.cs" />
-    <Compile Remove="obj\x86\Release\Shell.g.i.cs" />
-    <Compile Remove="obj\x86\Release\TeamProjectManager_Content.g.cs" />
-    <Compile Remove="obj\x86\Release\TeamProjectManager_Content.g.i.cs" />
-    <Compile Remove="obj\x86\Release\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Remove="obj\x86\Release\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Remove="obj\x86\Release\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\Logo\LogoView.g.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\Logo\LogoView.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\StatusPanel\StatusPanelView.g.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\StatusPanel\StatusPanelView.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\TaskHistory\TaskHistoryDialog.g.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\TaskHistory\TaskHistoryDialog.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\TeamProjects\TeamProjectsView.g.cs" />
-    <Compile Remove="obj\x86\Debug\Modules\TeamProjects\TeamProjectsView.g.i.cs" />
-    <Compile Remove="obj\x86\Release\Modules\Logo\LogoView.g.cs" />
-    <Compile Remove="obj\x86\Release\Modules\Logo\LogoView.g.i.cs" />
-    <Compile Remove="obj\x86\Release\Modules\StatusPanel\StatusPanelView.g.cs" />
-    <Compile Remove="obj\x86\Release\Modules\StatusPanel\StatusPanelView.g.i.cs" />
-    <Compile Remove="obj\x86\Release\Modules\TaskHistory\TaskHistoryDialog.g.cs" />
-    <Compile Remove="obj\x86\Release\Modules\TaskHistory\TaskHistoryDialog.g.i.cs" />
-    <Compile Remove="obj\x86\Release\Modules\TeamProjects\TeamProjectsView.g.cs" />
-    <Compile Remove="obj\x86\Release\Modules\TeamProjects\TeamProjectsView.g.i.cs" />
   </ItemGroup>
 </Project>

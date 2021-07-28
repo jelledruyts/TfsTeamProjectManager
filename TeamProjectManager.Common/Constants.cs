@@ -9,7 +9,7 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// The name of the application.
         /// </summary>
-        public const string ApplicationName = "Team Project Manager";
+            //public const string ApplicationName = "Team Project Manager";
 
         /// <summary>
         /// The URL of the homepage of the application.
@@ -19,36 +19,36 @@ namespace TeamProjectManager.Common
         /// <summary>
         /// The description of the application.
         /// </summary>
-        public const string ApplicationDescription = "Automates various tasks across Team Projects in Team Foundation Server.";
+        //public const string ApplicationDescription = "Automates various tasks across Team Projects in Team Foundation Server.";
 
         /// <summary>
         /// The company of the application.
         /// </summary>
-        public const string ApplicationCompany = "Jelle Druyts";
+            //public const string ApplicationCompany = "Jelle Druyts";
 
         /// <summary>
         /// The copyright statement of the application.
         /// </summary>
-        public const string ApplicationCopyright = "Copyright © " + ApplicationCompany;
+        //public const string ApplicationCopyright = "Copyright © " + ApplicationCompany;
 
         /// <summary>
         /// The configuration of the assemblies that make up the application.
         /// </summary>
-        public const string AssemblyConfiguration = "";
+        //public const string AssemblyConfiguration = "";
 
         /// <summary>
         /// The trademark of the assemblies that make up the application.
         /// </summary>
-        public const string AssemblyTrademark = "";
+        //public const string AssemblyTrademark = "";
 
         /// <summary>
         /// The culture of the assemblies that make up the application.
         /// </summary>
-        public const string AssemblyCulture = "";
+        //public const string AssemblyCulture = "";
 
         /// <summary>
         /// The neutral resources language of the assemblies that make up the application.
         /// </summary>
-        public const string AssemblyNeutralResourcesLanguage = "en-US";
+        //public const string AssemblyNeutralResourcesLanguage = "en-US";
     }
 }

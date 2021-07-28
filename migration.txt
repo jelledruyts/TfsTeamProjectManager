@@ -1,0 +1,151 @@
+ Andre    TfsTeamProjectManager  update-prism  羽9ms    dotnet migrate-2019 wizard **\*                                                             pwsh   96  23:07:36 
+[23:07:39 INF] W010:
+TeamProjectManager.Shell.csproj:30: Platform 'x86' is used in project file but not mentioned in $(Platforms).
+[23:07:39 INF] W010:
+TeamProjectManager.Shell.csproj:42: Platform 'x86' is used in project file but not mentioned in $(Platforms).
+Would you like to create backups? (Y/n) Yes
+[23:07:42 INF] Converting TeamProjectManager.Shell...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Shell\Backup
+[23:07:42 INF] Project TeamProjectManager.Shell has been converted
+[23:07:42 INF] Converting TeamProjectManager.Common...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Common\Backup
+[23:07:42 INF] Project TeamProjectManager.Common has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.WorkItemConfiguration...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.WorkItemConfiguration\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.WorkItemConfiguration has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.SourceControl...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.SourceControl\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.SourceControl has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.Security...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.Security\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.Security has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.Activity...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.Activity\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.Activity has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.XamlBuild...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.XamlBuild\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.XamlBuild has been converted
+[23:07:42 INF] Converting TeamProjectManager.Modules.BuildAndRelease...
+[23:07:42 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.BuildAndRelease\Backup
+[23:07:42 INF] Project TeamProjectManager.Modules.BuildAndRelease has been converted
+[23:07:42 INF] Modernization can be progressed a little further, but it might lead to unexpected behavioral changes.
+Would you like to modernize projects? (Y/n) Yes
+Would you like to create backups? (Y/n) Yes
+[23:07:46 INF] Modernizing TeamProjectManager.Shell...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Shell\Backup1
+[23:07:46 INF] Project TeamProjectManager.Shell has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Common...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Common\Backup1
+[23:07:46 INF] Project TeamProjectManager.Common has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.WorkItemConfiguration...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.WorkItemConfiguration\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.WorkItemConfiguration has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.SourceControl...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.SourceControl\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.SourceControl has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.Security...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.Security\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.Security has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.Activity...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.Activity\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.Activity has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.XamlBuild...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.XamlBuild\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.XamlBuild has been modernized
+[23:07:46 INF] Modernizing TeamProjectManager.Modules.BuildAndRelease...
+[23:07:46 INF] Backing up to C:\Projects\TfsTeamProjectManager\TeamProjectManager.Modules.BuildAndRelease\Backup1
+[23:07:46 INF] Project TeamProjectManager.Modules.BuildAndRelease has been modernized
+[23:07:46 INF] W021:
+TeamProjectManager.Shell.csproj:50: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Shell.csproj:52: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Shell.csproj:58: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Shell.csproj:59: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Shell.csproj:43: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Shell.csproj:47: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Common.csproj:41: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Common.csproj:45: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Common.csproj:46: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Common.csproj:32: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Common.csproj:35: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:46: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:48: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:52: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:53: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:40: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.WorkItemConfiguration.csproj:43: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.SourceControl.csproj:44: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.SourceControl.csproj:45: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.SourceControl.csproj:49: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.SourceControl.csproj:50: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.SourceControl.csproj:36: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.SourceControl.csproj:39: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Security.csproj:44: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Security.csproj:45: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Security.csproj:49: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Security.csproj:50: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.Security.csproj:36: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.Security.csproj:39: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Activity.csproj:44: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Activity.csproj:46: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Activity.csproj:49: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.Activity.csproj:50: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.Activity.csproj:36: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.Activity.csproj:39: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.XamlBuild.csproj:23: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.XamlBuild.csproj:26: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.XamlBuild.csproj:27: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.XamlBuild.csproj:28: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.XamlBuild.csproj:15: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.XamlBuild.csproj:18: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.BuildAndRelease.csproj:23: A better way to reference 'System.ComponentModel.Composition' assembly is using respective 'System.ComponentModel.Composition' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.BuildAndRelease.csproj:27: A better way to reference 'System.Data.DataSetExtensions' assembly is using respective 'System.Data.DataSetExtensions' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.BuildAndRelease.csproj:28: A better way to reference 'Microsoft.CSharp' assembly is using respective 'Microsoft.CSharp' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W021:
+TeamProjectManager.Modules.BuildAndRelease.csproj:29: A better way to reference 'System.Net.Http' assembly is using respective 'System.Net.Http' NuGet package. It will simplify porting to other runtimes and enable possible .NET SDK tooling improvements.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.BuildAndRelease.csproj:15: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.
+[23:07:46 INF] W030:
+TeamProjectManager.Modules.BuildAndRelease.csproj:18: Consider migrating to 'portable' debug type, cross-platform alternative to legacy Windows PDBs.

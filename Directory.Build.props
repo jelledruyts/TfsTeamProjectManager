@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+
+    <!--<AssemblyTitle>Team Project Manager</AssemblyTitle>-->
+    <Company>Jelle Druyts</Company>
+    <!--<Product>$(AssemblyTitle)</Product>-->
+    <Product>Team Project Manager</Product>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Description>Automates various tasks across Team Projects in Team Foundation Server.</Description>
+    <Copyright>Copyright © $(Company)</Copyright>
+
+    <!-- Keep this constant as long as possible to avoid the user's settings getting lost (it is used for the LocalUserAppDataPath where the configuration file is stored).-->
+    <Version>2.0.0.0</Version>
+    <!-- This can be updated anytime as long as .NET user settings are not used (otherwise the settings directory depends on this version). -->
+    <AssemblyVersion>2.3.0.0</AssemblyVersion>
+    <FileVersion>2.3.0.0</FileVersion>
+   
+    <PackageProjectUrl>https://github.com/jelledruyts/TfsTeamProjectManager</PackageProjectUrl>
+
+  </PropertyGroup>
+</Project>

@@ -1,96 +1,50 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{442B7FDF-6576-4C5D-A06D-B0EE3AEDB836}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TeamProjectManager.Modules.BuildAndRelease</RootNamespace>
-    <AssemblyName>TeamProjectManager.Modules.BuildAndRelease</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFramework>net45</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildAndReleaseModule.cs" />
-    <Compile Include="BuildAndReleaseView.xaml.cs">
+    <Compile Update="BuildAndReleaseView.xaml.cs">
       <DependentUpon>BuildAndReleaseView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BuildAndReleaseViewModel.cs" />
-    <Compile Include="BuildDefinitions\BuildDefinitionsView.xaml.cs">
+    <Compile Update="BuildDefinitions\BuildDefinitionsView.xaml.cs">
       <DependentUpon>BuildDefinitionsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BuildDefinitions\BuildDefinitionsViewModel.cs" />
-    <Compile Include="BuildDefinitions\BuildDefinitionUpdate.cs" />
-    <Compile Include="BuildDefinitions\BuildDefinitionUpdateDialog.xaml.cs">
+    <Compile Update="BuildDefinitions\BuildDefinitionUpdateDialog.xaml.cs">
       <DependentUpon>BuildDefinitionUpdateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BuildDefinitionTriggerSchedulesConverter.cs" />
-    <Compile Include="BuildDefinitionTriggerTypesConverter.cs" />
-    <Compile Include="BuildTemplates\BuildTemplatesView.xaml.cs">
+    <Compile Update="BuildTemplates\BuildTemplatesView.xaml.cs">
       <DependentUpon>BuildTemplatesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BuildTemplates\BuildTemplatesViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildRepositoryContentConverter.cs" />
-    <Compile Include="ServiceEndpoints\GenericServiceEndpoint.cs" />
-    <Compile Include="ServiceEndpoints\ServiceEndpointInfo.cs" />
-    <Compile Include="ServiceEndpoints\ServiceEndpointsView.xaml.cs">
+    <Compile Update="ServiceEndpoints\ServiceEndpointsView.xaml.cs">
       <DependentUpon>ServiceEndpointsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ServiceEndpoints\ServiceEndpointsViewModel.cs" />
-    <Compile Include="TaskGroups\TaskGroupInfo.cs" />
-    <Compile Include="TaskGroups\TaskGroupsView.xaml.cs">
+    <Compile Update="TaskGroups\TaskGroupsView.xaml.cs">
       <DependentUpon>TaskGroupsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TaskGroups\TaskGroupsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj">
-      <Project>{6034e65e-4e00-46fa-b683-65ab8f3c47e7}</Project>
-      <Name>TeamProjectManager.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="BuildAndReleaseView.xaml">
@@ -119,30 +73,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core">
-      <Version>5.2.6</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory">
-      <Version>3.19.8</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient">
-      <Version>15.112.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Services.DistributedTask.Client">
-      <Version>15.112.1-preview</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Mef">
-      <Version>6.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt">
-      <Version>4.0.4.403061554</Version>
-    </PackageReference>
-    <PackageReference Include="WindowsAzure.ServiceBus">
-      <Version>4.0.0</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="3.19.8" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="15.112.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.DistributedTask.Client" Version="15.112.1-preview" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Prism.Mef" Version="6.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.0.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

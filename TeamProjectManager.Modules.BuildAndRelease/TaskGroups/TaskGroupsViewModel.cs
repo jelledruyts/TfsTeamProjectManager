@@ -49,21 +49,21 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         public static readonly ObservableProperty<ICollection<TaskGroupInfo>> SelectedTaskGroupsProperty = new ObservableProperty<ICollection<TaskGroupInfo>, TaskGroupsViewModel>(o => o.SelectedTaskGroups);
 
-        public ObservableCollection<TaskGroup> TaskGroupsToImport
+        public ObservableCollection<TaskGroupCreateParameter> TaskGroupsToImport
         {
             get { return this.GetValue(TaskGroupsToImportProperty); }
             set { this.SetValue(TaskGroupsToImportProperty, value); }
         }
 
-        public static readonly ObservableProperty<ObservableCollection<TaskGroup>> TaskGroupsToImportProperty = new ObservableProperty<ObservableCollection<TaskGroup>, TaskGroupsViewModel>(o => o.TaskGroupsToImport);
+        public static readonly ObservableProperty<ObservableCollection<TaskGroupCreateParameter>> TaskGroupsToImportProperty = new ObservableProperty<ObservableCollection<TaskGroupCreateParameter>, TaskGroupsViewModel>(o => o.TaskGroupsToImport);
 
-        public ICollection<TaskGroup> SelectedTaskGroupsToImport
+        public ICollection<TaskGroupCreateParameter> SelectedTaskGroupsToImport
         {
             get { return this.GetValue(SelectedTaskGroupsToImportProperty); }
             set { this.SetValue(SelectedTaskGroupsToImportProperty, value); }
         }
 
-        public static readonly ObservableProperty<ICollection<TaskGroup>> SelectedTaskGroupsToImportProperty = new ObservableProperty<ICollection<TaskGroup>, TaskGroupsViewModel>(o => o.SelectedTaskGroupsToImport);
+        public static readonly ObservableProperty<ICollection<TaskGroupCreateParameter>> SelectedTaskGroupsToImportProperty = new ObservableProperty<ICollection<TaskGroupCreateParameter>, TaskGroupsViewModel>(o => o.SelectedTaskGroupsToImport);
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
         protected TaskGroupsViewModel(IEventAggregator eventAggregator, ILogger logger)
             : base(eventAggregator, logger, "Allows you to manage task groups for Team Projects.")
         {
-            this.TaskGroupsToImport = new ObservableCollection<TaskGroup>();
+            this.TaskGroupsToImport = new ObservableCollection<TaskGroupCreateParameter>();
             this.GetTaskGroupsCommand = new AsyncRelayCommand(GetTaskGroups, CanGetTaskGroups);
             this.DeleteSelectedTaskGroupsCommand = new AsyncRelayCommand(DeleteSelectedTaskGroups, CanDeleteSelectedTaskGroups);
             this.AddTaskGroupFromTeamProjectCommand = new AsyncRelayCommand(AddTaskGroupFromTeamProject, CanAddTaskGroupFromTeamProject);
@@ -218,15 +218,17 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
                     }
                     else
                     {
+
+
                         var picker = new ItemsPickerDialog();
                         picker.ItemDisplayMemberPath = nameof(TaskGroup.Name);
                         picker.Owner = Application.Current.MainWindow;
                         picker.Title = "Select the task groups to add";
                         picker.SelectionMode = SelectionMode.Multiple;
-                        picker.AvailableItems = taskGroups;
+                        picker.AvailableItems = taskGroups.Select(grp => grp.ConvertToTaskGroupCreateParameter());
                         if (picker.ShowDialog() == true)
                         {
-                            foreach (var taskGroupToImport in picker.SelectedItems.Cast<TaskGroup>().ToArray())
+                            foreach (var taskGroupToImport in picker.SelectedItems.Cast<TaskGroupCreateParameter>().ToArray())
                             {
                                 this.TaskGroupsToImport.Add(taskGroupToImport);
                             }

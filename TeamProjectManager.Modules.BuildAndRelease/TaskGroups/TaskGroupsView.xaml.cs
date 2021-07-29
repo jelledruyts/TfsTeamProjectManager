@@ -33,7 +33,7 @@ namespace TeamProjectManager.Modules.BuildAndRelease.TaskGroups
 
         private void taskGroupsToImportListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ViewModel.SelectedTaskGroupsToImport = this.taskGroupsToImportListBox.SelectedItems.Cast<TaskGroup>().ToList();
+            this.ViewModel.SelectedTaskGroupsToImport = this.taskGroupsToImportListBox.SelectedItems.Cast<TaskGroupCreateParameter>().ToList();
         }
     }
 }

@@ -1,35 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{EFFC5209-CB25-4DAC-93F4-F0D4655F16E1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net45</TargetFramework>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFramework>net48</TargetFramework>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <ApplicationManifest>App.exe.manifest</ApplicationManifest>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TeamProjectManager.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugType>full</DebugType>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
+    <Reference Include="System.Windows.Forms" />
+<!--    <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+      <Reference Include="System.Xaml" />
+      <Reference Include="WindowsBase" />
+      <Reference Include="PresentationCore" />
+      <Reference Include="PresentationFramework" />-->
   </ItemGroup>
   <ItemGroup>
     <None Include="App.exe.manifest" />
@@ -45,20 +34,6 @@
     <Content Include="Files\Transformation - TFS2012.X to TFS2012.2 - Agile Configuration.xdt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.BuildAndRelease\TeamProjectManager.Modules.BuildAndRelease.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="App.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Files\Comparison Source List - TFS Process Templates.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -73,8 +48,21 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.BuildAndRelease\TeamProjectManager.Modules.BuildAndRelease.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="15.112.1" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Prism.Mef" Version="6.3.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
   </ItemGroup>
 </Project>

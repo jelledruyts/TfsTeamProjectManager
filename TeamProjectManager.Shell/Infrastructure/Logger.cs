@@ -41,11 +41,12 @@ namespace TeamProjectManager.Shell.Infrastructure
             var logFileOverride = ConfigurationManager.AppSettings[InternalConstants.LoggerAppSettingNameLogFilePath];
             if (!string.IsNullOrEmpty(logFileOverride))
             {
-                this.LogFilePath = logFileOverride;
+                LogFilePath = logFileOverride;
             }
             else
             {
-                this.LogFilePath = Path.Combine(System.Windows.Forms.Application.LocalUserAppDataPath, InternalConstants.LoggerDefaultLogFileName);
+                var localUserAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                LogFilePath = Path.Combine(localUserAppDataPath, InternalConstants.LoggerDefaultLogFileName);
             }
             tracer.Listeners.Add(new TextWriterTraceListener(this.LogFilePath));
         }

@@ -1,19 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{6034E65E-4E00-46FA-B683-65AB8F3C47E7}</ProjectGuid>
     <TargetFramework>net45</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TeamProjectManager.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <!--<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <OutputPath>bin\$(Configuration)\</OutputPath>-->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />

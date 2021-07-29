@@ -1,4 +1,7 @@
 ﻿
+using System;
+using System.Reflection;
+
 namespace TeamProjectManager.Common
 {
     /// <summary>
@@ -6,10 +9,33 @@ namespace TeamProjectManager.Common
     /// </summary>
     public static class Constants
     {
+        //    private static readonly Lazy<(string ProductName, string Copyright, string FileVersion, string InformationVersion)> _assemblyInformation =
+        //new Lazy<(string ProductName, string Copyright, string FileVersion, string InformationVersion)>(() =>
+        //{
+        //            //var assembly = Assembly.GetCallingAssembly();
+        //            var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+
+        //    var fileVersionAttribute = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+        //    var assemblyVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        //    var productAttribute = assembly.GetCustomAttribute<AssemblyProductAttribute>();
+        //    var copyrightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+
+        //    var informationalVersion = assemblyVersionAttribute is null
+        //                                           ? assembly.GetName().Version.ToString()
+        //                                           : assemblyVersionAttribute.InformationalVersion;
+        //    return (productAttribute?.Product, copyrightAttribute?.Copyright, fileVersionAttribute?.Version, informationalVersion);
+        //});
+
+        private static Lazy<Assembly> _assembly = new Lazy<Assembly>(() => Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly());
+        private static Lazy<string> _productName = new Lazy<string>(() => _assembly.Value.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? string.Empty);
+        private static Lazy<string> _copyright = new Lazy<string>(() => _assembly.Value.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? string.Empty);
+        private static Lazy<string> _fileVersion = new Lazy<string>(() => _assembly.Value.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? string.Empty);
+        //private static Lazy<string> _assemblyVersion = new Lazy<string>(() => _assembly.Value.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? string.Empty);
+
         /// <summary>
         /// The name of the application.
         /// </summary>
-            //public const string ApplicationName = "Team Project Manager";
+        public static string ApplicationName => _productName.Value;
 
         /// <summary>
         /// The URL of the homepage of the application.

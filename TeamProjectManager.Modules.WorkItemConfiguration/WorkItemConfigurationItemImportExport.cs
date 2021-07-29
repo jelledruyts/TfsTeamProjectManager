@@ -19,28 +19,6 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
 {
     public static class WorkItemConfigurationItemImportExport
     {
-        private static string productName = string.Empty;
-        private static string ProductName
-        {
-            get
-            {
-                Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-                if (assembly != null)
-                {
-                    var customAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-                    if ((customAttributes != null) && (customAttributes.Length > 0))
-                    {
-                        productName = ((AssemblyProductAttribute)customAttributes[0]).Product;
-                    }
-                    if (string.IsNullOrEmpty(productName))
-                    {
-                        productName = string.Empty;
-                    }
-                }
-                return productName;
-            }
-        }
-
         #region Import
 
         public static void Import(ILogger logger, ApplicationTask task, bool setTaskProgress, WorkItemStore store, Dictionary<TeamProjectInfo, List<WorkItemConfigurationItem>> teamProjectsWithConfigurationItems, ImportOptions options)
@@ -70,7 +48,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                     var teamProject = teamProjectWithConfigurationItems.Key;
                     foreach (var workItemConfigurationItem in teamProjectWithConfigurationItems.Value)
                     {
-                        var directoryName = Path.Combine(Path.GetTempPath(), WorkItemConfigurationItemImportExport.ProductName, teamProject.Name);
+                        var directoryName = Path.Combine(Path.GetTempPath(), Constants.ApplicationName, teamProject.Name);
                         Directory.CreateDirectory(directoryName);
                         var fileName = Path.Combine(directoryName, workItemConfigurationItem.Name + ".xml");
                         using (var writer = XmlWriter.Create(fileName, new XmlWriterSettings { Indent = true }))

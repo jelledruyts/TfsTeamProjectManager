@@ -7,9 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Web.Services.Protocols;
 using System.Xml;
 using System.Xml.Schema;
 using TeamProjectManager.Common;
@@ -481,7 +479,7 @@ namespace TeamProjectManager.Modules.WorkItemConfiguration
                 // Working with the ProjectProcessConfigurationService throws NullReferenceException on TFS 2010 or earlier.
                 return null;
             }
-            catch (SoapException)
+            catch (SystemException)
             {
                 // A Team Project that doesn't have a process configuration yet throws a SOAP exception
                 // "TF400572: The Project Process Settings must be configured for this feature to be used".

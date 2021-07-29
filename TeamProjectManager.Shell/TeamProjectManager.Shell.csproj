@@ -1,25 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <ApplicationManifest>App.exe.manifest</ApplicationManifest>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\TeamProjectManager.snk</AssemblyOriginatorKeyFile>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Windows.Forms" />
-<!--    <Reference Include="System.Configuration" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="Microsoft.CSharp" />
-      <Reference Include="System.Xaml" />
-      <Reference Include="WindowsBase" />
-      <Reference Include="PresentationCore" />
-      <Reference Include="PresentationFramework" />-->
-  </ItemGroup>
   <ItemGroup>
     <None Include="App.exe.manifest" />
     <Content Include="Files\Transformation - Agile 6.0 to 6.2 - User Story.xdt">
@@ -52,12 +39,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj" />
+    <!--<ProjectReference Include="..\TeamProjectManager.Modules.Activity\TeamProjectManager.Modules.Activity.csproj" />
     <ProjectReference Include="..\TeamProjectManager.Modules.BuildAndRelease\TeamProjectManager.Modules.BuildAndRelease.csproj" />
     <ProjectReference Include="..\TeamProjectManager.Modules.Security\TeamProjectManager.Modules.Security.csproj" />
     <ProjectReference Include="..\TeamProjectManager.Modules.SourceControl\TeamProjectManager.Modules.SourceControl.csproj" />
     <ProjectReference Include="..\TeamProjectManager.Modules.WorkItemConfiguration\TeamProjectManager.Modules.WorkItemConfiguration.csproj" />
-    <ProjectReference Include="..\TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj" />
+    <ProjectReference Include="..\TeamProjectManager.Modules.XamlBuild\TeamProjectManager.Modules.XamlBuild.csproj" />-->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="15.112.1" />

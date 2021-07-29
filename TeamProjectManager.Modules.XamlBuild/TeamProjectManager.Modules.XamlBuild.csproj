@@ -1,60 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="BuildDefinitions\BuildDefinitionDeleteDialog.xaml.cs">
-      <DependentUpon>BuildDefinitionDeleteDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="BuildDefinitions\BuildDefinitionsView.xaml.cs">
-      <DependentUpon>BuildDefinitionsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="BuildDefinitions\BuildDefinitionUpdateDialog.xaml.cs">
-      <DependentUpon>BuildDefinitionUpdateDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="BuildProcessTemplates\BuildProcessTemplatesView.xaml.cs">
-      <DependentUpon>BuildProcessTemplatesView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="XamlBuildView.xaml.cs">
-      <DependentUpon>XamlBuildView.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="BuildDefinitions\BuildDefinitionDeleteDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="BuildDefinitions\BuildDefinitionsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="BuildDefinitions\BuildDefinitionUpdateDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="BuildProcessTemplates\BuildProcessTemplatesView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="XamlBuildView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamProjectManager.Common\TeamProjectManager.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="15.112.1" />
     <PackageReference Include="Prism.Mef" Version="6.3.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
   </ItemGroup>
 </Project>
